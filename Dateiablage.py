@@ -5,17 +5,36 @@ class MyFrame(wx.Frame):
     def __init__(self, *args, **kw):
         super(MyFrame, self).__init__(*args, **kw)
         
+        # Create a menu bar
+        menu_bar = wx.MenuBar()
+        
+        # Create the File menu
+        file_menu = wx.Menu()
+        browse_item = file_menu.Append(wx.ID_ANY, "&Wähle Quellverzeichnis")
+        file_menu.Append(wx.ID_OPEN, "&Importiere e-Learning Definition")
+        file_menu.Append(wx.ID_EXIT, "E&xit")
+        menu_bar.Append(file_menu, "&File")
+        
+        # Create the Edit menu
+        edit_menu = wx.Menu()
+        edit_menu.Append(wx.ID_COPY, "&Kopieren")
+        edit_menu.Append(wx.ID_CUT, "&Ausscheniden")
+        edit_menu.Append(wx.ID_PASTE, "&Einfügen")
+        menu_bar.Append(edit_menu, "&Bearbeiten")
+        
+        # Set the menu bar
+        self.SetMenuBar(menu_bar)
+        
         panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        
-        self.browse_button = wx.Button(panel, label="Browse")
-        self.browse_button.Bind(wx.EVT_BUTTON, self.on_browse)
-        
+
         self.file_listbox = wx.ListBox(panel)
-        
-        sizer.Add(self.browse_button, 0, wx.ALL | wx.CENTER, 5)
+
         sizer.Add(self.file_listbox, 1, wx.ALL | wx.EXPAND, 5)
         panel.SetSizer(sizer)
+
+        # Bind the Browse menu item to the on_browse method
+        self.Bind(wx.EVT_MENU, self.on_browse, browse_item)
         
         self.folder_path = os.path.join(os.path.expanduser("~"), "OneDrive - CGM", "UKE_Videos", "8. Turtorials_Videobearbeitung", "Dateistruktur Neu", "E-Learnings")
 

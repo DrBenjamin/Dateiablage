@@ -18,7 +18,6 @@ class MyFrame(wx.Frame):
         panel.SetSizer(sizer)
         
         self.folder_path = os.path.join(os.path.expanduser("~"), "OneDrive - CGM", "UKE_Videos", "8. Turtorials_Videobearbeitung", "Dateistruktur Neu", "E-Learnings")
-        print(f"Opening folder: {self.folder_path}")
 
     def on_browse(self, event):
         dialog = wx.DirDialog(None, "Select a folder:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)

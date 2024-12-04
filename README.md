@@ -9,7 +9,7 @@ Die Anleitung zur Dateiablage
 1. Unternehmensportal besuchen
   * Microsoft Visual Studio Code installieren
   * Git installieren
-  * Anaconda unter diesem Link installieren: https://www.anaconda.com/download/success#miniconda
+  * Miniconda unter diesem Link installieren: [Download](https://www.anaconda.com/download/success#miniconda)
 2. Minianaconda öffnen:
   * Setup Einstellung: Next -> I Agree -> Just Me muss angeklickt sein -> Next
   * Advanced Installation Options

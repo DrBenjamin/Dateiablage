@@ -107,7 +107,7 @@ class MyFrame(wx.Frame):
                     file_list.extend(os.path.join(dir_path, f) for f in files)
                 else:
                     # Adding all subdirectories of the matching directory
-                    # Bug: Not working under Windows
+                    # Bug: File and folder filtering not working under Windows
                     normalized_filter_text = unicodedata.normalize('NFC', filter_text)
                     normalized_name = unicodedata.normalize('NFC', name)
                     if normalized_filter_text in normalized_name:

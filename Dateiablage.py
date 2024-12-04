@@ -37,12 +37,12 @@ class MyFrame(wx.Frame):
         sizer.Add(self.file_listbox, 1, wx.ALL | wx.EXPAND, 5)
         panel.SetSizer(sizer)
 
-        # Bind the Import menu item to the on_import method
+        # Binding the Import menu item to the on_import method
         self.Bind(wx.EVT_MENU, self.on_import, import_item)
-        # Bind the Browse menu item to the on_browse method
+        # Binding the Browse menu item to the on_browse method
         self.Bind(wx.EVT_MENU, self.on_browse, browse_item)
 
-        # Bind the list control item activated event to the on_item_activated method
+        # Binding the list control item activated event to the on_item_activated method
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_item_activated)
 
     # Method to handle the Browse menu item
@@ -81,7 +81,7 @@ class MyFrame(wx.Frame):
             indent = ' ' * (level * 4)  # Indent based on the level
             self.list_ctrl.Append([f"{indent}{text}"])
 
-        # Automatically adjust the column width to fit the content
+        # Adjusting the column width to fit automatically the content
         self.list_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
     # Method to handle the list control item activated event
@@ -100,7 +100,8 @@ class MyFrame(wx.Frame):
                 if filter_text is None:
                     file_list.append(os.path.join(root, name))
                     files = [
-                        f for f in os.listdir(dir_path)
+                        f 
+                        for f in os.listdir(dir_path)
                         if os.path.isfile(os.path.join(dir_path, f))
                     ]
                     file_list.extend(os.path.join(dir_path, f) for f in files)
@@ -114,7 +115,8 @@ class MyFrame(wx.Frame):
                                 dir_path = os.path.join(sub_root, sub_name)
                                 file_list.append(os.path.join(sub_root, sub_name))
                                 sub_files = [
-                                    f for f in os.listdir(dir_path)
+                                    f 
+                                    for f in os.listdir(dir_path)
                                     if os.path.isfile(os.path.join(dir_path, f))
                                 ]
                                 file_list.extend(os.path.join(dir_path, f) for f in sub_files)

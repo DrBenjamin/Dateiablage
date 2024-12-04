@@ -11,11 +11,11 @@ Die Anleitung zur Dateiablage
   * Git installieren
   * Miniconda unter diesem Link installieren: [Download](https://www.anaconda.com/download/success#miniconda)
 2. Minianaconda öffnen:
-  * Setup Einstellung: Next -> I Agree -> Just Me muss angeklickt sein -> Next
-  * ![Image](https://github.com/DrBenjamin/Dateiablage/blob/78733ca3c744ff51aed75c3398c21696936c1972/Images/1.Miniconda_setup.png)
-  * Advanced Installation Options
+  * Setup Einstellung: Next -> I Agree -> "Just Me" muss angeklickt sein -> Next
+  ![Image](https://github.com/DrBenjamin/Dateiablage/blob/78733ca3c744ff51aed75c3398c21696936c1972/Images/1.Miniconda_setup.png)
   * Install ->  Next -> Finish
 3. Hinweis!: Zscaler öffnen: Oben rechts : Log Out klicke
+![Image](https://github.com/DrBenjamin/Dateiablage/blob/53e19c76fcb661d57c289d234f70ebd361d9699d/Images/2.Zscaler.png)
 4. Visual Code öffnena. Get Started schließen
   * Clone Git Respository wählen
   * Oben diesen Link einfügen: https://github.com/DrBenjamin/Dateiablage

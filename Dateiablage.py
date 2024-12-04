@@ -76,8 +76,8 @@ class MyFrame(wx.Frame):
         self.list_ctrl.AppendColumn("e-Learning Struktur")
 
         for index, row in df.iterrows():
-            text = row[0]
-            level = row[1]
+            text = row.iloc[0]
+            level = row.iloc[1]
             indent = ' ' * (level * 4)  # Indent based on the level
             self.list_ctrl.Append([f"{indent}{text}"])
 

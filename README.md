@@ -12,6 +12,7 @@ Die Anleitung zur Dateiablage
   * Miniconda unter diesem Link installieren: [Download](https://www.anaconda.com/download/success#miniconda)
 2. Minianaconda öffnen:
   * Setup Einstellung: Next -> I Agree -> Just Me muss angeklickt sein -> Next
+  * ![Image](https://github.com/DrBenjamin/Dateiablage/blob/78733ca3c744ff51aed75c3398c21696936c1972/Images/1.Miniconda_setup.png)
   * Advanced Installation Options
   * Install ->  Next -> Finish
 3. Hinweis!: Zscaler öffnen: Oben rechts : Log Out klicke

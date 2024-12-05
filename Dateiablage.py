@@ -32,11 +32,11 @@ class MyFrame(wx.Frame):
         panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.file_listbox = wx.ListBox(panel)
         self.list_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_REPORT
                                      |wx.BORDER_SUNKEN
                                      )
+        self.file_listbox = wx.ListBox(panel)
 
         sizer.Add(self.list_ctrl, 1, wx.ALL | wx.EXPAND, 5)
         sizer.Add(self.file_listbox, 1, wx.ALL | wx.EXPAND, 5)
@@ -48,9 +48,9 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_browse, browse_item)
 
         # Binding the list control to the on_item_activated method
-        self.list_ctrl.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_item_activated)
+        self.list_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_file_activated method
-        self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_activated)
+        self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
 
     # Method to handle the Browse menu item
     def on_browse(self, event):
@@ -85,14 +85,14 @@ class MyFrame(wx.Frame):
         for index, row in df.iterrows():
             text = row.iloc[0]
             level = row.iloc[1]
-            indent = ' ' * (level * 4)  # Indent based on the level
+            indent = ' ' * ((level * 4) - 4)  # Indent based on the level
             self.list_ctrl.Append([f"{indent}{text}"])
 
         # Adjusting the column width to fit automatically the content
         self.list_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
     # Method to handle the list control item activated event
-    def on_item_activated(self, event):
+    def on_item_selected(self, event):
         item_index = event.GetIndex()
         item_text = self.list_ctrl.GetItemText(item_index)
         self.SetTitle(f"Dateiablage - {item_text.strip()}")
@@ -100,16 +100,12 @@ class MyFrame(wx.Frame):
         
     # Method to handle the list control item activated event
     def on_file_activated(self, event):
-        item_index = event.GetSelection()
-        print(item_index)
-        item_text = self.list_ctrl.GetItemText(item_index)
-        print(item_text)
-        file_path = os.path.join(self.folder_path, item_text)
-        print(file_path)
+        file_index = event.GetSelection()
+        file_path = self.file_listbox.GetString(file_index)
 
         if platform.system() == "Windows":
             try:
-                os.startfile(file_path)
+                os.startfile(f'"{file_path}"')
             except Exception as e:
                 wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
         elif platform.system() == "Darwin":  # macOS

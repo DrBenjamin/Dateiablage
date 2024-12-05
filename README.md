@@ -27,11 +27,11 @@ Die Anleitung zur Dateiablage
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/5.Open_Respository.png)
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/6.Accept.png)
   * Doppelklick: 3 Dateien
-  ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/7.Datei_Doppelklick.png)
+  * ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/7.Datei_Doppelklick.png)
   * Unten rechts: auf installieren klicken
-  ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/8.Python_Erweiterung.png)
+  * ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/8.Python_Erweiterung.png)
 5. Browser öffnen
-  * [GitHub](https://github.com) oder [Dateiablage](https://github.com/DrBenjamin/Dateiablage) eingeben
+  * Dieser Link: [GitHub](https://github.com) oder [Dateiablage](https://github.com/DrBenjamin/Dateiablage) eingeben
   * GitHub Account erstellen, falls noch nicht vorhanden.
   * Die angemeldete E-Mail Adresse für diesen Account an Benjamin schicken
   * Man bekommt dann eine Mail: 1. View Invitation -> Accept invitation
@@ -55,7 +55,7 @@ Die Anleitung zur Dateiablage
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/18.png)
 
   * rechts das Python-symbol klicken
-  * (shift+steuerung+p) Tasten drücken, dann öffnet sich ein Fenster oben
+  * (shift+strg+p) Tasten drücken, dann öffnet sich ein Fenster oben
   * "Creat" schreiben -> "Python Envirenment" auswählen -> "Conda" auswählen -> Die höhste Version auswählen
   * Zum Bestätigen:
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/19.Best%C3%A4tigen.png)

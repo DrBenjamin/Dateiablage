@@ -1,5 +1,7 @@
 import wx
 import os
+import subprocess
+import platform
 import unicodedata
 import pandas as pd
 
@@ -31,7 +33,10 @@ class MyFrame(wx.Frame):
         sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.file_listbox = wx.ListBox(panel)
-        self.list_ctrl = wx.ListCtrl(panel, style=wx.LC_REPORT)
+        self.list_ctrl = wx.ListCtrl(panel,
+                                     style=wx.LC_REPORT
+                                     |wx.BORDER_SUNKEN
+                                     )
 
         sizer.Add(self.list_ctrl, 1, wx.ALL | wx.EXPAND, 5)
         sizer.Add(self.file_listbox, 1, wx.ALL | wx.EXPAND, 5)
@@ -42,8 +47,10 @@ class MyFrame(wx.Frame):
         # Binding the Browse menu item to the on_browse method
         self.Bind(wx.EVT_MENU, self.on_browse, browse_item)
 
-        # Binding the list control item activated event to the on_item_activated method
+        # Binding the list control to the on_item_activated method
         self.list_ctrl.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_item_activated)
+        # Binding the list control to the on_file_activated method
+        self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_activated)
 
     # Method to handle the Browse menu item
     def on_browse(self, event):
@@ -90,6 +97,32 @@ class MyFrame(wx.Frame):
         item_text = self.list_ctrl.GetItemText(item_index)
         self.SetTitle(f"Dateiablage - {item_text.strip()}")
         self.list_files(self.folder_path, item_text.strip())
+        
+    # Method to handle the list control item activated event
+    def on_file_activated(self, event):
+        item_index = event.GetSelection()
+        print(item_index)
+        item_text = self.list_ctrl.GetItemText(item_index)
+        print(item_text)
+        file_path = os.path.join(self.folder_path, item_text)
+        print(file_path)
+
+        if platform.system() == "Windows":
+            try:
+                os.startfile(file_path)
+            except Exception as e:
+                wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+        elif platform.system() == "Darwin":  # macOS
+            try:
+                subprocess.call(["open", file_path])
+            except Exception as e:
+                wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+        else:  # Linux
+            try:
+                subprocess.call(["xdg-open", file_path])
+            except Exception as e:
+                wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+        
 
     # Method to list the files in the selected folder
     def list_files(self, folder_path, filter_text=None):
@@ -98,16 +131,14 @@ class MyFrame(wx.Frame):
             for name in dirs:
                 dir_path = os.path.join(root, name)
                 if filter_text is None:
-                    file_list.append(os.path.join(root, name))
+                    file_list.append(dir_path)
                     files = [
                         f 
                         for f in os.listdir(dir_path)
-                        if os.path.isfile(os.path.join(dir_path, f))
                     ]
                     file_list.extend(os.path.join(dir_path, f) for f in files)
                 else:
                     # Adding all subdirectories of the matching directory
-                    # Bug: File and folder filtering not working under Windows
                     normalized_filter_text = unicodedata.normalize('NFC', filter_text)
                     normalized_name = unicodedata.normalize('NFC', name)
                     if normalized_filter_text in normalized_name:
@@ -118,7 +149,6 @@ class MyFrame(wx.Frame):
                                 sub_files = [
                                     f 
                                     for f in os.listdir(dir_path)
-                                    if os.path.isfile(os.path.join(dir_path, f))
                                 ]
                                 file_list.extend(os.path.join(dir_path, f) for f in sub_files)
 

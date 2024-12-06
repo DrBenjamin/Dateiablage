@@ -135,10 +135,16 @@ class MyFrame(wx.Frame):
 
             # Adding from Excel
             for index, row in data.iterrows():
-                output.append([index, str(row.iloc[1]).strip().title()])
+                if len(row) > 1:  # Ensure there are at least 2 columns
+                    # Extract relevant columns (adjust the indices as needed)
+                    task = str(row.iloc[1]).strip().title()
+                    status = str(row.iloc[8]).strip().title()
+                    output.append([index, task, status])
+                else:
+                    print(f"Row {index} does not have enough columns: {row}")
 
             # Tasks
-            output = pd.DataFrame(output, columns = ['ID', 'Aufgabenliste'])
+            output = pd.DataFrame(output, columns = ['ID', 'Aufgabenliste', 'Status'])
             output = output.set_index('ID')
             output = output.drop_duplicates(ignore_index = True)
             output = output.drop(0, axis = 0)
@@ -155,12 +161,10 @@ class MyFrame(wx.Frame):
 
         for index, row in df.iterrows():
             text = row.iloc[0]
-            level = row.iloc[1]
-            indent = ' ' * ((level * 4) - 4)  # Indent based on the level
-            self.learning_ctrl.Append([f"{indent}{text}"])
+            self.tasks_ctrl.Append([text])
 
         # Adjusting the column width to fit automatically the content
-        self.learning_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        self.tasks_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
     # Method to handle the list control item activated event
     def on_item_selected(self, event):

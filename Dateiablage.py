@@ -154,10 +154,10 @@ class MyFrame(wx.Frame):
         except Exception as e:
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
-    # Method to display the data in the learning control
+    # Method to display the data in the tasks control
     def display_tasks(self, df):
-        self.learning_ctrl.ClearAll()
-        self.learning_ctrl.AppendColumn("e-Learning Struktur")
+        self.tasks_ctrl.ClearAll()
+        self.tasks_ctrl.AppendColumn("e-Learning Struktur")
 
         for index, row in df.iterrows():
             text = row.iloc[0]

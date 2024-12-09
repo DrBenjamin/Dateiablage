@@ -201,27 +201,12 @@ class MyFrame(wx.Frame):
         for root, dirs, files in os.walk(folder_path):
             for name in dirs:
                 dir_path = os.path.join(root, name)
-                if filter_text is None:
-                    file_list.append(dir_path)
-                    files = [
-                        f 
-                        for f in os.listdir(dir_path)
-                    ]
-                    file_list.extend(os.path.join(dir_path, f) for f in files)
-                else:
-                    # Adding all subdirectories of the matching directory
-                    normalized_filter_text = unicodedata.normalize('NFC', filter_text)
-                    normalized_name = unicodedata.normalize('NFC', name)
-                    if normalized_filter_text in normalized_name:
-                        for sub_root, sub_dirs, sub_files in os.walk(dir_path):
-                            for sub_name in sub_dirs:
-                                dir_path = os.path.join(sub_root, sub_name)
-                                file_list.append(os.path.join(sub_root, sub_name))
-                                sub_files = [
-                                    f 
-                                    for f in os.listdir(dir_path)
-                                ]
-                                file_list.extend(os.path.join(dir_path, f) for f in sub_files)
+                file_list.append(dir_path)
+                files = [
+                    f 
+                    for f in os.listdir(dir_path)
+                ]
+                file_list.extend(os.path.join(dir_path, f) for f in files)
 
             self.file_listbox.Set(file_list)
 

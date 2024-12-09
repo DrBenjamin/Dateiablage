@@ -38,11 +38,11 @@ class MyFrame(wx.Frame):
         # Creating the list controls
         self.learning_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_REPORT
-                                     |wx.BORDER_SUNKEN
+                                     |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
                                      )
         self.tasks_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_ICON
-                                     |wx.BORDER_SUNKEN
+                                     |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
                                      )
         self.file_listbox = wx.ListBox(panel)
 

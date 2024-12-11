@@ -1,4 +1,3 @@
-wxPython
 pandas
 xlsxwriter
 openpyxl

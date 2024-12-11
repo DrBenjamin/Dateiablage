@@ -1,4 +1,5 @@
 wxPython
+pandas
 xlsxwriter
 openpyxl
 xlrd

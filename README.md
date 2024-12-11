@@ -62,9 +62,7 @@ Die Anleitung zur Dateiablage
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/16.png?raw=true)
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/17.png?raw=true)
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/18.png?raw=true)
-* rechts das Python-symbol klicken
-* (shift+strg+p) Tasten drücken, dann öffnet sich ein Fenster oben
-* "Creat" schreiben -> "Python Envirenment" auswählen -> "Conda" auswählen -> Die höhste Version auswählen
+* Im Terminal eingeben: conda env create --file=environment.yml
 * Zum Bestätigen:
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/19.Best%C3%A4tigen.png?raw=true)
 * Visual code schließen und wieder öffnen

@@ -74,8 +74,8 @@ Die Anleitung zur Dateiablage
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/21.png?raw=true)
 * Im Terminal eingeben:
 ```bash
-* git config --global user.name "Your Name"
-* git config --global user.email "youremail@yourdomain.com"
+git config --global user.name "Your Name"
+git config --global user.email "youremail@yourdomain.com"
 ```
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/23.png?raw=true)
 * Bei einer Änderung des Codes oder zum Beispiel in README.md Datei -> Speichern -> Commit -> Push

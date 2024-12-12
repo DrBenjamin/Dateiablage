@@ -1,5 +1,6 @@
-import wx
+import wx # wxPython / Phoenix
 import os
+import itertools
 import io
 import subprocess
 import platform
@@ -10,24 +11,24 @@ class MyFrame(wx.Frame):
     def __init__(self, *args, **kw):
         super(MyFrame, self).__init__(*args, **kw)
 
+        # Definition of global variables
+        self.file_list = []
+
         # Creating a menu bar
         menu_bar = wx.MenuBar()
 
-        # Creating the File menu
+        # Creating the `Datei` menu
         file_menu = wx.Menu()
         import_definition = file_menu.Append(wx.ID_OPEN, "&Importiere e-Learning Definition")
-        import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle Aufgabenliste")
-        browse_item = file_menu.Append(wx.ID_ANY, "&Wähle Quellverzeichnis")
+        import_tasks = file_menu.Append(wx.ID_OPEN, "&Wähle Aufgabenliste")
+        browse_item = file_menu.Append(wx.ID_OPEN, "&Wähle Quellverzeichnis")
         
         file_menu.Append(wx.ID_EXIT, "&Beenden")
         menu_bar.Append(file_menu, "&Datei")
         
-        # Creating the Edit menu
+        # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
-        edit_menu.Append(wx.ID_COPY, "&Kopieren")
-        edit_menu.Append(wx.ID_CUT, "&Ausscheniden")
-        edit_menu.Append(wx.ID_PASTE, "&Einfügen")
-        menu_bar.Append(edit_menu, "&Bearbeiten")
+        export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
 
         # Setting the menu bar
         self.SetMenuBar(menu_bar)
@@ -66,6 +67,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_import_excel, import_tasks)
         # Binding the Browse menu item to the on_browse method
         self.Bind(wx.EVT_MENU, self.on_browse, browse_item)
+        # Bindung the Export menu item to the on_export method
+        self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
 
         # Binding the list control to the on_item_activated method
         self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
@@ -74,11 +77,16 @@ class MyFrame(wx.Frame):
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
 
+    # Method to handle the Export file list
+    def on_export(self, event):
+        for item in self.file_list:
+            print(item)
+
     # Method to handle the Browse menu item
     def on_browse(self, event):
-        dialog = wx.DirDialog(None, "Select a folder:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
-            self.folder_path = dialog.GetPath()  # folder_path will contain the path of the folder you have selected as string
+            self.folder_path = dialog.GetPath() # folder_path will contain the path of the folder you have selected as string
             self.list_files(self.folder_path)
         dialog.Destroy()
 
@@ -197,17 +205,16 @@ class MyFrame(wx.Frame):
 
     # Method to list the files in the selected folder
     def list_files(self, folder_path, filter_text=None):
-        file_list = []
         for root, dirs, files in os.walk(folder_path):
             for name in dirs:
                 dir_path = os.path.join(root, name)
                 if filter_text is None:
-                    file_list.append(dir_path)
+                    self.file_list.append(dir_path)
                     files = [
                         f 
                         for f in os.listdir(dir_path)
                     ]
-                    file_list.extend(os.path.join(dir_path, f) for f in files)
+                    self.file_list.extend(os.path.join(dir_path, f) for f in files)
                 else:
                     # Adding all subdirectories of the matching directory
                     normalized_filter_text = unicodedata.normalize('NFC', filter_text)
@@ -216,14 +223,14 @@ class MyFrame(wx.Frame):
                         for sub_root, sub_dirs, sub_files in os.walk(dir_path):
                             for sub_name in sub_dirs:
                                 dir_path = os.path.join(sub_root, sub_name)
-                                file_list.append(os.path.join(sub_root, sub_name))
+                                self.file_list.append(os.path.join(sub_root, sub_name))
                                 sub_files = [
                                     f 
                                     for f in os.listdir(dir_path)
                                 ]
-                                file_list.extend(os.path.join(dir_path, f) for f in sub_files)
+                                self.file_list.extend(os.path.join(dir_path, f) for f in sub_files)
 
-            self.file_listbox.Set(file_list)
+        self.file_listbox.Set(self.file_list)
 
 # Creating the wx App
 class MyApp(wx.App):

@@ -2,3 +2,4 @@ pandas
 xlsxwriter
 openpyxl
 xlrd
+python-docx

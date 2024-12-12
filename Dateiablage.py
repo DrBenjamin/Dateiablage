@@ -6,6 +6,8 @@ import subprocess
 import platform
 import unicodedata
 import pandas as pd
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 class MyFrame(wx.Frame):
     def __init__(self, *args, **kw):
@@ -29,6 +31,7 @@ class MyFrame(wx.Frame):
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
+        menu_bar.Append(edit_menu, "&Bearbeiten")
 
         # Setting the menu bar
         self.SetMenuBar(menu_bar)
@@ -79,8 +82,23 @@ class MyFrame(wx.Frame):
 
     # Method to handle the Export file list
     def on_export(self, event):
-        for item in self.file_list:
-            print(item)
+        self.export_docx(self.file_list)
+
+    def export_docx(self, data):
+        document = Document()
+
+        # Adding header
+        document.add_heading('Dateiliste', 0)
+        paragraph = document.add_paragraph()
+        paragraph.add_run(data)
+        document.add_page_break()
+
+        ## Creating a Word file using python-docx as engine
+        buffer = io.BytesIO()
+        document.save(buffer)
+        with open("Export_Dateiliste.docx", "wb") as docx_file:
+            docx_file.write(buffer.getvalue())
+        buffer.close()
 
     # Method to handle the Browse menu item
     def on_browse(self, event):

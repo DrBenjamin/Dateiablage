@@ -24,7 +24,7 @@ Die Anleitung zur Dateiablage
 
 * Get Started schließen
 * Clone Git Respository wählen
-* Oben diesen Link einfügen:[Link](https://github.com/DrBenjamin/Dateiablage?raw=true?raw=true)
+* Oben diesen Link einfügen: [Link](https://github.com/DrBenjamin/Dateiablage?raw=true?raw=true)
 * ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/3.Visual_Code.png?raw=true)
 * Ordner auswählen: CGM Onedrive -> Doukumente -> Select Respoitory Location klicken
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/4.Ordner%20ausw%C3%A4hlen.png?raw=true)
@@ -62,7 +62,10 @@ Die Anleitung zur Dateiablage
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/16.png?raw=true)
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/17.png?raw=true)
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/18.png?raw=true)
-* Im Terminal eingeben: conda env create --file=environment.yml
+* Im Terminal eingeben:
+```bash
+ conda env create --file=environment.yml
+ ```
 * Zum Bestätigen:
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/19.Best%C3%A4tigen.png?raw=true)
 * Visual code schließen und wieder öffnen
@@ -70,12 +73,20 @@ Die Anleitung zur Dateiablage
 * Pfeli klicken
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/21.png?raw=true)
 * Im Terminal eingeben:
+```bash
 * git config --global user.name "Your Name"
 * git config --global user.email "youremail@yourdomain.com"
+```
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/23.png?raw=true)
 * Bei einer Änderung des Codes oder zum Beispiel in README.md Datei -> Speichern -> Commit -> Push
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/24.png?raw=true)
-* Im Terminal eingeben: python -m pip install -r .\requirements.txt
+* Im Terminal eingeben: 
+```bash
+python -m pip install -r .\requirements.txt
+```
 * Dann Enter-Taste drücken
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/f8ae2f8215aebd8e1638e083d3a2d11eb6cffb04/Images/22.png?raw=true)
-* Im Terminal eingeben: python Dateiablage.py
+* Im Terminal eingeben: 
+```bash
+python Dateiablage.py
+```

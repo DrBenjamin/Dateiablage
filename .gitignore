@@ -164,3 +164,4 @@ cython_debug/
 .conda/*
 test.py
 Export_Dateiliste.docx
+test2.py

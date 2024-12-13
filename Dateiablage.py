@@ -1,6 +1,5 @@
 import wx # wxPython / Phoenix
 import os
-import itertools
 import io
 import subprocess
 import platform
@@ -157,25 +156,28 @@ class MyFrame(wx.Frame):
             with open(file_path, 'rb') as file:
                 bytes_data = file.read()
 
+            # Creating pandas dataframe, e.g. sheet_name `1` for sheet no. 2 or "Arzt prozessual"
             data = pd.read_excel(io.BytesIO(bytes_data), sheet_name = 1)
 
             # Adding from Excel
             for index, row in data.iterrows():
                 if len(row) > 1:  # Ensure there are at least 2 columns
                     # Extract relevant columns (adjust the indices as needed)
-                    task = str(row.iloc[1]).strip().title()
-                    status = str(row.iloc[8]).strip().title()
+                    task = str(row.iloc[1]).strip()
+                    status = str(row.iloc[8]).strip()
                     output.append([index, task, status])
                 else:
                     print(f"Row {index} does not have enough columns: {row}")
-
+            print(output) # Debugging list of lists `output`
+            
             # Tasks
-            output = pd.DataFrame(output, columns = ['ID', 'Aufgabenliste', 'Status'])
-            output = output.set_index('ID')
-            output = output.drop_duplicates(ignore_index = True)
-            output = output.drop(0, axis = 0)
+            output_df = pd.DataFrame(output, columns = ['ID', 'Aufgabenliste', 'Status'])
+            output_df = output_df.set_index('ID')
+            output_df = output_df.drop_duplicates(ignore_index = True)
+            output_df = output_df.drop(0, axis = 0)
+            print(output_df) # Debugging pandas dataframe `output_df`
 
-            self.display_tasks(output)
+            self.display_tasks(output_df)
             wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
         except Exception as e:
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
@@ -183,10 +185,10 @@ class MyFrame(wx.Frame):
     # Method to display the data in the tasks control
     def display_tasks(self, df):
         self.tasks_ctrl.ClearAll()
-        self.tasks_ctrl.AppendColumn("e-Learning Struktur")
-
+        self.tasks_ctrl.AppendColumn("Aufgabenliste")
         for index, row in df.iterrows():
-            text = row.iloc[0]
+            print(row) # Debugging row data
+            text = "AUFGABENLISTE: " + row.iloc[0] + " STATUS: " + row.iloc[1]
             self.tasks_ctrl.Append([text])
 
         # Adjusting the column width to fit automatically the content
@@ -259,4 +261,5 @@ class MyApp(wx.App):
 
 # Initializing the wx App
 app = MyApp(False)
+print("App start")
 app.MainLoop()

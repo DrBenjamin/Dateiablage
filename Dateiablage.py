@@ -21,8 +21,8 @@ class MyFrame(wx.Frame):
 
         # Creating the `Datei` menu
         file_menu = wx.Menu()
-        import_definition = file_menu.Append(wx.ID_OPEN, "&Importiere e-Learning Definition")
-        import_tasks = file_menu.Append(wx.ID_OPEN, "&Wähle Aufgabenliste")
+        import_definition = file_menu.Append(wx.ID_ANY, "&Importiere e-Learning Definition")
+        import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle Aufgabenliste")
         browse_item = file_menu.Append(wx.ID_OPEN, "&Wähle Quellverzeichnis")
         
         file_menu.Append(wx.ID_EXIT, "&Beenden")

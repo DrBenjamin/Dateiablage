@@ -8,9 +8,66 @@ import pandas as pd
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
+class PreferencesPage(wx.PreferencesPage):
+    def __init__(self, config):
+        super().__init__()
+        self.config = config
+
+    def GetName(self):
+        return "Einstellungen"
+
+    def CreateWindow(self, parent):
+        panel = wx.Panel(parent)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        # Adding preference controls
+        heading_csv = wx.StaticText(panel, label="CSV Import Einstellungen")
+        font = heading_csv.GetFont()
+        font.PointSize += 2
+        heading_csv.SetFont(font)
+        sizer.Add(heading_csv, 0, wx.ALL, 5)
+        # CSV Import checkbox
+        self.csv_checkbox = wx.CheckBox(panel, label="CSV Import")
+        sizer.Add(self.csv_checkbox, 0, wx.ALL, 5)
+        # Load saved state
+        csv_state = self.config.ReadBool("csv_import_enabled", False)
+        self.csv_checkbox.SetValue(csv_state)
+        # Bind event to save state
+        self.csv_checkbox.Bind(wx.EVT_CHECKBOX, self.on_csv_checkbox)
+        
+        heading = wx.StaticText(panel, label="SRT Konverter Einstellungen")
+        font = heading.GetFont()
+        font.PointSize += 2 
+        heading.SetFont(font)
+        sizer.Add(heading, 0, wx.ALL, 5)
+        # SRT Konverter checkbox
+        self.srt_checkbox = wx.CheckBox(panel, label="SRT Konverter")
+        sizer.Add(self.srt_checkbox, 0, wx.ALL, 5)
+        # Load saved state
+        srt_state = self.config.ReadBool("srt_converter_enabled", False)
+        self.srt_checkbox.SetValue(srt_state)
+        # Bind event to save state
+        self.srt_checkbox.Bind(wx.EVT_CHECKBOX, self.on_srt_checkbox)
+
+        panel.SetSizer(sizer)
+        return panel
+    
+    # Method to handle the Preferences page csv checkbox
+    def on_csv_checkbox(self, event):
+        self.config.WriteBool("csv_import_enabled", self.csv_checkbox.IsChecked())
+        self.config.Flush()
+
+    # Method to handle the Preferences page srt checkbox
+    def on_srt_checkbox(self, event):
+        self.config.WriteBool("srt_converter_enabled", self.srt_checkbox.IsChecked())
+        self.config.Flush()
+
 class MyFrame(wx.Frame):
     def __init__(self, *args, **kw):
         super(MyFrame, self).__init__(*args, **kw)
+
+        # Initialize config
+        self.config = wx.Config("Dateiablage")
 
         # Definition of global variables
         self.file_list = []
@@ -18,18 +75,19 @@ class MyFrame(wx.Frame):
         # Creating a menu bar
         menu_bar = wx.MenuBar()
 
+
         # Creating the `Datei` menu
         file_menu = wx.Menu()
         import_definition = file_menu.Append(wx.ID_ANY, "&Importiere e-Learning Definition")
         import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle Aufgabenliste")
         browse_item = file_menu.Append(wx.ID_OPEN, "&Wähle Quellverzeichnis")
-        
-        file_menu.Append(wx.ID_EXIT, "&Beenden")
+        exit_app = file_menu.Append(wx.ID_EXIT, "&Beenden")
         menu_bar.Append(file_menu, "&Datei")
         
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
+        preferences = edit_menu.Append(wx.ID_ANY, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
 
         # Setting the menu bar
@@ -71,6 +129,10 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_browse, browse_item)
         # Bindung the Export menu item to the on_export method
         self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
+        # Binding the Exit menu item to the on_exit method
+        self.Bind(wx.EVT_MENU, self.on_exit, exit_app)
+        # Binding the Preferences menu item to the on_preferences method
+        self.Bind(wx.EVT_MENU, self.on_preferences, preferences)
 
         # Binding the list control to the on_item_activated method
         self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
@@ -79,10 +141,21 @@ class MyFrame(wx.Frame):
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
 
+    # Method to handle the Preferences menu item
+    def on_preferences(self, event):
+        dialog = wx.PreferencesEditor()
+        dialog.AddPage(PreferencesPage(self.config))
+        dialog.Show(self)
+
     # Method to handle the Export file list
     def on_export(self, event):
         self.export_docx(self.file_list)
 
+    # Method to handle the Exit menu item
+    def on_exit(self, event):
+        self.Close(True)
+
+    # Method to export the file list to a Word document
     def export_docx(self, data):
         document = Document()
 
@@ -109,11 +182,14 @@ class MyFrame(wx.Frame):
 
     # Method to handle the Import learning definition
     def on_import_csv(self, event):
-        dialog = wx.FileDialog(self, "Importiere e-Learning Definition", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if dialog.ShowModal() == wx.ID_OK:
-            file_path = dialog.GetPath()
-            self.import_csv(file_path)
-        dialog.Destroy()
+        if self.config.ReadBool("csv_import_enabled", True):
+            dialog = wx.FileDialog(self, "Importiere e-Learning Definition", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            if dialog.ShowModal() == wx.ID_OK:
+                file_path = dialog.GetPath()
+                self.import_csv(file_path)
+            dialog.Destroy()
+        else:
+            wx.MessageBox("CSV Import ist deaktiviert (siehe Einstellungen)", "Information", wx.ICON_WARNING | wx.ICON_INFORMATION)
 
     # Method to import the CSV file
     def import_csv(self, file_path):

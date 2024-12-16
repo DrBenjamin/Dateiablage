@@ -6,7 +6,6 @@ import platform
 import unicodedata
 import pandas as pd
 from docx import Document
-from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 class PreferencesPage(wx.PreferencesPage):
     def __init__(self, config):
@@ -20,7 +19,22 @@ class PreferencesPage(wx.PreferencesPage):
         panel = wx.Panel(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        # Adding preference controls
+        # Adding preference control user settings
+        heading_user = wx.StaticText(panel, label="Benutzereinstellungen")
+        font = heading_user.GetFont()
+        font.PointSize += 2
+        heading_user.SetFont(font)
+        sizer.Add(heading_user, 0, wx.ALL, 5)
+        # User choice
+        self.user_choice = wx.Choice(panel, choices=["Asher", "Benjamin", "Larisa", "Listan", "Mahsa", "Marko", "Sandra"])
+        sizer.Add(self.user_choice, 0, wx.ALL, 5)
+        # Load saved state
+        user_state = self.config.Read("user_choice", "Asher")
+        self.user_choice.SetStringSelection(user_state)
+        # Bind event to save state
+        self.user_choice.Bind(wx.EVT_CHOICE, self.on_user_choice)
+
+        # Adding preference control csv import
         heading_csv = wx.StaticText(panel, label="CSV Import Einstellungen")
         font = heading_csv.GetFont()
         font.PointSize += 2
@@ -34,7 +48,8 @@ class PreferencesPage(wx.PreferencesPage):
         self.csv_checkbox.SetValue(csv_state)
         # Bind event to save state
         self.csv_checkbox.Bind(wx.EVT_CHECKBOX, self.on_csv_checkbox)
-        
+
+        # Adding preference control srt converter
         heading = wx.StaticText(panel, label="SRT Konverter Einstellungen")
         font = heading.GetFont()
         font.PointSize += 2 
@@ -51,7 +66,12 @@ class PreferencesPage(wx.PreferencesPage):
 
         panel.SetSizer(sizer)
         return panel
-    
+
+    # Method to handle the Preferences page user choice
+    def on_user_choice(self, event):
+        self.config.Write("user_choice", self.user_choice.GetString(self.user_choice.GetSelection()))
+        self.config.Flush()
+
     # Method to handle the Preferences page csv checkbox
     def on_csv_checkbox(self, event):
         self.config.WriteBool("csv_import_enabled", self.csv_checkbox.IsChecked())
@@ -71,10 +91,12 @@ class MyFrame(wx.Frame):
 
         # Definition of global variables
         self.file_list = []
+        self.definition_csv = None
+        self.file_path_tasks = None
+        self.folder_path = None
 
         # Creating a menu bar
         menu_bar = wx.MenuBar()
-
 
         # Creating the `Datei` menu
         file_menu = wx.Menu()
@@ -87,6 +109,7 @@ class MyFrame(wx.Frame):
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
+        refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisiere")
         preferences = edit_menu.Append(wx.ID_ANY, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
 
@@ -131,6 +154,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
         # Binding the Exit menu item to the on_exit method
         self.Bind(wx.EVT_MENU, self.on_exit, exit_app)
+        # Binding the Refresh menu item to the on_refresh method
+        self.Bind(wx.EVT_MENU, self.on_refresh, refresh_ctrl_lists)
         # Binding the Preferences menu item to the on_preferences method
         self.Bind(wx.EVT_MENU, self.on_preferences, preferences)
 
@@ -140,6 +165,29 @@ class MyFrame(wx.Frame):
         self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
+    # Method to handle the Refresh menu item
+
+    def on_refresh(self, event):
+        # Clear the ctrl lists
+        self.learning_ctrl.DeleteAllItems()
+        self.tasks_ctrl.DeleteAllItems()
+        
+        # Refresh the ctrl lists
+        try:
+            if self.folder_path is not None:
+                self.list_files(self.folder_path)
+        except Exception as e:
+            print(f"Error: {e}")
+        try:
+            if self.definition_csv is not None:
+                self.display_learning(self.definition_csv)
+        except Exception as e:
+            print(f"Error: {e}")
+        try:
+            if self.file_path_tasks is not None:
+                self.import_excel(self.file_path_tasks)
+        except Exception as e:
+            print(f"Error: {e}")
 
     # Method to handle the Preferences menu item
     def on_preferences(self, event):
@@ -172,14 +220,6 @@ class MyFrame(wx.Frame):
             docx_file.write(buffer.getvalue())
         buffer.close()
 
-    # Method to handle the Browse menu item
-    def on_browse(self, event):
-        dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
-        if dialog.ShowModal() == wx.ID_OK:
-            self.folder_path = dialog.GetPath() # folder_path will contain the path of the folder you have selected as string
-            self.list_files(self.folder_path)
-        dialog.Destroy()
-
     # Method to handle the Import learning definition
     def on_import_csv(self, event):
         if self.config.ReadBool("csv_import_enabled", True):
@@ -189,13 +229,13 @@ class MyFrame(wx.Frame):
                 self.import_csv(file_path)
             dialog.Destroy()
         else:
-            wx.MessageBox("CSV Import ist deaktiviert (siehe Einstellungen)", "Information", wx.ICON_WARNING | wx.ICON_INFORMATION)
+            wx.MessageBox("CSV Import ist deaktiviert (siehe Einstellungen)", "Information", wx.OK | wx.ICON_WARNING)
 
     # Method to import the CSV file
     def import_csv(self, file_path):
         try:
-            definition_csv = pd.read_csv(file_path)
-            self.display_learning(definition_csv)
+            self.definition_csv = pd.read_csv(file_path)
+            self.display_learning(self.definition_csv)
             wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
         except Exception as e:
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
@@ -218,8 +258,8 @@ class MyFrame(wx.Frame):
     def on_import_excel(self, event):
         dialog = wx.FileDialog(self, "Importiere Aufgabenliste", wildcard="Exceldatei (*.xlsx)|*.xlsx|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dialog.ShowModal() == wx.ID_OK:
-            file_path = dialog.GetPath()
-            self.import_excel(file_path)
+            self.file_path_tasks = dialog.GetPath()
+            self.import_excel(self.file_path_tasks)
         dialog.Destroy()
 
     # Method to import the Excel file
@@ -234,24 +274,35 @@ class MyFrame(wx.Frame):
 
             # Creating pandas dataframe, e.g. sheet_name `1` for sheet no. 2 or "Arzt prozessual"
             data = pd.read_excel(io.BytesIO(bytes_data), sheet_name = 1)
-
-            # Adding from Excel
+            print("Excel: ", data)
+            
+            # Tasks from Excel
             for index, row in data.iterrows():
                 if len(row) > 1:  # Ensure there are at least 2 columns
                     # Extract relevant columns (adjust the indices as needed)
                     task = str(row.iloc[1]).strip()
+                    user = str(row.iloc[6]).strip()
                     status = str(row.iloc[8]).strip()
-                    output.append([index, task, status])
+                    if index >= 5:
+                        if self.config.Read("user_choice") == user:
+                            output.append([index, task, user, status])
                 else:
                     print(f"Row {index} does not have enough columns: {row}")
-            print(output) # Debugging list of lists `output`
-            
-            # Tasks
-            output_df = pd.DataFrame(output, columns = ['ID', 'Aufgabenliste', 'Status'])
-            output_df = output_df.set_index('ID')
-            output_df = output_df.drop_duplicates(ignore_index = True)
-            output_df = output_df.drop(0, axis = 0)
-            print(output_df) # Debugging pandas dataframe `output_df`
+            print("Output: ", output) # Debugging list of lists `output`
+            if output == [[]]:
+                output_df = pd.DataFrame({
+                                                'ID': "0",
+                                                'Aufgabenliste': ['leer'],
+                                                'Verantwortlicher': ['leer'],
+                                                'Status': ['leer']
+                                    })
+                output_df = output_df.set_index('ID')
+            else:
+                output_df = pd.DataFrame(output, columns = ['ID', 'Aufgabe', 'Verantwortlicher', 'Status'])
+                output_df = output_df.set_index('ID')
+                output_df = output_df.drop_duplicates(ignore_index = True)
+                output_df = output_df.drop(0, axis = 0)
+            print("Pandas df: ", len(output_df)) # Debugging pandas dataframe `output_df`
 
             self.display_tasks(output_df)
             wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
@@ -264,12 +315,21 @@ class MyFrame(wx.Frame):
         self.tasks_ctrl.AppendColumn("Aufgabenliste")
         for index, row in df.iterrows():
             print(row) # Debugging row data
-            text = "AUFGABENLISTE: " + row.iloc[0] + " STATUS: " + row.iloc[1]
+            text = "Aufgabe: " + row.iloc[0] + " Verantwortlicher: " + row.iloc[1] + " Status: " + row.iloc[2]
             self.tasks_ctrl.Append([text])
 
         # Adjusting the column width to fit automatically the content
-        self.tasks_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        self.tasks_ctrl.SetColumnWidth(0, 200)
+        #self.tasks_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
 
+    # Method to handle the Browse menu item
+    def on_browse(self, event):
+        dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        if dialog.ShowModal() == wx.ID_OK:
+            self.folder_path = dialog.GetPath() # folder_path will contain the path of the folder you have selected as string
+            self.list_files(self.folder_path)
+        dialog.Destroy()
+        
     # Method to handle the list control item activated event
     def on_item_selected(self, event):
         item_index = event.GetIndex()
@@ -297,10 +357,11 @@ class MyFrame(wx.Frame):
                 subprocess.call(["xdg-open", file_path])
             except Exception as e:
                 wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
-        
 
     # Method to list the files in the selected folder
     def list_files(self, folder_path, filter_text=None):
+        # Clear the existing file list
+        self.file_list = []
         for root, dirs, files in os.walk(folder_path):
             for name in dirs:
                 dir_path = os.path.join(root, name)
@@ -325,7 +386,6 @@ class MyFrame(wx.Frame):
                                     for f in os.listdir(dir_path)
                                 ]
                                 self.file_list.extend(os.path.join(dir_path, f) for f in sub_files)
-
         self.file_listbox.Set(self.file_list)
 
 # Creating the wx App

@@ -318,7 +318,11 @@ class MyFrame(wx.Frame):
 class MyApp(wx.App):
     def OnInit(self):
         frame = MyFrame(None, title="Dateiablage", size=(1024, 768))
+        
+        # Setting icon
         frame.Show(True)
+        frame.SetIcon(wx.Icon("images/icon.ico", wx.BITMAP_TYPE_ICO))
+        self.SetTopWindow(frame)
         return True
 
 # Initializing the wx App

@@ -9,7 +9,7 @@ class PreferencesPage(wx.PreferencesPage):
         return "Einstellungen"
 
     def GetIcon(self):
-        return wx.Bitmap('images/15.Einstellung.png', wx.BITMAP_TYPE_PNG)
+        return wx.BitmapBundle.FromBitmap(wx.Bitmap('images/preferences.png', wx.BITMAP_TYPE_PNG))
 
     def CreateWindow(self, parent):
         panel = wx.Panel(parent)

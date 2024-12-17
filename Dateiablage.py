@@ -36,7 +36,7 @@ class MyFrame(wx.Frame):
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
         refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisiere")
-        preferences = edit_menu.Append(wx.ID_ANY, "Einstellungen")
+        preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
 
         # Setting the menu bar

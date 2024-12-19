@@ -9,16 +9,9 @@ def on_browse(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
         self.folder_path = dialog.GetPath() # folder_path will contain the path of the folder you have selected as string
-        self.list_files(self.folder_path)
+        list_files(self, self.folder_path)
     dialog.Destroy()
-    
-# Method to handle the list control item activated event
-def on_item_selected(self, event):
-    item_index = event.GetIndex()
-    item_text = self.learning_ctrl.GetItemText(item_index)
-    self.SetTitle(f"Dateiablage - {item_text.strip()}")
-    self.list_files(self.folder_path, item_text.strip())
-    
+
 # Method to handle the list control item activated event
 def on_file_activated(self, event):
     file_index = event.GetSelection()

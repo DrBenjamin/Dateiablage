@@ -6,11 +6,13 @@ from src.methods import (
     on_exit
 )
 from src.preferences import on_preferences
-from src.learning import on_import_csv
+from src.learning import (
+    on_item_selected,
+    on_import_csv
+)
 from src.tasks import on_import_excel
 from src.files import (
     on_browse,
-    on_item_selected,
     on_file_activated
 )
 

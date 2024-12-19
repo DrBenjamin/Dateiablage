@@ -1,4 +1,8 @@
+import io
 from docx import Document
+from src.files import list_files
+from src.tasks import import_excel
+from src.learning import display_learning
 
 # Method to handle the Refresh menu item
 def on_refresh(self, event):
@@ -9,17 +13,17 @@ def on_refresh(self, event):
     # Refresh the ctrl lists
     try:
         if self.folder_path is not None:
-            self.list_files(self.folder_path)
+            list_files(self, self.folder_path)
     except Exception as e:
         print(f"Error: {e}")
     try:
         if self.definition_csv is not None:
-            self.display_learning(self.definition_csv)
+            display_learning(self, self.definition_csv)
     except Exception as e:
         print(f"Error: {e}")
     try:
         if self.file_path_tasks is not None:
-            self.import_excel(self.file_path_tasks)
+            import_excel(self, self.file_path_tasks)
     except Exception as e:
         print(f"Error: {e}")
 
@@ -29,7 +33,7 @@ def on_exit(self, event):
 
 # Method to handle the Export file list
 def on_export(self, event):
-    self.export_docx(self.file_list)
+    export_docx(self, self.file_list)
 
 # Method to export the file list to a Word document
 def export_docx(self, data):

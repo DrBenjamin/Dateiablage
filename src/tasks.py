@@ -1,12 +1,13 @@
 import wx
 import io
+import pandas as pd
 
 # Method to handle the Import tasks excel
 def on_import_excel(self, event):
     dialog = wx.FileDialog(self, "Importiere Aufgabenliste", wildcard="Exceldatei (*.xlsx)|*.xlsx|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
     if dialog.ShowModal() == wx.ID_OK:
         self.file_path_tasks = dialog.GetPath()
-        self.import_excel(self.file_path_tasks)
+        import_excel(self, self.file_path_tasks)
     dialog.Destroy()
 
 # Method to import the Excel file
@@ -51,7 +52,7 @@ def import_excel(self, file_path):
             output_df = output_df.drop(0, axis = 0)
         print("Pandas df: ", len(output_df)) # Debugging pandas dataframe `output_df`
 
-        self.display_tasks(output_df)
+        display_tasks(self, output_df)
         wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
     except Exception as e:
         wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)

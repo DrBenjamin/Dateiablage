@@ -1,5 +1,11 @@
 import wx # wxPython / Phoenix
 
+# Method to handle the Preferences menu item
+def on_preferences(self, event):
+    dialog = wx.PreferencesEditor()
+    dialog.AddPage(PreferencesPage(self.config))
+    dialog.Show(self)
+
 class PreferencesPage(wx.PreferencesPage):
     def __init__(self, config):
         super().__init__()

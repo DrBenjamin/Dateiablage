@@ -1,19 +1,17 @@
 import wx # wxPython / Phoenix
 import types
-#from src.methods import * #on_refresh, on_preferences, on_export, on_exit, on_import_csv
 from src.methods import (
     on_refresh,
-    on_preferences,
-    on_export,
-    on_exit,
-    on_import_csv,
-    on_import_excel,
+     on_export,
+    on_exit
+)
+from src.preferences import on_preferences
+from src.learning import on_import_csv
+from src.tasks import on_import_excel
+from src.files import (
     on_browse,
     on_item_selected,
-    on_file_activated,
-    display_learning,
-    display_tasks,
-    list_files
+    on_file_activated
 )
 
 class MyFrame(wx.Frame):
@@ -30,9 +28,6 @@ class MyFrame(wx.Frame):
         self.on_browse = types.MethodType(on_browse, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
-        self.display_learning = types.MethodType(display_learning, self)
-        self.display_tasks = types.MethodType(display_tasks, self)
-        self.list_files = types.MethodType(list_files, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")

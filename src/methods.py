@@ -68,7 +68,7 @@ def on_import_csv(self, event):
         dialog = wx.FileDialog(self, "Importiere e-Learning Definition", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dialog.ShowModal() == wx.ID_OK:
             file_path = dialog.GetPath()
-            self.import_csv(file_path)
+            import_csv(self, file_path)
         dialog.Destroy()
     else:
         wx.MessageBox("CSV Import ist deaktiviert (siehe Einstellungen)", "Information", wx.OK | wx.ICON_WARNING)
@@ -101,7 +101,7 @@ def on_import_excel(self, event):
     dialog = wx.FileDialog(self, "Importiere Aufgabenliste", wildcard="Exceldatei (*.xlsx)|*.xlsx|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
     if dialog.ShowModal() == wx.ID_OK:
         self.file_path_tasks = dialog.GetPath()
-        self.import_excel(self.file_path_tasks)
+        import_excel(self, self.file_path_tasks)
     dialog.Destroy()
 
 # Method to import the Excel file
@@ -169,7 +169,7 @@ def on_browse(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
         self.folder_path = dialog.GetPath() # folder_path will contain the path of the folder you have selected as string
-        self.list_files(self.folder_path)
+        list_files(self, self.folder_path)
     dialog.Destroy()
     
 # Method to handle the list control item activated event

@@ -10,7 +10,10 @@ from src.methods import (
     on_import_excel,
     on_browse,
     on_item_selected,
-    on_file_activated
+    on_file_activated,
+    display_learning,
+    display_tasks,
+    list_files
 )
 
 class MyFrame(wx.Frame):
@@ -27,6 +30,9 @@ class MyFrame(wx.Frame):
         self.on_browse = types.MethodType(on_browse, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
+        self.display_learning = types.MethodType(display_learning, self)
+        self.display_tasks = types.MethodType(display_tasks, self)
+        self.list_files = types.MethodType(list_files, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")

@@ -63,12 +63,20 @@ class MyFrame(wx.Frame):
 
         # Creating a panel
         panel = wx.Panel(self)
+      
+      
+        # Creating a vertical box sizer
+        vbox = wx.BoxSizer(wx.VERTICAL)
+    
 
+    
+        
         # Creating the list controls
         self.learning_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_REPORT
-                                     |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
-                                     )
+                                     |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID)
+        
+        
         self.tasks_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_ICON
                                      |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
@@ -77,12 +85,24 @@ class MyFrame(wx.Frame):
 
         # Creating a horizontal box sizer
         hbox = wx.BoxSizer(wx.HORIZONTAL)
+        
+        # Titles for the controls
+        learning_title = wx.StaticText(panel, label="E-learning", style=wx.ALIGN_LEFT)
+        task_title = wx.StaticText(panel, label= "Aufgaben", style=wx.ALIGN_RIGHT)
+        hbox.Add(learning_title, 0, wx.ALL | wx.LEFT, 5)
+        hbox.Add(task_title, 0, wx.ALL | wx.RIGHT, 5)
+
         # Adding the list controls to the horizontal box sizer
         hbox.Add(self.learning_ctrl, 1, wx.ALL | wx.EXPAND, 5)
         hbox.Add(self.tasks_ctrl, 1, wx.ALL | wx.EXPAND, 5)
 
         # Creating a vertical box sizer
         vbox = wx.BoxSizer(wx.VERTICAL)
+        
+        # title for File Explorer
+        explorer_title = wx.StaticText(panel, label= "Dateien und Ordner", style=wx.ALIGN_RIGHT)
+        vbox.Add(explorer_title, 0, wx.ALL | wx.LEFT, 5)
+        
         # Adding the horizontal box sizer and the file listbox to the vertical box sizer
         vbox.Add(hbox, 1, wx.ALL | wx.EXPAND, 5)
         vbox.Add(self.file_listbox, 1, wx.ALL | wx.EXPAND, 5)

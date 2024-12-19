@@ -60,7 +60,7 @@ def import_excel(self, file_path):
 # Method to display the data in the tasks control
 def display_tasks(self, df):
     self.tasks_ctrl.ClearAll()
-    self.tasks_ctrl.AppendColumn("Aufgabenliste")
+    #self.tasks_ctrl.AppendColumn("Aufgabenliste")
     for index, row in df.iterrows():
         print(row) # Debugging row data
         text = "Aufgabe: " + row.iloc[0] + " Verantwortlicher: " + row.iloc[1] + " Status: " + row.iloc[2]

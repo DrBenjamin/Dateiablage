@@ -32,7 +32,7 @@ def import_csv(self, file_path):
 # Method to display the data in the learning control
 def display_learning(self, df):
     self.learning_ctrl.ClearAll()
-    self.learning_ctrl.AppendColumn("e-Learning Struktur")
+    #self.learning_ctrl.AppendColumn("e-Learning Struktur")
 
     for index, row in df.iterrows():
         text = row.iloc[0]

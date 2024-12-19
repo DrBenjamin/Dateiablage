@@ -63,14 +63,10 @@ class MyFrame(wx.Frame):
 
         # Creating a panel
         panel = wx.Panel(self)
-      
-      
+
         # Creating a vertical box sizer
         vbox = wx.BoxSizer(wx.VERTICAL)
-    
 
-    
-        
         # Creating the list controls
         self.learning_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_REPORT
@@ -83,29 +79,28 @@ class MyFrame(wx.Frame):
                                      )
         self.file_listbox = wx.ListBox(panel)
 
-        # Creating a horizontal box sizer
-        hbox = wx.BoxSizer(wx.HORIZONTAL)
-        
         # Titles for the controls
         learning_title = wx.StaticText(panel, label="E-learning", style=wx.ALIGN_LEFT)
-        task_title = wx.StaticText(panel, label= "Aufgaben", style=wx.ALIGN_RIGHT)
-        hbox.Add(learning_title, 0, wx.ALL | wx.LEFT, 5)
-        hbox.Add(task_title, 0, wx.ALL | wx.RIGHT, 5)
+        task_title = wx.StaticText(panel, label="Aufgaben", style=wx.ALIGN_LEFT)
+        explorer_title = wx.StaticText(panel, label="Dateien und Ordner", style=wx.ALIGN_LEFT)
+
+        # Creating a horizontal box sizer
+        hbox = wx.BoxSizer(wx.HORIZONTAL)
 
         # Adding the list controls to the horizontal box sizer
-        hbox.Add(self.learning_ctrl, 1, wx.ALL | wx.EXPAND, 5)
-        hbox.Add(self.tasks_ctrl, 1, wx.ALL | wx.EXPAND, 5)
+        vbox.Add(learning_title, 0, wx.ALL | wx.LEFT, 5)
+        vbox.Add(self.learning_ctrl, 1, wx.ALL | wx.EXPAND, 5)
+        vbox.Add(task_title, 0, wx.ALL | wx.LEFT, 5)
+        vbox.Add(self.tasks_ctrl, 1, wx.ALL | wx.EXPAND, 5)
 
         # Creating a vertical box sizer
         vbox = wx.BoxSizer(wx.VERTICAL)
-        
-        # title for File Explorer
-        explorer_title = wx.StaticText(panel, label= "Dateien und Ordner", style=wx.ALIGN_RIGHT)
-        vbox.Add(explorer_title, 0, wx.ALL | wx.LEFT, 5)
-        
+
         # Adding the horizontal box sizer and the file listbox to the vertical box sizer
-        vbox.Add(hbox, 1, wx.ALL | wx.EXPAND, 5)
+        #vbox.Add(hbox, 1, wx.ALL | wx.EXPAND, 5)
+        vbox.Add(explorer_title, 0, wx.ALL | wx.LEFT, 5)
         vbox.Add(self.file_listbox, 1, wx.ALL | wx.EXPAND, 5)
+
         # Setting the sizer for the frame and fit the panel
         panel.SetSizer(vbox)
 

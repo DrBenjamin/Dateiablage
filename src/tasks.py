@@ -28,11 +28,12 @@ def import_xml(self, file_path):
     try:
         with open(file_path, 'r') as file:
             xml_string = file.read()
+        print(xml_string)
         dict_task = xml_to_dict(xml_string)
         output_df = pd.DataFrame({
                                     'ID': "0",
                                     'Aufgabe': [dict_task['channel']['item']['summary']],
-                                    'Verantwortlicher': [dict_task['channel']['item']['reporter']],
+                                    'Verantwortlicher': [dict_task['channel']['item']['assignee']],
                                     'Status': [dict_task['channel']['item']['status']]
                                 })
         output_df = output_df.set_index('ID')

@@ -27,7 +27,7 @@ def on_import_task(self, event):
 
 # Method to import XML file
 def import_xml(self, file_paths):
-    output_df = None
+    output_df = pd.DataFrame()
     def xml_to_dict(xml_string):
         root = ET.fromstring(xml_string)
         result = {}

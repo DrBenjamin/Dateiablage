@@ -2,7 +2,7 @@ import wx # wxPython / Phoenix
 import types
 from src.methods import (
     on_refresh,
-     on_export,
+    on_export,
     on_exit
 )
 from src.preferences import on_preferences
@@ -10,7 +10,7 @@ from src.learning import (
     on_item_selected,
     on_import_csv
 )
-from src.tasks import on_import_excel
+from src.tasks import on_import_task
 from src.files import (
     on_browse,
     on_file_activated
@@ -26,18 +26,25 @@ class MyFrame(wx.Frame):
         self.on_refresh = types.MethodType(on_refresh, self)
         self.on_preferences = types.MethodType(on_preferences, self)
         self.on_export = types.MethodType(on_export, self)
-        self.on_import_excel = types.MethodType(on_import_excel, self)
+        self.on_import_excel = types.MethodType(on_import_task, self)
         self.on_browse = types.MethodType(on_browse, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")
+        # Set default values if they do not exist
+        if not self.config.HasEntry("user_choice"):
+            self.config.Write("user_choice", "Alle")
+        if not self.config.HasEntry("xml_import_enabled"):
+            self.config.WriteBool("xml_import_enabled", True)
+        if not self.config.HasEntry("srt_converter_enabled"):
+            self.config.WriteBool("srt_converter_enabled", True)
 
         # Definition of global variables
         self.file_list = []
         self.definition_csv = None
-        self.file_path_tasks = None
+        self.file_path_tasks = []
         self.folder_path = None
 
         # Creating a menu bar

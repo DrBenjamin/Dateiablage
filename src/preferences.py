@@ -36,20 +36,20 @@ class PreferencesPage(wx.PreferencesPage):
         # Bind event to save state
         self.user_choice.Bind(wx.EVT_CHOICE, self.on_user_choice)
 
-        # Adding preference control csv import
-        heading_csv = wx.StaticText(panel, label="CSV Import Einstellungen")
-        font = heading_csv.GetFont()
+        # Adding preference control XML import
+        heading_xml = wx.StaticText(panel, label="XML Import Einstellungen")
+        font = heading_xml.GetFont()
         font.PointSize += 2
-        heading_csv.SetFont(font)
-        sizer.Add(heading_csv, 0, wx.ALL, 5)
-        # CSV Import checkbox
-        self.csv_checkbox = wx.CheckBox(panel, label="CSV Import")
-        sizer.Add(self.csv_checkbox, 0, wx.ALL, 5)
+        heading_xml.SetFont(font)
+        sizer.Add(heading_xml, 0, wx.ALL, 5)
+        # XML Import checkbox
+        self.xml_checkbox = wx.CheckBox(panel, label="XML Dateien importieren")
+        sizer.Add(self.xml_checkbox, 0, wx.ALL, 5)
         # Load saved state
-        csv_state = self.config.ReadBool("csv_import_enabled", False)
-        self.csv_checkbox.SetValue(csv_state)
+        xml_state = self.config.ReadBool("xml_import_enabled", False)
+        self.xml_checkbox.SetValue(xml_state)
         # Bind event to save state
-        self.csv_checkbox.Bind(wx.EVT_CHECKBOX, self.on_csv_checkbox)
+        self.xml_checkbox.Bind(wx.EVT_CHECKBOX, self.on_xml_checkbox)
 
         # Adding preference control srt converter
         heading = wx.StaticText(panel, label="SRT Konverter Einstellungen")
@@ -75,8 +75,8 @@ class PreferencesPage(wx.PreferencesPage):
         self.config.Flush()
 
     # Method to handle the Preferences page csv checkbox
-    def on_csv_checkbox(self, event):
-        self.config.WriteBool("csv_import_enabled", self.csv_checkbox.IsChecked())
+    def on_xml_checkbox(self, event):
+        self.config.WriteBool("xml_import_enabled", self.xml_checkbox.IsChecked())
         self.config.Flush()
 
     # Method to handle the Preferences page srt checkbox

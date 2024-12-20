@@ -27,12 +27,13 @@ def import_csv(self, file_path):
         display_learning(self, self.definition_csv)
         wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
     except Exception as e:
+        print(e)
         wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 # Method to display the data in the learning control
 def display_learning(self, df):
     self.learning_ctrl.ClearAll()
-    #self.learning_ctrl.AppendColumn("e-Learning Struktur")
+    self.learning_ctrl.AppendColumn("Struktur")
 
     for index, row in df.iterrows():
         text = row.iloc[0]

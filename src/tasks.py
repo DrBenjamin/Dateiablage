@@ -1,14 +1,46 @@
 import wx
 import io
 import pandas as pd
+import xml.etree.ElementTree as ET
 
 # Method to handle the Import tasks excel
 def on_import_excel(self, event):
-    dialog = wx.FileDialog(self, "Importiere Aufgabenliste", wildcard="Exceldatei (*.xlsx)|*.xlsx|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+    dialog = wx.FileDialog(self, "Importiere Aufgabenliste", wildcard="Excel- oder XML-Datei (*.xlsx;*.xml)|*.xlsx;*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
     if dialog.ShowModal() == wx.ID_OK:
         self.file_path_tasks = dialog.GetPath()
-        import_excel(self, self.file_path_tasks)
+        if self.file_path_tasks.endswith(".xml"):
+            import_xml(self, self.file_path_tasks)
+        else:
+            import_excel(self, self.file_path_tasks)
     dialog.Destroy()
+
+# Method to import XML file
+def import_xml(self, file_path):
+    def xml_to_dict(xml_string):
+        root = ET.fromstring(xml_string)
+        result = {}
+        for child in root:
+            if len(child) == 0:
+                result[child.tag] = child.text
+            else:
+                result[child.tag] = xml_to_dict(ET.tostring(child))
+        return result
+    try:
+        with open(file_path, 'r') as file:
+            xml_string = file.read()
+        print(xml_string)
+        dict_task = xml_to_dict(xml_string)
+        output_df = pd.DataFrame({
+                                    'ID': "0",
+                                    'Aufgabe': [dict_task['channel']['item']['summary']],
+                                    'Verantwortlicher': [dict_task['channel']['item']['assignee']],
+                                    'Status': [dict_task['channel']['item']['status']]
+                                })
+        output_df = output_df.set_index('ID')
+        display_tasks(self, output_df)
+        wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
+    except Exception as e:
+        wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 # Method to import the Excel file
 def import_excel(self, file_path):

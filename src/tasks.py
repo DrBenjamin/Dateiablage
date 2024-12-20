@@ -97,13 +97,10 @@ def import_excel(self, file_path):
 def display_tasks(self, df):
     self.tasks_ctrl.ClearAll()
 
-    # Add columns
-    self.tasks_ctrl.AppendColumn("Aufgabe")
-
     for index, row in df.iterrows():
         self.tasks_ctrl.Append([row.iloc[0]]) 
         self.tasks_ctrl.Append([row.iloc[1]])
         self.tasks_ctrl.Append([row.iloc[2]])
         text="-------------"
         self.tasks_ctrl.Append([text])
-        self.tasks_ctrl.SetColumnWidth(0, 600)
+        self.tasks_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)

@@ -64,8 +64,12 @@ def import_excel(self, file_path):
                 user = str(row.iloc[6]).strip()
                 status = str(row.iloc[8]).strip()
                 if index >= 5:
-                    if self.config.Read("user_choice") == user:
-                        output.append([index, task, user, status])
+                    if self.config.Read("user_choice") == "Alle":
+                        if task != "nan":
+                            output.append([index, task, user, status])
+                    else:
+                        if user == self.config.Read("user_choice"):
+                            output.append([index, task, user, status])
             else:
                 print(f"Row {index} does not have enough columns: {row}")
         print("Output: ", output) # Debugging list of lists `output`
@@ -91,27 +95,15 @@ def import_excel(self, file_path):
 
 # Method to display the data in the tasks control
 def display_tasks(self, df):
-    self.tasks_ctrl.ClearAll()    
+    self.tasks_ctrl.ClearAll()
+
+    # Add columns
+    self.tasks_ctrl.AppendColumn("Aufgabe")
+
     for index, row in df.iterrows():
-        if index==4:  
-            self.tasks_ctrl.Append([row.iloc[0]]) 
-            self.tasks_ctrl.Append([row.iloc[1]])
-            self.tasks_ctrl.Append([row.iloc[2]])
-            text="-------------"
-            self.tasks_ctrl.Append([text])
-            text="-------------"
-            self.tasks_ctrl.Append([text])
-            self.tasks_ctrl.SetColumnWidth(0, 200)
-            self.tasks_ctrl.SetColumnWidth(1, 200)
-            self.tasks_ctrl.SetColumnWidth(2, 200)
-        
-        elif index >= 5:
-            print(row) # Debugging row data
-            self.tasks_ctrl.Append([row.iloc[0]]) 
-            self.tasks_ctrl.Append([row.iloc[1]])
-            self.tasks_ctrl.Append([row.iloc[2]])
-            text="-------"
-            self.tasks_ctrl.Append([text])
-            text="-------"
-            self.tasks_ctrl.Append([text])
-        
+        self.tasks_ctrl.Append([row.iloc[0]]) 
+        self.tasks_ctrl.Append([row.iloc[1]])
+        self.tasks_ctrl.Append([row.iloc[2]])
+        text="-------------"
+        self.tasks_ctrl.Append([text])
+        self.tasks_ctrl.SetColumnWidth(0, 600)

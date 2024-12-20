@@ -75,7 +75,7 @@ class MyFrame(wx.Frame):
         
         
         self.tasks_ctrl = wx.ListCtrl(panel,
-                                     style=wx.LC_ICON
+                                     style=wx.LC_LIST
                                      |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
                                      )
         self.file_listbox = wx.ListBox(panel)

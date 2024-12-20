@@ -28,7 +28,7 @@ class PreferencesPage(wx.PreferencesPage):
         heading_user.SetFont(font)
         sizer.Add(heading_user, 0, wx.ALL, 5)
         # User choice
-        self.user_choice = wx.Choice(panel, choices=["Asher", "Benjamin", "Larisa", "Listan", "Mahsa", "Marko", "Sandra"])
+        self.user_choice = wx.Choice(panel, choices=["Alle", "Asher", "Benjamin", "Larisa", "Listan", "Mahsa", "Marko", "Sandra"])
         sizer.Add(self.user_choice, 0, wx.ALL, 5)
         # Load saved state
         user_state = self.config.Read("user_choice", "Asher")

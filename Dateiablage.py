@@ -92,6 +92,11 @@ class MyFrame(wx.Frame):
         task_title = wx.StaticText(panel, label="Aufgaben", style=wx.ALIGN_RIGHT)
         explorer_title = wx.StaticText(panel, label="Dateien und Ordner", style=wx.ALIGN_LEFT)
 
+        # Setting font style
+        learning_title.SetFont(wx.Font(wx.FontInfo(12).Bold()))
+        task_title.SetFont(wx.Font(wx.FontInfo(12).Bold()))
+        explorer_title.SetFont(wx.Font(wx.FontInfo(12).Bold()))
+
         # Creating a horizontal box sizer
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 

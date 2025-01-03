@@ -51,6 +51,7 @@ class MyFrame(wx.Frame):
 
         # Definition of global variables
         self.file_path_tasks = []
+        self.file_path = None
 
         # Creating a menu bar
         menu_bar = wx.MenuBar()

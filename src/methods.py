@@ -5,6 +5,20 @@ from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
 
+# Method to handle the Convert menu item
+def on_convert(self, file_path, event):
+    convert_srt_to_vtt(self, file_path)
+    
+# Method to convert srt into vtt 
+def convert_srt_to_vtt(self, file_path):
+    io.buffer_vtt.write("WEBVTT\n\n")
+    for line in file_path:
+        if line.strip().isdigit():
+            continue
+        if "-->" in line:
+            line = line.replace(",", ".")
+        io.buffer_vtt.write(line)
+
 # Method to handle über die App menu item
 def on_about(self, event):
     wx.MessageBox("Dateiablage\nVersion 0.1.0\n\n© CompuGroup Medical\n2025", "Über die App", wx.OK | wx.ICON_INFORMATION)

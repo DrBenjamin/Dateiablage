@@ -46,10 +46,7 @@ class MyFrame(wx.Frame):
             self.config.WriteBool("srt_converter_enabled", True)
 
         # Definition of global variables
-        self.file_list = []
-        self.definition_csv = None
         self.file_path_tasks = []
-        self.folder_path = None
 
         # Creating a menu bar
         menu_bar = wx.MenuBar()
@@ -65,7 +62,8 @@ class MyFrame(wx.Frame):
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
-        refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisiere")
+        convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere srt in vtt")
+        refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisieren")
         preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
 

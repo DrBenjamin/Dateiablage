@@ -16,7 +16,8 @@ from src.learning import (
 from src.tasks import on_import_task
 from src.files import (
     on_browse,
-    on_file_activated
+    on_file_activated,
+    on_file_selected
 )
 
 class MyFrame(wx.Frame):
@@ -33,6 +34,7 @@ class MyFrame(wx.Frame):
         self.on_browse = types.MethodType(on_browse, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
+        self.on_file_selected = types.MethodType(on_file_selected, self)
         self.on_contact = types.MethodType(on_contact, self)
         self.on_about = types.MethodType(on_about, self)
         self.on_convert = types.MethodType(on_convert, self)
@@ -130,6 +132,7 @@ class MyFrame(wx.Frame):
         # Setting the sizer for the frame and fit the panel
         panel.SetSizer(vbox)
 
+        ## Binding of methods to menu items
         # Binding the Import menu item to the on_import method
         self.Bind(wx.EVT_MENU, self.on_import_csv, import_definition)
         # Binding the Import menu item to the on_import method
@@ -151,10 +154,13 @@ class MyFrame(wx.Frame):
         # Binding the Convert menu to the on_convert method
         self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)    
         
+        ## Bindings of events
         # Binding the list control to the on_item_activated method
         self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_item_activated method
         self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
+        # Binding the list control to the on_file_selected method
+        self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_selected)
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
 

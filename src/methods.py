@@ -5,10 +5,15 @@ from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
 
-# Method to handle the Convert menu item
-def on_convert(self, event):
+# Method to handle selected file
+def on_file_selected(self, event):
     file_index = event.GetSelection()
     file_path = self.file_listbox.GetString(file_index)
+    return file_path
+    
+# Method to handle the Convert menu item
+def on_convert(self, event):
+    file_path = on_file_selected(self, event)
     print(file_path)
     #convert_srt_to_vtt(self, file_path)
     

@@ -12,6 +12,12 @@ def on_browse(self, event):
         list_files(self, self.folder_path)
     dialog.Destroy()
 
+# Method to handle selected file
+def on_file_selected(self, event):
+    file_index = event.GetSelection()
+    file_path = self.file_listbox.GetString(file_index)
+    self.file_path = file_path
+    
 # Method to handle the list control item activated event
 def on_file_activated(self, event):
     file_index = event.GetSelection()

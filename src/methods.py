@@ -4,6 +4,35 @@ from docx import Document
 from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
+   
+# Method to handle the Convert menu item
+def on_convert(self, event):
+    try:
+        if self.file_path.endswith(".srt"):
+            convert_srt_to_vtt(self.file_path)
+        else:
+            wx.MessageBox("Dateiendung wird nicht unterstützt", "Error", wx.OK | wx.ICON_ERROR)
+    except Exception as e:
+        wx.MessageBox(f"Datei konnte nicht konvertiert werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+
+# Method to convert srt into vtt 
+def convert_srt_to_vtt(file_path):
+    with open(file_path, "r") as f:
+        buffer_vtt = io.StringIO()
+        buffer_vtt.write("WEBVTT\n\n")
+        for line in f:
+            if line.strip().isdigit():
+                continue
+            if "-->" in line:
+                line = line.replace(",", ".")
+            buffer_vtt.write(line)
+
+        ## To-Do
+        #  - Write the converted content to a new file with same name and path
+        #    but different extension e.g. (`subtile.srt`` to `subtitle.vtt`)
+        #  - Checking if there is already a file with the same name
+        #    and ask the user if they want to overwrite it
+        print(buffer_vtt.getvalue())
 
 # Method to handle über die App menu item
 

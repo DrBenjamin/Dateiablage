@@ -5,7 +5,8 @@ from src.methods import (
     on_export,
     on_exit,
     on_contact,
-    on_about
+    on_about,
+    on_convert
 )
 from src.preferences import on_preferences
 from src.learning import (
@@ -15,7 +16,8 @@ from src.learning import (
 from src.tasks import on_import_task
 from src.files import (
     on_browse,
-    on_file_activated
+    on_file_activated,
+    on_file_selected
 )
 
 class MyFrame(wx.Frame):
@@ -32,8 +34,10 @@ class MyFrame(wx.Frame):
         self.on_browse = types.MethodType(on_browse, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
+        self.on_file_selected = types.MethodType(on_file_selected, self)
         self.on_contact = types.MethodType(on_contact, self)
         self.on_about = types.MethodType(on_about, self)
+        self.on_convert = types.MethodType(on_convert, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")
@@ -46,10 +50,8 @@ class MyFrame(wx.Frame):
             self.config.WriteBool("srt_converter_enabled", True)
 
         # Definition of global variables
-        self.file_list = []
-        self.definition_csv = None
         self.file_path_tasks = []
-        self.folder_path = None
+        self.file_path = None
 
         # Creating a menu bar
         menu_bar = wx.MenuBar()
@@ -65,7 +67,8 @@ class MyFrame(wx.Frame):
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
-        refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisiere")
+        convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere srt in vtt")
+        refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisieren")
         preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
 
@@ -130,6 +133,7 @@ class MyFrame(wx.Frame):
         # Setting the sizer for the frame and fit the panel
         panel.SetSizer(vbox)
 
+        ## Binding of methods to menu items
         # Binding the Import menu item to the on_import method
         self.Bind(wx.EVT_MENU, self.on_import_csv, import_definition)
         # Binding the Import menu item to the on_import method
@@ -147,12 +151,17 @@ class MyFrame(wx.Frame):
         # Binding the Contact menu to the on_contact method
         self.Bind(wx.EVT_MENU, self.on_contact, help_contact)
         # Binding the über die App menu to the on_about method 
-        self.Bind(wx.EVT_MENU, self.on_about, help_about) 
-
+        self.Bind(wx.EVT_MENU, self.on_about, help_about)
+        # Binding the Convert menu to the on_convert method
+        self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)    
+        
+        ## Bindings of events
         # Binding the list control to the on_item_activated method
         self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_item_activated method
         self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
+        # Binding the list control to the on_file_selected method
+        self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_selected)
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
 

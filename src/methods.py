@@ -5,7 +5,11 @@ from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
 
-# Method to handle the Convert menu item
+# Method to handle über die App menu item
+def on_about(self, event):
+    wx.MessageBox("Dateiablage\nVersion 0.1.0\n\n© CompuGroup Medical\n2025", "Über die App", wx.OK | wx.ICON_INFORMATION)
+
+# Method to handle the Contact menu item
 def on_contact(self, event):
     mailto_link = "mailto:benjamin.gross@partner.cgm.com?subject=Supportanfrage&body=Hallo%20Support-Team"
     wx.LaunchDefaultBrowser(mailto_link)

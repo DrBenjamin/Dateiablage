@@ -4,7 +4,8 @@ from src.methods import (
     on_refresh,
     on_export,
     on_exit,
-    on_contact
+    on_contact,
+    on_about
 )
 from src.preferences import on_preferences
 from src.learning import (
@@ -32,6 +33,7 @@ class MyFrame(wx.Frame):
         self.on_item_selected = types.MethodType(on_item_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
         self.on_contact = types.MethodType(on_contact, self)
+        self.on_about = types.MethodType(on_about, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")
@@ -69,8 +71,8 @@ class MyFrame(wx.Frame):
 
         # Creating the `Hilfemenü` menu
         help_menu = wx.Menu()
-        help_contact = help_menu.Append(wx.ID_ANY, "&Kontakt") # Informationen, wie Benutzer Unterstützung erhalten können.
-        help_about = help_menu.Append(wx.ID_ANY, "&Über die App") # Informationen über die Anwendung.
+        help_contact = help_menu.Append(wx.ID_ANY, "&Kontakt") # Information on how users can receive support.
+        help_about = help_menu.Append(wx.ID_ANY, "&Über die App") # Information about the application.
 
         menu_bar.Append(help_menu, "&Hilfe")
 
@@ -144,6 +146,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_preferences, preferences)
         # Binding the Contact menu to the on_contact method
         self.Bind(wx.EVT_MENU, self.on_contact, help_contact)
+        # Binding the über die App menu to the on_about method 
+        self.Bind(wx.EVT_MENU, self.on_about, help_about) 
 
         # Binding the list control to the on_item_activated method
         self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)

@@ -6,8 +6,23 @@ from src.tasks import import_excel
 from src.learning import display_learning
 
 # Method to handle über die App menu item
-def on_about(self, event):
-    wx.MessageBox("Dateiablage\nVersion 0.1.0\n\n© CompuGroup Medical\n2025", "Über die App", wx.OK | wx.ICON_INFORMATION)
+
+def on_about(self, event):               # wx.MessageBox("Dateiablage\nVersion 0.1.0\n\n© CompuGroup Medical\n2025", "Über die App", wx.OK | wx.ICON_INFORMATION)
+    message = (
+        "Name der Anwendung:\n" 
+        "Dateiablage\n\n"
+        "Versionsnummer:\n" 
+        "0.1.0\n\n"
+        "Das Unternehmen:\n" 
+        "© CompuGroup Medical\n\n"
+        "**** Beschreibung ****\n"
+        "Die Dateiablage ist eine Anwendung zur unkomplizierten Verwaltung von E-Learning-Inhalten und Aufgaben für das medizinische Personal.\n\n"
+        "**** Support ****\n"
+        "Bei Fragen oder technischen Problemen kontaktieren Sie bitte unseren Support unter:\n"
+        "support@compugroup.com\n\n"
+    )
+
+    wx.MessageBox(message, "Über die App ", wx.OK | wx.ICON_INFORMATION)
 
 # Method to handle the Contact menu item
 def on_contact(self, event):

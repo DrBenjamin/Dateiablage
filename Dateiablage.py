@@ -72,7 +72,7 @@ class MyFrame(wx.Frame):
         # Creating the `Hilfemenü` menu
         help_menu = wx.Menu()
         help_contact = help_menu.Append(wx.ID_ANY, "&Kontakt") # Information on how users can receive support.
-        help_about = help_menu.Append(wx.ID_ANY, "&Über die App") # Information about the application.
+        help_about = help_menu.Append(wx.ID_ANY, "&Über die App") # Informationen über die Anwendung.
 
         menu_bar.Append(help_menu, "&Hilfe")
 

@@ -65,6 +65,13 @@ class MyFrame(wx.Frame):
         preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
 
+        # Creating the `Hilfemenü` menu
+        help_menu = wx.Menu()
+        help_about = help_menu.Append(wx.ID_ANY, "&Über die App") # Informationen über die Anwendung.
+        help_contact = help_menu.Append(wx.ID_ANY, "&Kontakt") # Informationen, wie Benutzer Unterstützung erhalten können.
+
+        menu_bar.Append(help_menu, "&Hilfe")
+
         # Setting the menu bar
         self.SetMenuBar(menu_bar)
 

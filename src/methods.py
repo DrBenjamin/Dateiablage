@@ -6,8 +6,11 @@ from src.tasks import import_excel
 from src.learning import display_learning
 
 # Method to handle the Convert menu item
-def on_convert(self, file_path, event):
-    convert_srt_to_vtt(self, file_path)
+def on_convert(self, event):
+    file_index = event.GetSelection()
+    file_path = self.file_listbox.GetString(file_index)
+    print(file_path)
+    #convert_srt_to_vtt(self, file_path)
     
 # Method to convert srt into vtt 
 def convert_srt_to_vtt(self, file_path):

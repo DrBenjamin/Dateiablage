@@ -1,8 +1,14 @@
+import wx
 import io
 from docx import Document
 from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
+
+# Method to handle the Convert menu item
+def on_contact(self, event):
+    mailto_link = "mailto:benjamin.gross@partner.cgm.com?subject=Supportanfrage&body=Hallo%20Support-Team"
+    wx.LaunchDefaultBrowser(mailto_link)
 
 # Method to handle the Refresh menu item
 def on_refresh(self, event):

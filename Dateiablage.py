@@ -60,8 +60,8 @@ class MyFrame(wx.Frame):
 
         # Creating the `Datei` menu
         file_menu = wx.Menu()
-        import_definition = file_menu.Append(wx.ID_ANY, "&Importiere e-Learning Definition")
-        import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle Aufgabenliste")
+        import_definition = file_menu.Append(wx.ID_ANY, "&Wähle e-Learning Definition")
+        import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle Aufgaben")
         browse_item = file_menu.Append(wx.ID_OPEN, "&Wähle Quellverzeichnis")
         exit_app = file_menu.Append(wx.ID_EXIT, "&Beenden")
         menu_bar.Append(file_menu, "&Datei")
@@ -79,7 +79,6 @@ class MyFrame(wx.Frame):
         help_menu = wx.Menu()
         help_contact = help_menu.Append(wx.ID_ANY, "&Kontakt") # Information on how users can receive support.
         help_about = help_menu.Append(wx.ID_ANY, "&Über die App") # Informationen über die Anwendung.
-
         menu_bar.Append(help_menu, "&Hilfe")
 
         # Setting the menu bar
@@ -105,7 +104,7 @@ class MyFrame(wx.Frame):
         self.file_listbox = wx.ListBox(panel)
 
         # Titles for the controls
-        learning_title = wx.StaticText(panel, label="E-learning", style=wx.ALIGN_LEFT)
+        learning_title = wx.StaticText(panel, label="e-Learning", style=wx.ALIGN_LEFT)
         task_title = wx.StaticText(panel, label="Aufgaben", style=wx.ALIGN_RIGHT)
         explorer_title = wx.StaticText(panel, label="Dateien und Ordner", style=wx.ALIGN_LEFT)
 

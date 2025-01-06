@@ -43,9 +43,8 @@ def convert_srt_to_vtt(file_path):
         #    and ask the user if they want to overwrite it
         print(buffer_vtt.getvalue())
 
-# Method to handle über die App menu item
-
-def on_about(self, event):               # wx.MessageBox("Dateiablage\nVersion 0.1.0\n\n© CompuGroup Medical\n2025", "Über die App", wx.OK | wx.ICON_INFORMATION)
+# Method to handle `Über die App` menu item
+def on_about(self, event):
     message = (
         "Name der Anwendung:\n" 
         "Dateiablage\n\n"
@@ -54,17 +53,16 @@ def on_about(self, event):               # wx.MessageBox("Dateiablage\nVersion 0
         "Das Unternehmen:\n" 
         "© CompuGroup Medical\n\n"
         "**** Beschreibung ****\n"
-        "Die Dateiablage ist eine Anwendung zur unkomplizierten Verwaltung von E-Learning-Inhalten und Aufgaben für das medizinische Personal.\n\n"
+        "Die Dateiablage ist eine Anwendung zur unkomplizierten Verwaltung von e-Learning-Inhalten und Aufgaben für das medizinische Personal.\n\n"
         "**** Support ****\n"
         "Bei Fragen oder technischen Problemen kontaktieren Sie bitte unseren Support unter:\n"
-        "support@compugroup.com\n\n"
+        "support-dateiablage@cgm.com\n\n"
     )
-
     wx.MessageBox(message, "Über die App ", wx.OK | wx.ICON_INFORMATION)
 
 # Method to handle the Contact menu item
 def on_contact(self, event):
-    mailto_link = "mailto:benjamin.gross@partner.cgm.com?subject=Supportanfrage&body=Hallo%20Support-Team"
+    mailto_link = "mailto:support-dateiablage@cgm.com?subject=Supportanfrage&body=Hallo%20Support-Team"
     wx.LaunchDefaultBrowser(mailto_link)
 
 # Method to handle the Refresh menu item
@@ -72,7 +70,7 @@ def on_refresh(self, event):
     # Clear the ctrl lists
     self.learning_ctrl.DeleteAllItems()
     self.tasks_ctrl.DeleteAllItems()
-    
+
     # Refresh the ctrl lists
     try:
         if self.folder_path is not None:

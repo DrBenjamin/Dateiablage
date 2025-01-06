@@ -26,22 +26,19 @@ def on_file_selected(self, event):
     
 # Method to handle the list control item activated event
 def on_file_activated(self, event):
-    file_index = event.GetSelection()
-    file_path = self.file_listbox.GetString(file_index)
-
     if platform.system() == "Windows":
         try:
-            os.startfile(f'"{file_path}"')
+            os.startfile(f'"{self.file_path}"')
         except Exception as e:
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
     elif platform.system() == "Darwin":  # macOS
         try:
-            subprocess.call(["open", file_path])
+            subprocess.call(["open", self.file_path])
         except Exception as e:
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
     else:  # Linux
         try:
-            subprocess.call(["xdg-open", file_path])
+            subprocess.call(["xdg-open", self.file_path])
         except Exception as e:
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
 

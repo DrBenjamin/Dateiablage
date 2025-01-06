@@ -7,7 +7,8 @@ from src.methods import (
     on_contact,
     on_about,
     on_convert,
-    on_copy_path
+    on_copy_path,
+    on_right_click,
 )
 from src.preferences import on_preferences
 from src.learning import (
@@ -40,6 +41,7 @@ class MyFrame(wx.Frame):
         self.on_about = types.MethodType(on_about, self)
         self.on_convert = types.MethodType(on_convert, self)
         self.on_copy_path = types.MethodType(on_copy_path, self)
+        self.on_right_click = types.MethodType(on_right_click, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")
@@ -160,6 +162,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)
         # Binding the Copy menu to the on_copy_path method
         self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
+        # Binding the right-click event
+        self.file_listbox.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click)
 
         ## Bindings of events
         # Binding the list control to the on_item_activated method

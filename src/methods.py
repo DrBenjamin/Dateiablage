@@ -1,9 +1,28 @@
 import wx
 import io
+import types
 from docx import Document
-from src.files import list_files
+from src.files import (
+    list_files,
+    on_file_activated
+)
 from src.tasks import import_excel
 from src.learning import display_learning
+
+# Method to handle the right click event
+def on_right_click(self, event):
+    # Create the context menu
+    menu = wx.Menu()
+    open_item = menu.Append(wx.ID_ANY, "Open")
+    copy_path = menu.Append(wx.ID_ANY, "Copy Path")
+    
+    # Binding handlers
+    self.Bind(wx.EVT_MENU, self.on_file_activated, open_item)
+    self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
+    
+    # Show the menu
+    self.PopupMenu(menu, event.GetPosition())
+    menu.Destroy()
 
 # Method to handle the Copy Path menu item
 def on_copy_path(self, event):

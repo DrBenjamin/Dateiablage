@@ -9,15 +9,15 @@ from src.learning import display_learning
 def on_right_click(self, event):
     # Create the context menu
     menu = wx.Menu()
-    open_item = menu.Append(wx.ID_ANY, "Öffne Datei / Ordner")
+    open_item = menu.Append(wx.ID_ANY, "Öffnen")
     copy_path = menu.Append(wx.ID_ANY, "Kopiere Pfad")
     convert_item = menu.Append(wx.ID_ANY, "Konvertiere srt in vtt")
-    
+
     # Binding handlers
     self.Bind(wx.EVT_MENU, self.on_file_activated, open_item)
     self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
     self.Bind(wx.EVT_MENU, self.on_convert, convert_item)
-    
+
     # Show the menu
     self.PopupMenu(menu, event.GetPosition())
     menu.Destroy()

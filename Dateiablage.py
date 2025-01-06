@@ -73,7 +73,7 @@ class MyFrame(wx.Frame):
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
-        copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Dateipfad")
+        copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Pfad")
         convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere srt in vtt")
         refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisieren")
         preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")

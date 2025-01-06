@@ -50,6 +50,8 @@ class MyFrame(wx.Frame):
             self.config.WriteBool("xml_import_enabled", True)
         if not self.config.HasEntry("srt_converter_enabled"):
             self.config.WriteBool("srt_converter_enabled", True)
+        if not self.config.HasEntry("d_mapping_enabled"):
+            self.config.WriteBool("d_mapping_enabled", False)
 
         # Definition of global variables
         self.file_path_tasks = []

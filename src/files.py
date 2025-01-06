@@ -8,8 +8,14 @@ import unicodedata
 def on_browse(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
-        self.folder_path = dialog.GetPath() # folder_path will contain the path of the folder you have selected as string
-        list_files(self, self.folder_path)
+        # `folder_path`` contains the path of the folder selected as string
+        self.folder_path = dialog.GetPath()
+        if self.config.ReadBool("d_mapping_enabled", True):
+            if not os.path.exists("D:"):
+                subprocess.run(['subst', 'D:', self.folder_path], check=True)
+            list_files(self, "D:\\")
+        else:
+            list_files(self, self.folder_path)
     dialog.Destroy()
 
 # Method to handle selected file

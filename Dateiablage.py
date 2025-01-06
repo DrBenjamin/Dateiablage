@@ -6,7 +6,8 @@ from src.methods import (
     on_exit,
     on_contact,
     on_about,
-    on_convert
+    on_convert,
+    on_copy_path
 )
 from src.preferences import on_preferences
 from src.learning import (
@@ -38,6 +39,7 @@ class MyFrame(wx.Frame):
         self.on_contact = types.MethodType(on_contact, self)
         self.on_about = types.MethodType(on_about, self)
         self.on_convert = types.MethodType(on_convert, self)
+        self.on_copy_path = types.MethodType(on_copy_path, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")
@@ -67,6 +69,7 @@ class MyFrame(wx.Frame):
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
+        copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Dateipfad")
         convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere srt in vtt")
         refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisieren")
         preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")
@@ -153,8 +156,10 @@ class MyFrame(wx.Frame):
         # Binding the über die App menu to the on_about method 
         self.Bind(wx.EVT_MENU, self.on_about, help_about)
         # Binding the Convert menu to the on_convert method
-        self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)    
-        
+        self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)
+        # Binding the Copy menu to the on_copy_path method
+        self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
+
         ## Bindings of events
         # Binding the list control to the on_item_activated method
         self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)

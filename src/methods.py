@@ -4,7 +4,16 @@ from docx import Document
 from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
-   
+
+# Method to handle the Copy Path menu item
+def on_copy_path(self, event):
+    if self.file_path is not None:
+        wx.TheClipboard.Open()
+        wx.TheClipboard.SetData(wx.TextDataObject(self.file_path))
+        wx.TheClipboard.Close()
+    else:
+        wx.MessageBox("Keine Datei ausgewählt", "Error", wx.OK | wx.ICON_ERROR)
+
 # Method to handle the Convert menu item
 def on_convert(self, event):
     try:

@@ -165,3 +165,5 @@ cython_debug/
 test.py
 Export_Dateiliste.docx
 test2.py
+_internal/
+!_internal/images/

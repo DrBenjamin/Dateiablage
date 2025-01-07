@@ -162,7 +162,4 @@ cython_debug/
 #.idea/
 .vscode/settings.json
 .conda/*
-test.py
 Export_Dateiliste.docx
-test2.py
-_internal/

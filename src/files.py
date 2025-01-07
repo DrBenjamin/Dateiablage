@@ -1,5 +1,7 @@
 import wx
 import os
+import sys
+import ctypes
 import subprocess
 import platform
 import unicodedata
@@ -17,11 +19,12 @@ def on_browse(self, event):
 
                 # Writing registry file
                 with open(f"{self.folder_path}\\MapVirtualDriveD.reg", "w") as f:
+                    path_to_folder = self.folder_path.replace("\\", "\\\\")
                     f.write(
 f"""Windows Registry Editor Version 5.00\n\n\
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices]\n\
-"D Drive\"=\"subst D: {self.folder_path}\"""")
-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]
+"D Drive"="subst D: \\"{path_to_folder}\\""
+""")
                 # Importing registry file
                 subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDriveD.reg"], check=True, shell=True)
             list_files(self, "D:\\")

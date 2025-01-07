@@ -12,7 +12,18 @@ def on_browse(self, event):
         self.folder_path = dialog.GetPath()
         if self.config.ReadBool("d_mapping_enabled", True):
             if not os.path.exists("D:"):
+                # Mapping the folder to drive D
                 subprocess.run(['subst', 'D:', self.folder_path], check=True)
+
+                # Writing registry file
+                with open(f"{self.folder_path}\\MapVirtualDriveD.reg", "w") as f:
+                    f.write(
+f"""Windows Registry Editor Version 5.00\n\n\
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices]\n\
+"D Drive\"=\"subst D: {self.folder_path}\"""")
+
+                # Importing registry file
+                subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDriveD.reg"], check=True, shell=True)
             list_files(self, "D:\\")
         else:
             list_files(self, self.folder_path)
@@ -23,7 +34,7 @@ def on_file_selected(self, event):
     file_index = event.GetSelection()
     file_path = self.file_listbox.GetString(file_index)
     self.file_path = file_path
-    
+
 # Method to handle the list control item activated event
 def on_file_activated(self, event):
     if platform.system() == "Windows":

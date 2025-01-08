@@ -90,12 +90,9 @@ python -m pip install -r .\requirements.txt
 ```bash
 python Dateiablage.py
 ```
-
-Baue die aktuelle Version von Dateiablage
-
-```bash
 8. Dateiablage veröffentlichen
 
+Aktuelle Version bauen:
 ```bash
 pyinstaller Dateiablage.spec
 ```

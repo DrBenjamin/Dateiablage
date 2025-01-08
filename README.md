@@ -4,23 +4,27 @@ Tool zur Organisation der Dateiablage von e-Learning Inhalten.
 
 ## Installation
 
-Die Anleitung zur Dateiablage
+Anleitung zur Dateiablage.
 
 1. Unternehmensportal besuchen
 
 * Microsoft Visual Studio Code installieren
 * Git installieren
-* Miniconda unter diesem Link installieren: [Download](https://www.anaconda.com/download/success#miniconda)
 
-2. Minianaconda öffnen:
+2. Minianaconda installieren
 
+* Miniconda unter diesem Link [Link](https://www.anaconda.com/download/success#miniconda) installieren
 * Setup Einstellung: Next -> I Agree -> "Just Me" muss angeklickt sein -> Next
+
   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/78733ca3c744ff51aed75c3398c21696936c1972/Images/1.Miniconda_setup.png?raw=true)
 * Install ->  Next -> Finish
 
-3. Hinweis!: Zscaler öffnen: Oben rechts : Log Out klicke
-   ![Image](https://github.com/DrBenjamin/Dateiablage/blob/53e19c76fcb661d57c289d234f70ebd361d9699d/Images/2.Zscaler.png?raw=true)
-4. Visual Code öffnen:
+3. Hinweis!: Das VPN macht Probleme bei der Verbindung mit Github
+* Zscaler öffnen: Oben rechts : Log Out klicke
+
+![Image](https://github.com/DrBenjamin/Dateiablage/blob/53e19c76fcb661d57c289d234f70ebd361d9699d/Images/2.Zscaler.png?raw=true)
+
+4. Visual Code öffnen
 
 * Get Started schließen
 * Clone Git Respository wählen

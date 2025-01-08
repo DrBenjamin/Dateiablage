@@ -68,7 +68,7 @@ def on_about(self, event):
         "Versionsnummer:\n" 
         "0.1.0\n\n"
         "Das Unternehmen:\n" 
-        "© CompuGroup Medical\n\n"
+        "CompuGroup Medical\n\n"
         "**** Beschreibung ****\n"
         "Die Dateiablage ist eine Anwendung zur unkomplizierten Verwaltung von e-Learning-Inhalten und Aufgaben für das medizinische Personal.\n\n"
         "**** Support ****\n"

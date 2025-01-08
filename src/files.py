@@ -42,6 +42,7 @@ f"""Windows Registry Editor Version 5.00\n\n\
                             print("Registry file imported")
 
                         except:
+                            print("Existing: ", letter)
                             continue
                         self.config.Write("drive_mapping_letter", letter)
                         break

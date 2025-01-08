@@ -81,7 +81,12 @@ class PreferencesPage(wx.PreferencesPage):
         self.drive_checkbox.SetValue(drive_state)
         # Bind event to save state
         self.drive_checkbox.Bind(wx.EVT_CHECKBOX, self.on_drive_checkbox)
+        # Showing drive letter
+        sizer.Add(wx.StaticText(panel,
+                                label=f'Laufwerk {self.config.Read("drive_mapping_letter")} wurde gemappt.'),
+                  0, wx.ALL, 5)
 
+        # Setting the sizer for the panel
         panel.SetSizer(sizer)
         return panel
 

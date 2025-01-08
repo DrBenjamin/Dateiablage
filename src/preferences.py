@@ -68,16 +68,16 @@ class PreferencesPage(wx.PreferencesPage):
         self.srt_checkbox.Bind(wx.EVT_CHECKBOX, self.on_srt_checkbox)
 
         # Adding preference control Drive mapping
-        heading_drive = wx.StaticText(panel, label="D Drive mappen")
+        heading_drive = wx.StaticText(panel, label="Virtuelles Laufwerk")
         font = heading_drive.GetFont()
         font.PointSize += 2
         heading_drive.SetFont(font)
         sizer.Add(heading_drive, 0, wx.ALL, 5)
         # Drive mapping checkbox
-        self.drive_checkbox = wx.CheckBox(panel, label="Laufwerk D mappen")
+        self.drive_checkbox = wx.CheckBox(panel, label="Laufwerk mappen")
         sizer.Add(self.drive_checkbox, 0, wx.ALL, 5)
         # Load saved state
-        drive_state = self.config.ReadBool("d_mapping_enabled", False)
+        drive_state = self.config.ReadBool("drive_mapping_enabled", False)
         self.drive_checkbox.SetValue(drive_state)
         # Bind event to save state
         self.drive_checkbox.Bind(wx.EVT_CHECKBOX, self.on_drive_checkbox)
@@ -102,5 +102,5 @@ class PreferencesPage(wx.PreferencesPage):
 
     # Method to handle the Preferences page D Drive checkbox
     def on_drive_checkbox(self, event):
-        self.config.WriteBool("d_mapping_enabled", self.drive_checkbox.IsChecked())
+        self.config.WriteBool("drive_mapping_enabled", self.drive_checkbox.IsChecked())
         self.config.Flush()

@@ -12,10 +12,16 @@ def on_browse(self, event):
     if dialog.ShowModal() == wx.ID_OK:
         # `folder_path`` contains the path of the folder selected as string
         self.folder_path = dialog.GetPath()
-        if self.config.ReadBool("d_mapping_enabled", True):
-            if not os.path.exists("D:"):
-                # Mapping the folder to drive D
-                subprocess.run(['subst', 'D:', self.folder_path], check=True)
+        if self.config.ReadBool("drive_mapping_enabled", True):
+            letters = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+            for letter in letters:
+                if os.path.exists(f"{letter}:"):
+                    continue
+                else:
+                    # Mapping the folder to drive letter
+                    subprocess.run(['subst', f"{letter}:", self.folder_path], check=True)
+                    self.config.Write("drive_mapping_enabled", letter)
+                    break
 
                 # Writing registry file
                 with open(f"{self.folder_path}\\MapVirtualDriveD.reg", "w") as f:
@@ -23,11 +29,11 @@ def on_browse(self, event):
                     f.write(
 f"""Windows Registry Editor Version 5.00\n\n\
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]
-"D Drive"="subst D: \\"{path_to_folder}\\""
+"Virtual Drive"="subst {letter}: \\"{path_to_folder}\\""
 """)
                 # Importing registry file
                 subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDriveD.reg"], check=True, shell=True)
-            list_files(self, "D:\\")
+            list_files(self, f"{self.config.Read("drive_mapping_enabled")}:\\")
         else:
             list_files(self, self.folder_path)
     dialog.Destroy()

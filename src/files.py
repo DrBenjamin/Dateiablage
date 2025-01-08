@@ -56,6 +56,12 @@ def on_file_selected(self, event):
     file_index = event.GetSelection()
     file_path = self.file_listbox.GetString(file_index)
     self.file_path = file_path
+    
+    # To-Do Kanjo
+    # - Get the file name from the path
+    # - Xy
+    file_name = os.path.basename(self.file_path)
+    print(file_name)
 
 # Method to handle the list control item activated event
 def on_file_activated(self, event):

@@ -92,7 +92,7 @@ python Dateiablage.py
 ```
 8. Dateiablage veröffentlichen
 
-Aktuelle Version bauen:
+Aktuelle Windows App bauen:
 ```bash
 pyinstaller Dateiablage.spec
 ```

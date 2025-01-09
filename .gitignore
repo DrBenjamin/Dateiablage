@@ -163,3 +163,5 @@ cython_debug/
 .conda/*
 Export_Dateiliste.docx
 pyinstaller.bat
+Dateiablage.exe
+_internal/*

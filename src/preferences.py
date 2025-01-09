@@ -113,10 +113,7 @@ class PreferencesPage(wx.PreferencesPage):
 
     # Method to handle the Preferences page Drive mapping checkbox
     def on_drive_checkbox(self, event):
-        if self.drive_checkbox.IsChecked():
-            self.config.WriteBool("drive_mapping_enabled", self.drive_checkbox.IsChecked())
-            self.config.Flush()
-        else:
+        if not self.drive_checkbox.IsChecked():
             try:
                 # Unmapping the drive
                 subprocess.run(['subst', '/d', f"{self.config.Read('drive_mapping_letter')}:"])
@@ -124,8 +121,10 @@ class PreferencesPage(wx.PreferencesPage):
                 # Deleting the registry entry `Virtual Drive`
                 subprocess.run(["reg", "delete", "HKCU\Software\Microsoft\Windows\CurrentVersion\Run", "/v", "Virtual Drive", "/f"])
 
-                # Setting the variables to default
+                # Setting the variable to default value
                 self.config.WriteBool("drive_mapping_enabled", self.drive_checkbox.IsChecked())
                 self.config.Write("drive_mapping_letter", "")
             except FileNotFoundError:
                 pass
+        self.config.WriteBool("drive_mapping_enabled", self.drive_checkbox.IsChecked())
+        self.config.Flush()

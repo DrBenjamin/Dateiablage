@@ -162,6 +162,5 @@ cython_debug/
 .vscode/settings.json
 .conda/*
 Export_Dateiliste.docx
-pyinstaller.bat
 Dateiablage.exe
 _internal/*

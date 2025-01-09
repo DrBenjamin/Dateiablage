@@ -1,5 +1,6 @@
 import wx # wxPython / Phoenix
 import os
+import subprocess
 
 # Method to handle the Preferences menu item
 def on_preferences(self, event):
@@ -82,9 +83,14 @@ class PreferencesPage(wx.PreferencesPage):
         # Bind event to save state
         self.drive_checkbox.Bind(wx.EVT_CHECKBOX, self.on_drive_checkbox)
         # Showing drive letter
-        sizer.Add(wx.StaticText(panel,
-                                label=f'Laufwerk {self.config.Read("drive_mapping_letter")} wurde gemappt.'),
-                  0, wx.ALL, 5)
+        if self.drive_checkbox.IsChecked() and self.config.Read("drive_mapping_letter") != "":
+            sizer.Add(wx.StaticText(panel,
+                                    label=f'Laufwerk {self.config.Read("drive_mapping_letter")} wurde gemappt.'),
+                      0, wx.ALL, 5)
+        else:
+            sizer.Add(wx.StaticText(panel,
+                                    label='Kein Laufwerk gemappt.'),
+                      0, wx.ALL, 5)
 
         # Setting the sizer for the panel
         panel.SetSizer(sizer)
@@ -105,7 +111,21 @@ class PreferencesPage(wx.PreferencesPage):
         self.config.WriteBool("srt_converter_enabled", self.srt_checkbox.IsChecked())
         self.config.Flush()
 
-    # Method to handle the Preferences page D Drive checkbox
+    # Method to handle the Preferences page Drive mapping checkbox
     def on_drive_checkbox(self, event):
-        self.config.WriteBool("drive_mapping_enabled", self.drive_checkbox.IsChecked())
-        self.config.Flush()
+        if self.drive_checkbox.IsChecked():
+            self.config.WriteBool("drive_mapping_enabled", self.drive_checkbox.IsChecked())
+            self.config.Flush()
+        else:
+            try:
+                # Unmapping the drive
+                subprocess.run(['subst', '/d', f"{self.config.Read('drive_mapping_letter')}:"])
+
+                # Deleting the registry entry `Virtual Drive`
+                subprocess.run(["reg", "delete", "HKCU\Software\Microsoft\Windows\CurrentVersion\Run", "/v", "Virtual Drive", "/f"])
+
+                # Setting the variables to default
+                self.config.WriteBool("drive_mapping_enabled", self.drive_checkbox.IsChecked())
+                self.config.Write("drive_mapping_letter", "")
+            except FileNotFoundError:
+                pass

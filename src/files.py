@@ -13,18 +13,14 @@ def on_browse(self, event):
         # `folder_path`` contains the path of the folder selected as string
         self.folder_path = dialog.GetPath()
         if self.config.ReadBool("drive_mapping_enabled", True):
-            print("Stored letter: ", self.config.Read("drive_mapping_letter"))
-            print(self.config.Read("drive_mapping_letter"))
             if self.config.Read("drive_mapping_letter") == "":
                 letters = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
                 for letter in letters:
                     if os.path.exists(f"{letter}:"):
-                        print("Existing: ", letter)
                         continue
                     else:
                         try:
                             # Mapping the folder to drive letter
-                            print("Mapping: ", letter)
                             subprocess.run(['subst', f"{letter}:", self.folder_path],
                                         check=True)
 
@@ -39,10 +35,7 @@ f"""Windows Registry Editor Version 5.00\n\n\
 
                             # Importing registry file
                             subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDrive.reg"], check=True)
-                            print("Registry file imported")
-
                         except:
-                            print("Existing: ", letter)
                             continue
                         self.config.Write("drive_mapping_letter", letter)
                         break

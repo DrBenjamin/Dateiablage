@@ -1,10 +1,12 @@
 import wx
 import os
-import sys
-import ctypes
 import subprocess
 import platform
 import unicodedata
+
+# Method for creating the folder structur
+def on_create_folder_structure(self, event):
+    print("Creating folder structure")
 
 # Method to handle the Browse menu item
 def on_browse(self, event):

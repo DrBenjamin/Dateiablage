@@ -19,7 +19,8 @@ from src.tasks import on_import_task
 from src.files import (
     on_browse,
     on_file_activated,
-    on_file_selected
+    on_file_selected,
+    on_create_folder_structure
 )
 
 class MyFrame(wx.Frame):
@@ -42,6 +43,7 @@ class MyFrame(wx.Frame):
         self.on_convert = types.MethodType(on_convert, self)
         self.on_copy_path = types.MethodType(on_copy_path, self)
         self.on_right_click = types.MethodType(on_right_click, self)
+        self.on_create_folder_structure = types.MethodType(on_create_folder_structure, self)
 
         # Initialize config
         self.config = wx.Config("Dateiablage")
@@ -74,6 +76,7 @@ class MyFrame(wx.Frame):
         
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
+        folder_structure = edit_menu.Append(wx.ID_ANY, "Ordnerstruktur anlegen")
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
         copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Pfad")
         convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere srt in vtt")
@@ -166,6 +169,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
         # Binding the right-click event
         self.file_listbox.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click)
+        # Binding the Create folder structure menu item to the on_create_folder_structure method
+        self.Bind(wx.EVT_MENU, self.on_create_folder_structure, folder_structure)
 
         ## Bindings of events
         # Binding the list control to the on_item_activated method

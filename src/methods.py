@@ -4,6 +4,7 @@ from docx import Document
 from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
+import os
 
 # Method to handle the right click event
 def on_right_click(self, event):
@@ -43,23 +44,40 @@ def on_convert(self, event):
 
 # Method to convert srt into vtt 
 def convert_srt_to_vtt(file_path):
-    with open(file_path, "r") as f:
-        buffer_vtt = io.StringIO()
-        buffer_vtt.write("WEBVTT\n\n")
+    vtt_file_path = file_path.rsplit(".", 1)[0] + ".vtt"
+    
+    if os.path.exists(vtt_file_path):
+        file_name = os.path.basename(vtt_file_path)
+        response = wx.MessageBox(
+            f"Die Datei '{file_name}' existiert bereits. Möchten Sie sie ersetzen?",
+            "Datei existiert",
+            wx.YES_NO | wx.ICON_QUESTION
+        )
+        if response == wx.NO:
+            return
+        
+        os.remove(vtt_file_path)
+        
+    with open(file_path, "r") as f, open(vtt_file_path, "w") as vtt_file:
+        vtt_file.write("WEBVTT\n\n")
+        first_line = True
         for line in f:
-            if line.strip().isdigit():
+            if first_line:
+                first_line = False # skip the first line
                 continue
-            if "-->" in line:
+            if line.strip().isdigit():  # skip rows wth digits
+                continue
+            if "-->" in line:  # convert time format "," into "."
                 line = line.replace(",", ".")
-            buffer_vtt.write(line)
-
-        ## To-Do
-        #  - Write the converted content to a new file with same name and path
-        #    but different extension e.g. (`subtile.srt`` to `subtitle.vtt`)
-        #  - Checking if there is already a file with the same name
-        #    and ask the user if they want to overwrite it
-        print(buffer_vtt.getvalue())
-
+            vtt_file.write(line)
+    
+    file_name = os.path.basename(vtt_file_path)        
+    wx.MessageBox(
+        f"Die Datei wurde erfolgreich konvertiert und gespeichert als:\n{file_name}",
+        "Erfolg",
+        wx.OK | wx.ICON_INFORMATION
+    )
+    
 # Method to handle `Über die App` menu item
 def on_about(self, event):
     message = (

@@ -3,10 +3,90 @@ import os
 import subprocess
 import platform
 import unicodedata
+import pandas as pd
+import re
+import xml.etree.ElementTree as ET
+
+# Method to import XML file
+def import_xml(self, file_paths):
+    output_df = pd.DataFrame()
+    def xml_to_dict(xml_string):
+        root = ET.fromstring(xml_string)
+        result = {}
+        for child in root:
+            if len(child) == 0:
+                result[child.tag] = child.text
+            else:
+                result[child.tag] = xml_to_dict(ET.tostring(child))
+        return result
+    df_list = []
+    counter = 0
+    for file_path in file_paths:
+        counter += 1
+        try:
+            with open(file_path, 'r') as file:
+                xml_string = file.read()
+
+            dict_task = xml_to_dict(xml_string)
+            snippet = dict_task['channel']['item']['description']
+            
+            # Converting HTML entities like &lt; &gt; to < >
+            snippet_decoded = snippet.replace("&lt;", "<").replace("&gt;", ">")
+            pattern = re.compile(
+                r"<b>Zuordnung:</b>\s*(.*?)</li>.*?"
+                r"<b>Typ:</b>\s*(.*?)</li>.*?"
+                r"<b>Reihenfolge:</b>\s*(.*?)</li>",
+                re.DOTALL
+            )
+            match = pattern.search(snippet_decoded)
+            parent = match.group(1).strip()
+            type = match.group(2).strip()
+            order = match.group(3).strip()
+            df = pd.DataFrame({
+                                        'ID': counter,
+                                        'Aufgabe': [dict_task['channel']['item']['summary']],
+                                        'Zuordnung': [parent],
+                                        'Typ': [type],
+                                        'Reihenfolge': [order],
+                                    })
+            df.set_index('ID', inplace = True)
+            df_list.append(df)
+        except Exception as e:
+            wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
+    output_df = pd.concat(df_list)
+    output_df.reset_index(drop=True, inplace=True)
+    print(output_df)
+    base_dir = r"D:\\Test"  # Adjusting to your desired output location
+
+    def sanitize_path(path_str):
+        # Replacing invalid Windows path chars: < > : " / \ | ? *
+        invalid_chars = r'<>:"/\|?*'
+        for c in invalid_chars:
+            path_str = path_str.replace(c, "_")
+        return path_str
+
+    for _, row in output_df.iterrows():
+        # Cleaning up invalid Windows path characters, etc. (example: replace ":" with "_")
+        parent_folder = sanitize_path(row["Zuordnung"])
+        subfolders = sanitize_path(row["Aufgabe"].split("/")[-1])
+
+        # Building the folder path from subfolders
+        folder_path = os.path.join(base_dir, parent_folder, subfolders)
+
+        if row["Zuordnung"] != "ROOT":
+            os.makedirs(folder_path, exist_ok=True)
+            print("Created:", folder_path)
 
 # Method for creating the folder structur
 def on_create_folder_structure(self, event):
     print("Creating folder structure")
+    file_path_jira = []
+    folder_path = "C:\\Users\\120700002024\\OneDrive - CGM\\UKE_Videos\\8. Turtorials_Videobearbeitung\\Dateiablage\\Mit NAVIS arbeiten für Arztinnen"
+    for name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, name)
+        if os.path.isfile(file_path) and name.endswith(".xml"):
+            file_path_jira.append(file_path)
+    import_xml(self, file_path_jira)
 
 # Method to handle the Browse menu item
 def on_browse(self, event):

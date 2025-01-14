@@ -82,17 +82,21 @@ def import_xml(self, file_paths):
         parent_map[row["Aufgabe"]] = row["Zuordnung"]
     print(parent_map)
 
+    def build_full_path(task, parent_map, root_path):
+        parts = []
+        current = task
+        while current and current != "ROOT":
+            parts.append(current)
+            current = parent_map.get(current)
+        parts.reverse()
+        sanitized_parts = [sanitize_path(p) for p in parts]
+        return os.path.join(root_path, *sanitized_parts)
+
+    # Use build_full_path for each row
     for _, row in output_df.iterrows():
-        # Cleaning up invalid Windows path characters, etc. (example: replace ":" with "_")
-        parent_folder = sanitize_path(row["Zuordnung"])
-        subfolders = sanitize_path(row["Aufgabe"].split("/")[-1])
-
-        # Building the folder path from subfolders
-        folder_path = os.path.join(self.folder_path_elearning, parent_folder, subfolders)
-
-        if row["Zuordnung"] != "ROOT":
-            os.makedirs(folder_path, exist_ok=True)
-            print("Created:", folder_path)
+        path = build_full_path(row["Aufgabe"], parent_map, self.folder_path_elearning)
+        os.makedirs(path, exist_ok=True)
+        print("Created:", path)
 
 # Method for creating the folder structur
 def on_create_folder_structure(self, event):

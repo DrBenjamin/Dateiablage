@@ -48,8 +48,14 @@ if exist _internal\_internal (
 )
 
 REM 10) Copy the Release to Sharepoint
-set "TARGET_PATH=%USERPROFILE%\OneDrive - CGM\UKE_Videos\8. Turtorials_Videobearbeitung\Dateiablage\"
-del /q "%TARGET_PATH%Dateiablage.exe"
-xcopy /y /i /e "Dateiablage.exe" "%TARGET_PATH%"
-rd /s /q "%TARGET_PATH%_internal"
-xcopy /y /i /e "_internal" "%TARGET_PATH%_internal"
+set /p COPYTO="Do you want to copy the build to SharePoint? (Y/N): "
+if /I "%COPYTO%"=="Y" (
+    echo Copying build to SharePoint...
+    set "TARGET_PATH=%USERPROFILE%\OneDrive - CGM\UKE_Videos\8. Turtorials_Videobearbeitung\Dateiablage\"
+    del /q "%TARGET_PATH%Dateiablage.exe"
+    xcopy /y /i /e "Dateiablage.exe" "%TARGET_PATH%"
+    rd /s /q "%TARGET_PATH%_internal"
+    xcopy /y /i /e "_internal" "%TARGET_PATH%_internal"
+) else (
+    echo Skipping copy to SharePoint.
+)

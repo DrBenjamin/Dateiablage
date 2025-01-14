@@ -20,7 +20,9 @@ from src.files import (
     on_browse,
     on_file_activated,
     on_file_selected,
-    on_create_folder_structure
+    on_create_folder_structure,
+    on_browse_target,
+    on_browse_jira
 )
 
 class MyFrame(wx.Frame):
@@ -35,6 +37,8 @@ class MyFrame(wx.Frame):
         self.on_export = types.MethodType(on_export, self)
         self.on_import_excel = types.MethodType(on_import_task, self)
         self.on_browse = types.MethodType(on_browse, self)
+        self.on_browse_target = types.MethodType(on_browse_target, self)
+        self.on_browse_jira = types.MethodType(on_browse_jira, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
         self.on_file_selected = types.MethodType(on_file_selected, self)
@@ -62,6 +66,9 @@ class MyFrame(wx.Frame):
         # Definition of global variables
         self.file_path_tasks = []
         self.file_path = None
+        self.folder_path = None
+        self.folder_path_elearning = None
+        self.folder_path_jira = None
 
         # Creating a menu bar
         menu_bar = wx.MenuBar()
@@ -69,8 +76,10 @@ class MyFrame(wx.Frame):
         # Creating the `Datei` menu
         file_menu = wx.Menu()
         import_definition = file_menu.Append(wx.ID_ANY, "&Wähle e-Learning Definition")
-        import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle Aufgaben")
+        import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle offene Aufgaben")
+        import_jira = file_menu.Append(wx.ID_ANY, "&Wähle Jira Aufgaben")
         browse_item = file_menu.Append(wx.ID_OPEN, "&Wähle Quellverzeichnis")
+        write_item = file_menu.Append(wx.ID_OPEN, "&Wähle Zielverzeichnis")
         exit_app = file_menu.Append(wx.ID_EXIT, "&Beenden")
         menu_bar.Append(file_menu, "&Datei")
         
@@ -151,6 +160,10 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_import_excel, import_tasks)
         # Binding the Browse menu item to the on_browse method
         self.Bind(wx.EVT_MENU, self.on_browse, browse_item)
+        # Binding the Browse menu item to the on_browse_target method
+        self.Bind(wx.EVT_MENU, self.on_browse_target, write_item)
+        # Binding the Browse menu item to the on_browse_jira method
+        self.Bind(wx.EVT_MENU, self.on_browse_jira, import_jira)
         # Bindung the Export menu item to the on_export method
         self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
         # Binding the Exit menu item to the on_exit method

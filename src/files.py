@@ -7,6 +7,19 @@ import pandas as pd
 import re
 import xml.etree.ElementTree as ET
 
+# Method to handle the Browse menu item
+def on_browse_target(self, event):
+    dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+    if dialog.ShowModal() == wx.ID_OK:
+        # The `folder_path` variable contains the path of the folder selected as string
+        self.folder_path_elearning = dialog.GetPath()
+        
+def on_browse_jira(self, event):
+    dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+    if dialog.ShowModal() == wx.ID_OK:
+        # The `folder_path` variable contains the path of the folder selected as string
+        self.folder_path_jira = dialog.GetPath()
+
 # Method to import XML file
 def import_xml(self, file_paths):
     output_df = pd.DataFrame()
@@ -55,8 +68,6 @@ def import_xml(self, file_paths):
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
     output_df = pd.concat(df_list)
     output_df.reset_index(drop=True, inplace=True)
-    print(output_df)
-    base_dir = r"D:\\Test"  # Adjusting to your desired output location
 
     def sanitize_path(path_str):
         # Replacing invalid Windows path chars: < > : " / \ | ? *
@@ -65,13 +76,19 @@ def import_xml(self, file_paths):
             path_str = path_str.replace(c, "_")
         return path_str
 
+    # Building the parent map
+    parent_map = {}
+    for _, row in output_df.iterrows():
+        parent_map[row["Aufgabe"]] = row["Zuordnung"]
+    print(parent_map)
+
     for _, row in output_df.iterrows():
         # Cleaning up invalid Windows path characters, etc. (example: replace ":" with "_")
         parent_folder = sanitize_path(row["Zuordnung"])
         subfolders = sanitize_path(row["Aufgabe"].split("/")[-1])
 
         # Building the folder path from subfolders
-        folder_path = os.path.join(base_dir, parent_folder, subfolders)
+        folder_path = os.path.join(self.folder_path_elearning, parent_folder, subfolders)
 
         if row["Zuordnung"] != "ROOT":
             os.makedirs(folder_path, exist_ok=True)
@@ -79,11 +96,9 @@ def import_xml(self, file_paths):
 
 # Method for creating the folder structur
 def on_create_folder_structure(self, event):
-    print("Creating folder structure")
     file_path_jira = []
-    folder_path = "C:\\Users\\120700002024\\OneDrive - CGM\\UKE_Videos\\8. Turtorials_Videobearbeitung\\Dateiablage\\Mit NAVIS arbeiten für Arztinnen"
-    for name in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, name)
+    for name in os.listdir(self.folder_path_jira):
+        file_path = os.path.join(self.folder_path_jira, name)
         if os.path.isfile(file_path) and name.endswith(".xml"):
             file_path_jira.append(file_path)
     import_xml(self, file_path_jira)
@@ -92,7 +107,7 @@ def on_create_folder_structure(self, event):
 def on_browse(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
-        # `folder_path`` contains the path of the folder selected as string
+        # The `folder_path` variable contains the path of the folder selected as string
         self.folder_path = dialog.GetPath()
         if self.config.ReadBool("drive_mapping_enabled", True):
             if self.config.Read("drive_mapping_letter") == "":

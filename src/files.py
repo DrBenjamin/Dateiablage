@@ -78,23 +78,33 @@ def import_xml(self, file_paths):
 
     # Building the parent map
     parent_map = {}
+    base_folder = None
+    i = 0
     for _, row in output_df.iterrows():
-        parent_map[row["Aufgabe"]] = row["Zuordnung"]
-    print(parent_map)
+        # Checking if `row["Zuordnung"]` is not in the parent map
+        zuordnung_strip = row["Zuordnung"].strip()
+        if zuordnung_strip != "ROOT":
+            i += 1
+            parent_map[i] = [zuordnung_strip, row["Reihenfolge"]]
+            print(row)
+        else:
+            base_folder = sanitize_path(row["Aufgabe"].strip())
+    print("Dictonaries: ", parent_map)
+    print("Base Directory:", base_folder)
 
-    def build_full_path(task, parent_map, root_path):
-        parts = []
-        current = task
-        while current and current != "ROOT":
-            parts.append(current)
-            current = parent_map.get(current)
-        parts.reverse()
-        sanitized_parts = [sanitize_path(p) for p in parts]
-        return os.path.join(root_path, *sanitized_parts)
+    def build_full_path(item, parent):
+        if parent != "ROOT":
+            if parent != base_folder:
+                return os.path.join(parent, item)
+            else:
+                return item
+        else:
+            return ""
 
     # Use build_full_path for each row
     for _, row in output_df.iterrows():
-        path = build_full_path(row["Aufgabe"], parent_map, self.folder_path_elearning)
+        item_path = build_full_path(row["Aufgabe"].split('/')[-1], sanitize_path(row["Zuordnung"]))
+        path = os.path.join("F:\\Test", base_folder, item_path)
         os.makedirs(path, exist_ok=True)
         print("Created:", path)
 

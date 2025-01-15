@@ -107,27 +107,25 @@ def import_xml(self, file_paths):
     output_df = pd.concat(df_list)
     output_df.reset_index(drop=True, inplace=True)
 
+    # Method to sanitize path
     def sanitize_path(path_str):
-        # Replace invalid Windows path chars: < > : " / \ | ? *
-        invalid_chars = r'<>:"/\|?*'
+        invalid_chars = r'<>:"/\|?*' # Invalid Windows path chars: < > : " / \ | ? *
         for c in invalid_chars:
             path_str = path_str.replace(c, "_")
         return path_str
 
+    # Method for normalizing names
     def normalize_name(name: str) -> str:
-        """
-        Example normalization: removes the 'Schulung: ' prefix, 
-        trims whitespace, removes quotes, etc. Adjust as needed.
-        """
         if name.startswith("Schulung: "):
             name = name[len("Schulung: "):]
         name = name.replace('"', '').strip()
         return name
 
+    # Method to build hierarchical tree
     def build_hierarchical_tree(output_df):
         item_map = {}
         
-        # Normalize both child and parent names
+        # Normalizing names
         for _, row in output_df.iterrows():
             child_name = normalize_name(row["Aufgabe"]).split('/')[-1]
             item_map[child_name] = {
@@ -135,23 +133,23 @@ def import_xml(self, file_paths):
                 "order": row["Reihenfolge"]
             }
 
+        # Method to check if the item is root
         def is_root(name):
             return item_map[name]["parent"] == "ROOT"
 
-        # Collect all roots (parent == "ROOT")
+        # Collecting all roots (parent == "ROOT")
         roots = [name for name in item_map if is_root(name)]
         roots.sort(key=lambda x: item_map[x]["order"])  # sort top-level items by their order
-
         if not roots:
-            print("No root items found. Please ensure at least one item has 'ROOT' as its parent.")
+            wx.MessageBox(f"Keine Zuordnung mit 'ROOT' gefunden: {e}", "Error", wx.OK | wx.ICON_ERROR)
             return {}
         elif len(roots) > 1:
-            print("Multiple root items found:", roots)
-            # Depending on requirements, you can handle multiple roots or enforce a single root
-            # For now, we'll proceed with multiple roots
+            wx.MessageBox(f"Mehrfach Zuordnung mit 'ROOT' gefunden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+            return {}
 
-        # Recursively gather children
+        # Method to get children
         def get_children(name):
+            # Recursively gather children
             children = [
                 child for child, info in item_map.items()
                 if info["parent"] == name
@@ -159,19 +157,15 @@ def import_xml(self, file_paths):
             children.sort(key=lambda x: item_map[x]["order"])  # sort siblings by order
             return {child: get_children(child) for child in children} if children else {}
 
-        # Build the overall tree
+        # Building the overall tree
         tree = {}
         for root in roots:
             tree[root] = get_children(root)
 
-        # Debug: Print the tree structure
-        print("\nHierarchical Tree:")
-        def print_tree(node_dict, indent=0):
-            for name, sub in node_dict.items():
-                print("    " * indent + "- " + name)
-                print_tree(sub, indent + 1)
+        # Returning the tree
         return tree
 
+    # Method to create folders
     def create_folders(node_dict, parent_path):
         for name, sub in node_dict.items():
             # Sanitize folder names
@@ -181,16 +175,13 @@ def import_xml(self, file_paths):
             if sub:  # Only recurse if there are subfolders
                 create_folders(sub, folder_path)
 
-    # Build the hierarchical tree
+    # Building the hierarchical tree
     tree = build_hierarchical_tree(output_df)
 
-    # Define the base directory where folders should be created
-    base_dir = r"D:\Test"
+    # Creating the folder structure
+    create_folders(tree, self.folder_path_elearning)
 
-    # Create the folder structure
-    create_folders(tree, base_dir)
-
-# Method for creating the folder structur
+# Method to create the folder structur
 def on_create_folder_structure(self, event):
     file_path_jira = []
     for name in os.listdir(self.folder_path_jira):

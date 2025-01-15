@@ -5,6 +5,7 @@ from src.files import list_files
 from src.tasks import import_excel
 from src.learning import display_learning
 import os
+import webbrowser
 
 # Method to handle the right click event
 def on_right_click(self, event):
@@ -80,20 +81,47 @@ def convert_srt_to_vtt(file_path):
     
 # Method to handle `Über die App` menu item
 def on_about(self, event):
+    # Erstelle ein neues benutzerdefiniertes Fenster
+    frame = wx.Frame(None, title="Über die App", size=(500, 400))
+    panel = wx.Panel(frame)
+    sizer = wx.BoxSizer(wx.VERTICAL)
+
+    # Nachricht hinzufügen
     message = (
-        "Name der Anwendung:\n" 
+        "Name der Anwendung:\n"
         "Dateiablage\n\n"
-        "Versionsnummer:\n" 
+        "Versionsnummer:\n"
         "0.1.0\n\n"
-        "Das Unternehmen:\n" 
+        "Das Unternehmen:\n"
         "CompuGroup Medical\n\n"
         "**** Beschreibung ****\n"
-        "Die Dateiablage ist eine Anwendung zur unkomplizierten Verwaltung von e-Learning-Inhalten und Aufgaben für das medizinische Personal.\n\n"
+        "Die Dateiablage ist eine Anwendung zur unkomplizierten Verwaltung von "
+        "e-Learning-Inhalten und Aufgaben für das medizinische Personal.\n\n"
         "**** Support ****\n"
-        "Bei Fragen oder technischen Problemen kontaktieren Sie bitte unseren Support unter:\n"
-        "support-dateiablage@cgm.com\n\n"
+        "Bei Fragen oder technischen Problemen kontaktieren Sie bitte unseren Support.\n\n"
     )
-    wx.MessageBox(message, "Über die App ", wx.OK | wx.ICON_INFORMATION)
+    message_label = wx.StaticText(panel, label=message)
+    sizer.Add(message_label, 0, wx.ALL, 10)
+
+    # Weblink zur Support-Seite hinzufügen
+    support_label = wx.StaticText(panel, label="Weitere Informationen finden Sie auf unserer Support-Seite.")
+    support_label.SetForegroundColour((0, 0, 255))  # Link-Farbe (Blau)
+    font = support_label.GetFont()
+    font.SetUnderlined(True)  # Unterstrichen hinzufügen
+    support_label.SetFont(font)
+
+    # Klick-Event für den Link
+    support_label.Bind(wx.EVT_LEFT_DOWN, lambda event: webbrowser.open("https://www.cgm.com/corp_de/unternehmen/kontakt.html"))
+    sizer.Add(support_label, 0, wx.ALL, 10)
+
+    # Freundlicher Hinweis
+    thanks_label = wx.StaticText(panel, label="Vielen Dank, dass Sie unsere Anwendung verwenden!")
+    thanks_label.SetForegroundColour((0, 128, 0))  # Grüne Farbe für Freundlichkeit
+    sizer.Add(thanks_label, 0, wx.ALL, 10)
+
+    # Sizer setzen und Fenster anzeigen
+    panel.SetSizer(sizer)
+    frame.Show()
 
 # Method to handle the Contact menu item
 def on_contact(self, event):

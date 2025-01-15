@@ -108,43 +108,87 @@ def import_xml(self, file_paths):
     output_df.reset_index(drop=True, inplace=True)
 
     def sanitize_path(path_str):
-        # Replacing invalid Windows path chars: < > : " / \ | ? *
+        # Replace invalid Windows path chars: < > : " / \ | ? *
         invalid_chars = r'<>:"/\|?*'
         for c in invalid_chars:
             path_str = path_str.replace(c, "_")
         return path_str
 
-    # Building the parent map
-    parent_map = {}
-    base_folder = None
-    i = 0
-    for _, row in output_df.iterrows():
-        # Checking if `row["Zuordnung"]` is not in the parent map
-        zuordnung_strip = row["Zuordnung"].strip()
-        if zuordnung_strip != "ROOT":
-            i += 1
-            parent_map[i] = [zuordnung_strip, row["Reihenfolge"]]
-            print(row)
-        else:
-            base_folder = sanitize_path(row["Aufgabe"].strip())
-    print("Dictonaries: ", parent_map)
-    print("Base Directory:", base_folder)
+    def normalize_name(name: str) -> str:
+        """
+        Example normalization: removes the 'Schulung: ' prefix, 
+        trims whitespace, removes quotes, etc. Adjust as needed.
+        """
+        if name.startswith("Schulung: "):
+            name = name[len("Schulung: "):]
+        name = name.replace('"', '').strip()
+        return name
 
-    def build_full_path(item, parent):
-        if parent != "ROOT":
-            if parent != base_folder:
-                return os.path.join(parent, item)
-            else:
-                return item
-        else:
-            return ""
+    def build_hierarchical_tree(output_df):
+        item_map = {}
+        
+        # Normalize both child and parent names
+        for _, row in output_df.iterrows():
+            child_name = normalize_name(row["Aufgabe"]).split('/')[-1]
+            item_map[child_name] = {
+                "parent": row["Zuordnung"],
+                "order": row["Reihenfolge"]
+            }
 
-    # Use build_full_path for each row
-    for _, row in output_df.iterrows():
-        item_path = build_full_path(row["Aufgabe"].split('/')[-1], sanitize_path(row["Zuordnung"]))
-        path = os.path.join("F:\\Test", base_folder, item_path)
-        os.makedirs(path, exist_ok=True)
-        print("Created:", path)
+        def is_root(name):
+            return item_map[name]["parent"] == "ROOT"
+
+        # Collect all roots (parent == "ROOT")
+        roots = [name for name in item_map if is_root(name)]
+        roots.sort(key=lambda x: item_map[x]["order"])  # sort top-level items by their order
+
+        if not roots:
+            print("No root items found. Please ensure at least one item has 'ROOT' as its parent.")
+            return {}
+        elif len(roots) > 1:
+            print("Multiple root items found:", roots)
+            # Depending on requirements, you can handle multiple roots or enforce a single root
+            # For now, we'll proceed with multiple roots
+
+        # Recursively gather children
+        def get_children(name):
+            children = [
+                child for child, info in item_map.items()
+                if info["parent"] == name
+            ]
+            children.sort(key=lambda x: item_map[x]["order"])  # sort siblings by order
+            return {child: get_children(child) for child in children} if children else {}
+
+        # Build the overall tree
+        tree = {}
+        for root in roots:
+            tree[root] = get_children(root)
+
+        # Debug: Print the tree structure
+        print("\nHierarchical Tree:")
+        def print_tree(node_dict, indent=0):
+            for name, sub in node_dict.items():
+                print("    " * indent + "- " + name)
+                print_tree(sub, indent + 1)
+        return tree
+
+    def create_folders(node_dict, parent_path):
+        for name, sub in node_dict.items():
+            # Sanitize folder names
+            sanitized_name = sanitize_path(name)
+            folder_path = os.path.join(parent_path, sanitized_name)
+            os.makedirs(folder_path, exist_ok=True)
+            if sub:  # Only recurse if there are subfolders
+                create_folders(sub, folder_path)
+
+    # Build the hierarchical tree
+    tree = build_hierarchical_tree(output_df)
+
+    # Define the base directory where folders should be created
+    base_dir = r"D:\Test"
+
+    # Create the folder structure
+    create_folders(tree, base_dir)
 
 # Method for creating the folder structur
 def on_create_folder_structure(self, event):
@@ -160,7 +204,7 @@ def on_file_selected(self, event):
     file_index = event.GetSelection()
     file_path = self.file_listbox.GetString(file_index)
     self.file_path = file_path
-    
+
     # To-Do Kanjo
     # - Get the file name from the path
     # - Xy

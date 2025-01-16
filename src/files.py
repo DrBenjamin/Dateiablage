@@ -5,7 +5,7 @@ import platform
 import unicodedata
 import pandas as pd
 import re
-import json
+import html
 import xml.etree.ElementTree as ET
 
 # Method to handle the Browse menu item
@@ -111,17 +111,20 @@ def import_xml(self, file_paths):
 
                     # Extracting path in the e-learning structure field
                     customfield_raw = customfields[index]
-                    snippet_customfield_decoded = customfield_raw.replace("&lt;", "<").replace("&gt;", ">")
+                    snippet_customfield_decoded = html.unescape(customfield_raw.replace("&lt;", "<").replace("&gt;", ">"))
                     pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>")
                     ort_elearning = pattern_ort.search(snippet_customfield_decoded).group(1).strip()
-
+                    if "/" in ort_elearning:
+                        ort_elearning = ort_elearning.split("/")[-1]
+                    else:
+                        wx.MessageBox(f"{index + 1} Tickets importiert - Ordnername = `{ort_elearning}`", "Info", wx.OK | wx.ICON_INFORMATION)
                     df = pd.DataFrame({
                         'ID': counter,
-                        'Aufgabe': [dict_task.get("summary", "")],
+                        #'Aufgabe': [dict_task.get("summary", "")],
+                        'Aufgabe': [ort_elearning],
                         'Zuordnung': [parent],
                         'Typ': [type],
                         'Reihenfolge': [order],
-                        'Ort in eLearning': [ort_elearning],
                     })
                     df.set_index('ID', inplace = True)
                     df_list.append(df)
@@ -167,11 +170,11 @@ def import_xml(self, file_paths):
     # Method for normalizing names
     def normalize_name(name: str) -> str:
         # Removing everything up to the first colon (":") and any trailing space
-        name = re.sub(r'^.*?:\s*', '', name)
+        #name = re.sub(r'^.*?:\s*', '', name)
         # Removing specific strings
-        name = name.replace("Anlage ", "")
-        name = name.replace("Kapitel ", "")
-        name = name.replace("Lektion ", "")
+        #name = name.replace("Anlage ", "")
+        #name = name.replace("Kapitel ", "")
+        #name = name.replace("Lektion ", "")
         return name.strip()
 
     # Method to build hierarchical tree

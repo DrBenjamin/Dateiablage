@@ -137,7 +137,7 @@ def import_xml(self, file_paths):
         def is_root(name):
             return item_map[name]["parent"] == "ROOT"
 
-        # Collecting all roots (parent == "ROOT")
+        # Collecting all roots (`Zuordnung` == "ROOT")
         roots = [name for name in item_map if is_root(name)]
         roots.sort(key=lambda x: item_map[x]["order"])  # sort top-level items by their order
         if not roots:
@@ -161,6 +161,17 @@ def import_xml(self, file_paths):
         tree = {}
         for root in roots:
             tree[root] = get_children(root)
+
+        # Writing the tree to CSV file
+        csv_file_path = f"{self.folder_path_elearning}\\{sanitize_path(roots[0])}.csv"
+        with open(csv_file_path, "w", encoding="utf-8", errors="replace") as f:
+            f.write(f'"Thema",0\n')
+            def writing_tree(node_dict, indent=0):
+                for name, sub in node_dict.items():
+                    f.write(f'"{name}",{indent}\n')
+                    writing_tree(sub, indent + 1)
+            writing_tree(tree)
+            f.close()
 
         # Returning the tree
         return tree

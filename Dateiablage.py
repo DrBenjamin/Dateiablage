@@ -56,6 +56,8 @@ class MyFrame(wx.Frame):
             self.config.Write("user_choice", "Alle")
         if not self.config.HasEntry("xml_import_enabled"):
             self.config.WriteBool("xml_import_enabled", True)
+        if not self.config.HasEntry("xml_import_one_file"):
+            self.config.WriteBool("xml_import_one_file", True)
         if not self.config.HasEntry("srt_converter_enabled"):
             self.config.WriteBool("srt_converter_enabled", True)
         if not self.config.HasEntry("drive_mapping_enabled"):

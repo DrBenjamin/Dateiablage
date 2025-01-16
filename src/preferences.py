@@ -45,6 +45,8 @@ class PreferencesPage(wx.PreferencesPage):
         heading_xml.SetFont(font)
         sizer.Add(heading_xml, 0, wx.ALL, 5)
         # XML Import checkbox
+        sizer.Add(wx.StaticText(panel,
+                                    label=f'XML statt Excel für die Aufgaben verwenden?'),0, wx.ALL, 5)
         self.xml_checkbox = wx.CheckBox(panel, label="XML Dateien importieren")
         sizer.Add(self.xml_checkbox, 0, wx.ALL, 5)
         # Load saved state
@@ -52,6 +54,17 @@ class PreferencesPage(wx.PreferencesPage):
         self.xml_checkbox.SetValue(xml_state)
         # Bind event to save state
         self.xml_checkbox.Bind(wx.EVT_CHECKBOX, self.on_xml_checkbox)
+
+        # XML Import for JIRA Tickets checkbox
+        sizer.Add(wx.StaticText(panel,
+                                    label=f'Eine XML Datei statt einzelne JIRA Tickets verwenden?'),0, wx.ALL, 5)
+        self.xml_checkbox_jira = wx.CheckBox(panel, label="XML nur eine Datei importieren")
+        sizer.Add(self.xml_checkbox_jira, 0, wx.ALL, 5)
+        # Load saved state
+        xml_state_jira = self.config.ReadBool("xml_import_one_file", False)
+        self.xml_checkbox_jira.SetValue(xml_state_jira)
+        # Bind event to save state
+        self.xml_checkbox_jira.Bind(wx.EVT_CHECKBOX, self.on_xml_jira_checkbox)
 
         # Adding preference control srt converter
         heading = wx.StaticText(panel, label="SRT Konverter Einstellungen")
@@ -101,9 +114,14 @@ class PreferencesPage(wx.PreferencesPage):
         self.config.Write("user_choice", self.user_choice.GetString(self.user_choice.GetSelection()))
         self.config.Flush()
 
-    # Method to handle the Preferences page csv checkbox
+    # Method to handle the Preferences page xml checkbox
     def on_xml_checkbox(self, event):
         self.config.WriteBool("xml_import_enabled", self.xml_checkbox.IsChecked())
+        self.config.Flush()
+
+    # Method to handle the Preferences page xml checkbox
+    def on_xml_jira_checkbox(self, event):
+        self.config.WriteBool("xml_import_one_file", self.xml_checkbox_jira.IsChecked())
         self.config.Flush()
 
     # Method to handle the Preferences page srt checkbox

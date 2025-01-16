@@ -5,6 +5,7 @@ import platform
 import unicodedata
 import pandas as pd
 import re
+import json
 import xml.etree.ElementTree as ET
 
 # Method to handle the Browse menu item
@@ -87,7 +88,8 @@ def import_xml(self, file_paths):
             # Iterate through the XML file
             if self.config.ReadBool("xml_import_one_file"):
                 items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
-                for item_block in items:
+                customfields = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
+                for index, item_block in enumerate(items):
                     counter += 1
                     # Reconstruct a valid fragment
                     item_xml = f"<item>{item_block}</item>"
@@ -106,13 +108,21 @@ def import_xml(self, file_paths):
                     parent = match.group(1).strip()
                     type = match.group(2).strip()
                     order = match.group(3).strip()
+
+                    # Extracting path in the e-learning structure field
+                    customfield_raw = customfields[index]
+                    snippet_customfield_decoded = customfield_raw.replace("&lt;", "<").replace("&gt;", ">")
+                    pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>")
+                    ort_elearning = pattern_ort.search(snippet_customfield_decoded).group(1).strip()
+
                     df = pd.DataFrame({
-                                                'ID': counter,
-                                                'Aufgabe': [dict_task.get("summary", "")],
-                                                'Zuordnung': [parent],
-                                                'Typ': [type],
-                                                'Reihenfolge': [order],
-                                            })
+                        'ID': counter,
+                        'Aufgabe': [dict_task.get("summary", "")],
+                        'Zuordnung': [parent],
+                        'Typ': [type],
+                        'Reihenfolge': [order],
+                        'Ort in eLearning': [ort_elearning],
+                    })
                     df.set_index('ID', inplace = True)
                     df_list.append(df)
             else:
@@ -131,6 +141,7 @@ def import_xml(self, file_paths):
                 parent = match.group(1).strip()
                 type = match.group(2).strip()
                 order = match.group(3).strip()
+                snippet = dict_task['channel']['item']['description']                
                 df = pd.DataFrame({
                                             'ID': counter,
                                             'Aufgabe': [dict_task['channel']['item']['summary']],

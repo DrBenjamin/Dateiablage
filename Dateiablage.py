@@ -62,6 +62,8 @@ class MyFrame(wx.Frame):
             self.config.WriteBool("drive_mapping_enabled", False)
         if not self.config.HasEntry("drive_mapping_letter"):
             self.config.Write("drive_mapping_letter", "")
+        # Overiding the save values for testing
+        self.config.WriteBool("xml_import_one_file", False)
 
         # Definition of global variables
         self.file_path_tasks = []

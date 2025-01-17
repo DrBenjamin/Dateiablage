@@ -93,7 +93,6 @@ def import_xml(self, file_paths):
                 items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
                 customfields = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
                 for index, item_block in enumerate(items):
-                    counter += 1
                     # Reconstruct a valid fragment
                     item_xml = f"<item>{item_block}</item>"
                     dict_task = xml_to_dict(item_xml)  # parse each item separately
@@ -131,16 +130,18 @@ def import_xml(self, file_paths):
                         'Aufgabe': [ort_elearning],
                         'Zuordnung': [parent],
                         'Typ': [type],
-                        'Reihenfolge': [order],
+                        'Reihenfolge': [order]
                     })
                     df.set_index('ID', inplace = True)
                     df_list.append(df)
 
-                # Setting variable for status message
+                # Setting variables for status message and ID
                 number_of_items = index + 1
+                counter += 1
             else:
                 dict_task = xml_to_dict(xml_string)
                 snippet = dict_task['channel']['item']['description']
+                customfield_raw = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
 
                 # Converting HTML entities like &lt; &gt; to < >
                 snippet_decoded = snippet.replace("&lt;", "<").replace("&gt;", ">")
@@ -154,28 +155,34 @@ def import_xml(self, file_paths):
                 parent = match.group(1).strip()
                 type = match.group(2).strip()
                 order = match.group(3).strip()
-                snippet = dict_task['channel']['item']['description']
 
                 # Extracting path in the e-learning structure field
-                customfield_raw = customfields[index]
-                snippet_customfield_decoded = html.unescape(customfield_raw.replace("&lt;", "<").replace("&gt;", ">"))
-                pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>")
-                ort_elearning = pattern_ort.search(snippet_customfield_decoded).group(1).strip()
+                snippet_customfield_decoded = html.unescape(customfield_raw[0].replace("&lt;", "<").replace("&gt;", ">"))
+                pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>",
+                                         re.DOTALL)
+                match_ort = pattern_ort.search(snippet_customfield_decoded)
+                ort_elearning = match_ort.group(1).strip()
+
+                # Extracting the last part of the path if not `ROOT`
+                if "/" in ort_elearning:
+                    ort_elearning = ort_elearning.split("/")[-1]
 
                 # Building the DataFrame
                 df = pd.DataFrame({
                                             'ID': counter,
-                                            #'Aufgabe': [dict_task['channel']['item']['summary']],
-                                            'Titel': [dict_task.get("summary", "")],
-                                            'Status': [dict_task.get("status", "")],
-                                            'Verantwortlicher': [dict_task.get("assignee", "")],
+                                            'Titel': [dict_task['channel']['item']['summary']],
+                                            'Status': [dict_task['channel']['item']['status']],
+                                            'Verantwortlicher':[dict_task['channel']['item']['assignee']],
                                             'Aufgabe': [ort_elearning],
                                             'Zuordnung': [parent],
                                             'Typ': [type],
-                                            'Reihenfolge': [order],
+                                            'Reihenfolge': [order]
                                         })
                 df.set_index('ID', inplace = True)
                 df_list.append(df)
+
+                # Setting variable for status message
+                number_of_items = counter
         except Exception as e:
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
     output_df = pd.concat(df_list)

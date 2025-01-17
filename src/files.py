@@ -8,6 +8,9 @@ import re
 import html
 import xml.etree.ElementTree as ET
 
+number_of_items = 0
+root_folder_name = None
+
 # Method to handle the Browse menu item
 def on_browse_source(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Quell-Ordner (e-Learnings) aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
@@ -114,13 +117,17 @@ def import_xml(self, file_paths):
                     snippet_customfield_decoded = html.unescape(customfield_raw.replace("&lt;", "<").replace("&gt;", ">"))
                     pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>")
                     ort_elearning = pattern_ort.search(snippet_customfield_decoded).group(1).strip()
+
+                    # Extracting the last part of the path if not `ROOT`
                     if "/" in ort_elearning:
                         ort_elearning = ort_elearning.split("/")[-1]
-                    else:
-                        wx.MessageBox(f"{index + 1} Tickets importiert - Ordnername = `{ort_elearning}`", "Info", wx.OK | wx.ICON_INFORMATION)
+
+                    # Building the DataFrame
                     df = pd.DataFrame({
                         'ID': counter,
-                        #'Aufgabe': [dict_task.get("summary", "")],
+                        'Titel': [dict_task.get("summary", "")],
+                        'Status': [dict_task.get("status", "")],
+                        'Verantwortlicher': [dict_task.get("assignee", "")],
                         'Aufgabe': [ort_elearning],
                         'Zuordnung': [parent],
                         'Typ': [type],
@@ -128,6 +135,9 @@ def import_xml(self, file_paths):
                     })
                     df.set_index('ID', inplace = True)
                     df_list.append(df)
+
+                # Setting variable for status message
+                number_of_items = index + 1
             else:
                 dict_task = xml_to_dict(xml_string)
                 snippet = dict_task['channel']['item']['description']
@@ -144,10 +154,22 @@ def import_xml(self, file_paths):
                 parent = match.group(1).strip()
                 type = match.group(2).strip()
                 order = match.group(3).strip()
-                snippet = dict_task['channel']['item']['description']                
+                snippet = dict_task['channel']['item']['description']
+
+                # Extracting path in the e-learning structure field
+                customfield_raw = customfields[index]
+                snippet_customfield_decoded = html.unescape(customfield_raw.replace("&lt;", "<").replace("&gt;", ">"))
+                pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>")
+                ort_elearning = pattern_ort.search(snippet_customfield_decoded).group(1).strip()
+
+                # Building the DataFrame
                 df = pd.DataFrame({
                                             'ID': counter,
-                                            'Aufgabe': [dict_task['channel']['item']['summary']],
+                                            #'Aufgabe': [dict_task['channel']['item']['summary']],
+                                            'Titel': [dict_task.get("summary", "")],
+                                            'Status': [dict_task.get("status", "")],
+                                            'Verantwortlicher': [dict_task.get("assignee", "")],
+                                            'Aufgabe': [ort_elearning],
                                             'Zuordnung': [parent],
                                             'Typ': [type],
                                             'Reihenfolge': [order],
@@ -158,7 +180,7 @@ def import_xml(self, file_paths):
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
     output_df = pd.concat(df_list)
     output_df.reset_index(drop=True, inplace=True)
-    output_df.to_csv(f"{self.folder_path_elearning}\\eLearning_Tasks.txt", sep="\t", index=False)
+    output_df.to_csv(os.path.join(self.folder_path_elearning, "eLearning_Tasks.txt"), sep = "\t", index = False)
 
     # Method to sanitize path
     def sanitize_path(path_str):
@@ -220,7 +242,8 @@ def import_xml(self, file_paths):
             tree[root] = get_children(root)
 
         # Writing the tree to CSV file
-        csv_file_path = f"{self.folder_path_elearning}\\{sanitize_path(roots[0])}.csv"
+        self.root_folder_name = roots[0]
+        csv_file_path = os.path.join(self.folder_path_elearning, f"{sanitize_path(roots[0])}.csv")
         with open(csv_file_path, "w", encoding="utf-8", errors="replace") as f:
             f.write(f'"Thema",0\n')
             def writing_tree(node_dict, indent=0):
@@ -249,8 +272,12 @@ def import_xml(self, file_paths):
     # Creating the folder structure
     create_folders(tree, self.folder_path_elearning)
 
+    # Informing the user
+    wx.MessageBox(f"{number_of_items} Ordner wurden in `{self.root_folder_name}` erfolgreich erstellt.", "Information", wx.OK | wx.ICON_INFORMATION)
+
 # Method to create the folder structur
 def on_create_folder_structure(self, event):
+    on_browse_target(self, event)
     file_path_jira = []
     if self.config.ReadBool("xml_import_one_file"):
         file_path_jira.append(self.folder_path_jira[0])

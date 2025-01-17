@@ -63,7 +63,7 @@ class MyFrame(wx.Frame):
         if not self.config.HasEntry("drive_mapping_letter"):
             self.config.Write("drive_mapping_letter", "")
         # Overiding the save values for testing
-        self.config.WriteBool("xml_import_one_file", False)
+        #self.config.WriteBool("xml_import_one_file", False)
 
         # Definition of global variables
         self.file_path_tasks = []
@@ -79,7 +79,7 @@ class MyFrame(wx.Frame):
         file_menu = wx.Menu()
         import_definition = file_menu.Append(wx.ID_ANY, "&Wähle e-Learning Definition")
         import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle JIRA offene Aufgaben")
-        import_jira = file_menu.Append(wx.ID_ANY, "&Wähle Jira e-Learning Aufgaben")
+        import_jira = file_menu.Append(wx.ID_ANY, "&Wähle JIRA e-Learning Export")
         browse_item = file_menu.Append(wx.ID_ANY, "&Wähle Quellverzeichnis")
         exit_app = file_menu.Append(wx.ID_EXIT, "&Beenden")
         menu_bar.Append(file_menu, "&Datei")

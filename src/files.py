@@ -93,7 +93,7 @@ def import_xml(self, file_paths):
                 items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
                 customfields = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
                 for index, item_block in enumerate(items):
-                    # Reconstruct a valid fragment
+                    # Reconstructing a valid fragment
                     item_xml = f"<item>{item_block}</item>"
                     dict_task = xml_to_dict(item_xml)  # parse each item separately
                     snippet = dict_task.get("description", "")
@@ -124,6 +124,7 @@ def import_xml(self, file_paths):
                     # Building the DataFrame
                     df = pd.DataFrame({
                         'ID': counter,
+                        'Ticket': [dict_task.get("key", "")],
                         'Titel': [dict_task.get("summary", "")],
                         'Status': [dict_task.get("status", "")],
                         'Verantwortlicher': [dict_task.get("assignee", "")],
@@ -139,6 +140,7 @@ def import_xml(self, file_paths):
                 number_of_items = index + 1
                 counter += 1
             else:
+                # Reconstructing a valid fragment
                 dict_task = xml_to_dict(xml_string)
                 snippet = dict_task['channel']['item']['description']
                 customfield_raw = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
@@ -170,6 +172,7 @@ def import_xml(self, file_paths):
                 # Building the DataFrame
                 df = pd.DataFrame({
                                             'ID': counter,
+                                            'Ticket': [dict_task['channel']['item']['key']],
                                             'Titel': [dict_task['channel']['item']['summary']],
                                             'Status': [dict_task['channel']['item']['status']],
                                             'Verantwortlicher':[dict_task['channel']['item']['assignee']],

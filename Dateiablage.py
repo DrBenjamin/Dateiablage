@@ -63,7 +63,7 @@ class MyFrame(wx.Frame):
         if not self.config.HasEntry("drive_mapping_letter"):
             self.config.Write("drive_mapping_letter", "")
         # Overiding the save values for testing
-        #self.config.WriteBool("xml_import_one_file", False)
+        #self.config.WriteBool("xml_import_one_file", True)
 
         # Definition of global variables
         self.file_path_tasks = []

@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 number_of_items = 0
 root_folder_name = None
+jira_ticket = None
 
 # Method to handle the Browse menu item
 def on_browse_source(self, event):
@@ -58,7 +59,7 @@ def on_browse_target(self, event):
 
 def on_browse_jira(self, event):
     if self.config.ReadBool("xml_import_one_file"):
-        dialog = wx.FileDialog(None, "Wähle das JIRA Ticket aus:", wildcard="XML files (*.xml)|*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
+        dialog = wx.FileDialog(None, "Wähle die JIRA Tickets (aus einer Exportdatei) aus:", wildcard="XML files (*.xml)|*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
         if dialog.ShowModal() == wx.ID_OK:
             # The `folder_path` variable contains the path of the file selected as string
             self.folder_path_jira = dialog.GetPaths()
@@ -84,18 +85,19 @@ def import_xml(self, file_paths):
     counter = 0
     for file_path in file_paths:
         counter += 1
-        try:
-            with open(file_path, 'r') as file:
-                xml_string = file.read()
+        with open(file_path, 'r') as file:
+            xml_string = file.read()
 
-            # Iterate through the XML file
-            if self.config.ReadBool("xml_import_one_file"):
-                items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
-                customfields = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
-                for index, item_block in enumerate(items):
+        # Iterate through the XML file
+        if self.config.ReadBool("xml_import_one_file"):
+            items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
+            customfields = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
+            for index, item_block in enumerate(items):
+                try:
                     # Reconstructing a valid fragment
                     item_xml = f"<item>{item_block}</item>"
-                    dict_task = xml_to_dict(item_xml)  # parse each item separately
+                    dict_task = xml_to_dict(item_xml)  # Parsing each item separately
+                    jira_ticket = dict_task.get("key", "")
                     snippet = dict_task.get("description", "")
 
                     # Converting HTML entities like &lt; &gt; to < >
@@ -134,14 +136,18 @@ def import_xml(self, file_paths):
                         'Reihenfolge': [order]
                     })
                     df.set_index('ID', inplace = True)
-                    df_list.append(df)
+                    df_list.append(df) 
+                except Exception as e:
+                    wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
 
-                # Setting variables for status message and ID
-                number_of_items = index + 1
-                counter += 1
-            else:
+            # Setting variables for status message and ID
+            number_of_items = index + 1
+            counter += 1
+        else:
+            try:
                 # Reconstructing a valid fragment
                 dict_task = xml_to_dict(xml_string)
+                jira_ticket = dict_task['channel']['item']['key']
                 snippet = dict_task['channel']['item']['description']
                 customfield_raw = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
 
@@ -161,7 +167,7 @@ def import_xml(self, file_paths):
                 # Extracting path in the e-learning structure field
                 snippet_customfield_decoded = html.unescape(customfield_raw[0].replace("&lt;", "<").replace("&gt;", ">"))
                 pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>",
-                                         re.DOTALL)
+                                            re.DOTALL)
                 match_ort = pattern_ort.search(snippet_customfield_decoded)
                 ort_elearning = match_ort.group(1).strip()
 
@@ -172,7 +178,7 @@ def import_xml(self, file_paths):
                 # Building the DataFrame
                 df = pd.DataFrame({
                                             'ID': counter,
-                                            'Ticket': [dict_task['channel']['item']['key']],
+                                            'Ticket': jira_ticket,
                                             'Titel': [dict_task['channel']['item']['summary']],
                                             'Status': [dict_task['channel']['item']['status']],
                                             'Verantwortlicher':[dict_task['channel']['item']['assignee']],
@@ -186,8 +192,8 @@ def import_xml(self, file_paths):
 
                 # Setting variable for status message
                 number_of_items = counter
-        except Exception as e:
-            wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
+            except Exception as e:
+                wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
     output_df = pd.concat(df_list)
     output_df.reset_index(drop=True, inplace=True)
     output_df.to_csv(os.path.join(self.folder_path_elearning, "eLearning_Tasks.txt"), sep = "\t", index = False)

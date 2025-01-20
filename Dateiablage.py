@@ -37,6 +37,9 @@ def on_import_jira(self, event = None):
     self.on_import_csv(event, self.file_path_elearning)
     self.file_path_elearning = None
 
+    # Calling the `on_import_task` method
+    #self.on_import_task(event, self.file_path_elearning)
+
 class MyFrame(wx.Frame):
     def __init__(self, *args, **kw):
         super(MyFrame, self).__init__(*args, **kw)
@@ -84,9 +87,9 @@ class MyFrame(wx.Frame):
         # Definition of global variables
         self.file_path_tasks = []
         self.file_path = None
+        self.file_path_elearning = None
         self.folder_path = None
         self.folder_path_elearning = None
-        self.file_path_elearning = None
         self.folder_path_jira = None
 
         # Creating a menu bar

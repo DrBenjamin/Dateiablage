@@ -3,7 +3,7 @@ import pandas as pd
 from src.files import list_files
 
 # Method to handle the Import learning definition
-def on_import_csv(self, event, file_path=None):
+def on_import_csv(self, event, file_path = None):
     if file_path == None:
         dialog = wx.FileDialog(self, "Importiere e-Learning Definition", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dialog.ShowModal() == wx.ID_OK:

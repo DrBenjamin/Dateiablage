@@ -2,7 +2,7 @@ import wx
 import io
 from docx import Document
 from src.files import list_files
-from src.tasks import import_excel
+from src.tasks import on_import_task
 from src.learning import display_learning
 import os
 import webbrowser
@@ -146,8 +146,8 @@ def on_refresh(self, event):
     except Exception as e:
         print(f"Error: {e}")
     try:
-        if self.file_path_tasks is not None:
-            import_excel(self, self.file_path_tasks)
+        if self.df_tasks is not None:
+            on_import_task(self, self.df_tasks)
     except Exception as e:
         print(f"Error: {e}")
 

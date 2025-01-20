@@ -16,8 +16,7 @@ from src.learning import (
     on_import_csv
 )
 from src.tasks import (
-    on_import_task,
-    display_tasks
+    on_import_task
 )
 from src.files import (
     on_browse_source,
@@ -104,7 +103,7 @@ class MyFrame(wx.Frame):
         # Creating the `Datei` menu
         file_menu = wx.Menu()
         import_definition = file_menu.Append(wx.ID_ANY, "&Wähle e-Learning Definition")
-        import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle JIRA offene Aufgaben")
+        #import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle JIRA offene Aufgaben")
         import_jira = file_menu.Append(wx.ID_ANY, "&Wähle JIRA e-Learning Export")
         browse_item = file_menu.Append(wx.ID_ANY, "&Wähle Quellverzeichnis")
         exit_app = file_menu.Append(wx.ID_EXIT, "&Beenden")
@@ -183,8 +182,6 @@ class MyFrame(wx.Frame):
         ## Binding of methods to menu items
         # Binding the Import CSV menu item to the `on_import_csv`` method
         self.Bind(wx.EVT_MENU, self.on_import_csv, import_definition)
-        # Binding the Import Excel menu item to the `on_import_excel` method
-        self.Bind(wx.EVT_MENU, self.on_import_tasks, import_tasks)
         # Binding the Browse menu item to the `on_browse_source` method
         self.Bind(wx.EVT_MENU, self.on_browse_source, browse_item)
         # Binding the Browse menu item to the on_browse_jira method

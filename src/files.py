@@ -258,7 +258,7 @@ def import_xml(self, file_paths):
                 for child, info in item_map.items()
                 if info["parent"] == name
             ]
-            children.sort(key=lambda x: item_map[x]["order"])  # Sorting siblings by order
+            children.sort(key=lambda x: item_map[x]["order"])  # sorting siblings by order
             return {child: get_children(child) for child in children} if children else {}
 
         # Building the overall tree
@@ -275,7 +275,7 @@ def import_xml(self, file_paths):
             sanitized_name = sanitize_path(name)
             folder_path = os.path.join(parent_path, sanitized_name)
             os.makedirs(folder_path, exist_ok=True)
-            if sub:  # Only recurse if there are subfolders
+            if sub:  # only recurse if there are subfolders
                 create_folders(sub, folder_path)
 
     # Building the hierarchical tree

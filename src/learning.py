@@ -32,10 +32,10 @@ def display_learning(self, df):
     self.learning_ctrl.ClearAll()
     self.learning_ctrl.AppendColumn("Struktur")
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         text = row.iloc[0]
         level = row.iloc[1]
-        indent = ' ' * ((level * 4) - 4)  # Indent based on the level
+        indent = ' ' * (((level + 4) * 4) - 12)  # Iident based on the level
         self.learning_ctrl.Append([f"{indent}{text}"])
 
     # Adjusting the column width to fit automatically the content

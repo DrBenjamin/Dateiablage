@@ -16,7 +16,6 @@ jira_ticket = None
 def on_browse_source(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Quell-Ordner (e-Learnings) aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
-        # The `folder_path` variable contains the path of the folder selected as string
         self.folder_path = dialog.GetPath()
         if self.config.ReadBool("drive_mapping_enabled", True):
             if self.config.Read("drive_mapping_letter") == "":
@@ -54,19 +53,16 @@ f"""Windows Registry Editor Version 5.00\n\n\
 def on_browse_target(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Ziel-Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
-        # The `folder_path` variable contains the path of the folder selected as string
         self.folder_path_elearning = dialog.GetPath()
 
 def on_browse_jira(self, event):
     if self.config.ReadBool("xml_import_one_file"):
         dialog = wx.FileDialog(None, "Wähle die JIRA Tickets (aus einer Exportdatei) aus:", wildcard="XML files (*.xml)|*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
         if dialog.ShowModal() == wx.ID_OK:
-            # The `folder_path` variable contains the path of the file selected as string
             self.folder_path_jira = dialog.GetPaths()
     else:
         dialog = wx.DirDialog(None, "Wähle den Ordner der JIRA Tickets aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
-            # The `folder_path` variable contains the path of the folder selected as string
             self.folder_path_jira = dialog.GetPath()
 
 # Method to import XML file
@@ -88,7 +84,7 @@ def import_xml(self, file_paths):
         with open(file_path, 'r') as file:
             xml_string = file.read()
 
-        # Iterate through the XML file
+        # Iterating through the XML file
         if self.config.ReadBool("xml_import_one_file"):
             items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
             customfields = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
@@ -196,7 +192,6 @@ def import_xml(self, file_paths):
                 wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
     output_df = pd.concat(df_list)
     output_df.reset_index(drop=True, inplace=True)
-    output_df.to_csv(os.path.join(self.folder_path_elearning, "eLearning_Tasks.txt"), sep = "\t", index = False)
 
     # Method to sanitize path
     def sanitize_path(path_str):
@@ -209,10 +204,6 @@ def import_xml(self, file_paths):
     def normalize_name(name: str) -> str:
         # Removing everything up to the first colon (":") and any trailing space
         #name = re.sub(r'^.*?:\s*', '', name)
-        # Removing specific strings
-        #name = name.replace("Anlage ", "")
-        #name = name.replace("Kapitel ", "")
-        #name = name.replace("Lektion ", "")
         return name.strip()
 
     # Method to build hierarchical tree
@@ -256,20 +247,7 @@ def import_xml(self, file_paths):
         tree = {}
         for root in roots:
             tree[root] = get_children(root)
-
-        # Writing the tree to CSV file
         self.root_folder_name = roots[0]
-        csv_file_path = os.path.join(self.folder_path_elearning, f"{sanitize_path(roots[0])}.csv")
-        with open(csv_file_path, "w", encoding="utf-8", errors="replace") as f:
-            f.write(f'"Thema",0\n')
-            def writing_tree(node_dict, indent=0):
-                for name, sub in node_dict.items():
-                    f.write(f'"{name}",{indent}\n')
-                    writing_tree(sub, indent + 1)
-            writing_tree(tree)
-            f.close()
-
-        # Returning the tree
         return tree
 
     # Method to create folders
@@ -287,6 +265,20 @@ def import_xml(self, file_paths):
 
     # Creating the folder structure
     create_folders(tree, self.folder_path_elearning)
+
+    # Writing the tree to CSV file
+    csv_file_path = os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}.csv")
+    with open(csv_file_path, "w", encoding="utf-8", errors="replace") as f:
+        f.write(f'"Thema",0\n')
+        def writing_tree(node_dict, indent=0):
+            for name, sub in node_dict.items():
+                f.write(f'"{name}",{indent}\n')
+                writing_tree(sub, indent + 1)
+        writing_tree(tree)
+        f.close()
+
+    # Writing the dataframe to TXT file
+    output_df.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}.txt"), sep = "\t", index = False)
 
     # Informing the user
     wx.MessageBox(f"{number_of_items} Ordner wurden in `{self.root_folder_name}` erfolgreich erstellt.", "Information", wx.OK | wx.ICON_INFORMATION)

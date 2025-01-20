@@ -28,10 +28,16 @@ def on_import_task(self, event, df = None):
     else:
         # Filtering the df for the selected user
         if self.config.Read("user_choice") == "Alle":
-            display_tasks(self, df[df['Status'] == "Neu"])
+            if self.config.Read("status_choice") == "Alle":
+                display_tasks(self, df)
+            else:
+                display_tasks(self, df[df['Status'] == self.config.Read("status_choice")])
         else:
-            output_df = df[df['Verantwortlicher'] == self.config.Read("user_choice")]
-            display_tasks(self, output_df[output_df['Status'] == "Neu"])
+            if self.config.Read("status_choice") == "Alle":
+                display_tasks(self, df[df['Verantwortlicher'] == self.config.Read("user_choice")])
+            else:
+                output_df = df[df['Verantwortlicher'] == self.config.Read("user_choice")]
+                display_tasks(self, output_df[output_df['Status'] == self.config.Read("status_choice")])
 
 # Method to import XML file
 def import_xml(self, file_paths):

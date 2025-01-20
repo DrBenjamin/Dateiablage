@@ -47,7 +47,7 @@ class PreferencesPage(wx.PreferencesPage):
         sizer.Add(self.status_choice, 0, wx.ALL, 5)
         # Load saved state
         status_state = self.config.Read("status_choice", "Alle")
-        self.user_choice.SetStringSelection(status_state)
+        self.status_choice.SetStringSelection(status_state)
         # Bind event to save state
         self.status_choice.Bind(wx.EVT_CHOICE, self.on_status_choice)
 

@@ -300,17 +300,13 @@ def import_xml(self, file_paths):
     self.df_tasks.to_string(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}.txt"))
 
     # Informing the user
-    wx.MessageBox(f"{number_of_items} Ordner wurden in `{self.root_folder_name}` erfolgreich erstellt.", "Information", wx.OK | wx.ICON_INFORMATION)
+    wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{self.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)
 
 # Method to handle selected file
 def on_file_selected(self, event):
     file_index = event.GetSelection()
     file_path = self.file_listbox.GetString(file_index)
     self.file_path = file_path
-
-    # To-Do Kanjo
-    # - Get the file name from the path
-    # - Xy
     file_name = os.path.basename(self.file_path)
     print(file_name)
 

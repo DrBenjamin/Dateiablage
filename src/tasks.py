@@ -1,7 +1,6 @@
 import wx
 
-# Method to handle the Import tasks excel
-def on_import_task(self, event, df = None):
+def on_import_tasks(self, event, df = None):
     # Filtering the df for the selected user
     if self.config.Read("user_choice") == "Alle":
         if self.config.Read("status_choice") == "Alle":

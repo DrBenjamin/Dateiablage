@@ -285,8 +285,8 @@ def import_xml(self, file_paths):
     create_folders(tree, self.folder_path_elearning)
 
     # Writing the tree to CSV file
-    self.file_path_elearning = os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}.csv")
-    with open(self.file_path_elearning, "w", encoding="utf-8", errors="replace") as f:
+    self.file_path_elearning = os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_e-Learning_Definition.csv")
+    with open(self.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema",0\n')
         def writing_tree(node_dict, indent=0):
             for name, sub in node_dict.items():
@@ -297,7 +297,8 @@ def import_xml(self, file_paths):
 
     # Writing the dataframe to global variable and TXT file
     self.df_tasks = output_df
-    self.df_tasks.to_string(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}.txt"))
+    self.df_tasks.to_string(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
+    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_offene_Aufgaben.csv"), sep = ",", index = False)
 
     # Informing the user
     wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{self.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)

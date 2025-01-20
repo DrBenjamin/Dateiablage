@@ -2,7 +2,7 @@ import wx
 import io
 from docx import Document
 from src.files import list_files
-from src.tasks import on_import_task
+from src.tasks import on_import_tasks
 from src.learning import display_learning
 import os
 import webbrowser

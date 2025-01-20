@@ -24,9 +24,25 @@ from src.files import (
     on_create_folder_structure
 )
 
+# Method to handle the import of JIRA tickets
+def on_import_jira(self, event = None):
+    print("Import JIRA")
+    # Calling the `on_create_folder_structure` method
+    self.on_create_folder_structure(event)
+
+    # Calling the `on_browse_source` method
+    self.on_browse_source(event, self.folder_path_elearning)
+
+    # Calling the `on_import_csv` method
+    self.on_import_csv(event, self.file_path_elearning)
+    self.file_path_elearning = None
+
 class MyFrame(wx.Frame):
     def __init__(self, *args, **kw):
         super(MyFrame, self).__init__(*args, **kw)
+
+        # Binding function to `self`
+        self.on_import_jira = types.MethodType(on_import_jira, self)
 
         # Assigning imported functions as methods
         self.on_import_csv = types.MethodType(on_import_csv, self)
@@ -70,6 +86,7 @@ class MyFrame(wx.Frame):
         self.file_path = None
         self.folder_path = None
         self.folder_path_elearning = None
+        self.file_path_elearning = None
         self.folder_path_jira = None
 
         # Creating a menu bar
@@ -155,11 +172,11 @@ class MyFrame(wx.Frame):
         panel.SetSizer(vbox)
 
         ## Binding of methods to menu items
-        # Binding the Import menu item to the on_import method
+        # Binding the Import CSV menu item to the `on_import_csv`` method
         self.Bind(wx.EVT_MENU, self.on_import_csv, import_definition)
-        # Binding the Import menu item to the on_import method
+        # Binding the Import Excel menu item to the `on_import_excel` method
         self.Bind(wx.EVT_MENU, self.on_import_excel, import_tasks)
-        # Binding the Browse menu item to the on_browse method
+        # Binding the Browse menu item to the `on_browse_source` method
         self.Bind(wx.EVT_MENU, self.on_browse_source, browse_item)
         # Binding the Browse menu item to the on_browse_jira method
         self.Bind(wx.EVT_MENU, self.on_browse_jira, import_jira)
@@ -182,7 +199,7 @@ class MyFrame(wx.Frame):
         # Binding the right-click event
         self.file_listbox.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click)
         # Binding the Create folder structure menu item to the on_create_folder_structure method
-        self.Bind(wx.EVT_MENU, self.on_create_folder_structure, folder_structure)
+        self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
 
         ## Bindings of events
         # Binding the list control to the on_item_activated method

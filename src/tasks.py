@@ -5,25 +5,33 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 
 # Method to handle the Import tasks excel
-def on_import_task(self, event):
-    if self.config.ReadBool("xml_import_enabled", True):
-        dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
-        if dialog.ShowModal() == wx.ID_OK:
-            self.folder_path = dialog.GetPath()
-            for name in os.listdir(self.folder_path):
-                file_path = os.path.join(self.folder_path, name)
-                if os.path.isfile(file_path) and name.endswith(".xml"):
-                    self.file_path_tasks.append(file_path)
-            import_xml(self, self.file_path_tasks)
+def on_import_task(self, event, df = None):
+    if df is None:
+        if self.config.ReadBool("xml_import_enabled", True):
+            dialog = wx.DirDialog(None, "Wähle einen Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+            if dialog.ShowModal() == wx.ID_OK:
+                self.folder_path = dialog.GetPath()
+                for name in os.listdir(self.folder_path):
+                    file_path = os.path.join(self.folder_path, name)
+                    if os.path.isfile(file_path) and name.endswith(".xml"):
+                        self.file_path_tasks.append(file_path)
+                import_xml(self, self.file_path_tasks)
+        else:
+            dialog = wx.FileDialog(self, "Importiere Aufgabenliste", wildcard="Excel- oder XML-Datei (*.xlsx;*.xml)|*.xlsx;*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            if dialog.ShowModal() == wx.ID_OK:
+                self.file_path_tasks = dialog.GetPath()
+                if self.file_path_tasks.endswith(".xml"):
+                    import_xml(self, [self.file_path_tasks])
+                else:
+                    import_excel(self, self.file_path_tasks)
+        dialog.Destroy()
     else:
-        dialog = wx.FileDialog(self, "Importiere Aufgabenliste", wildcard="Excel- oder XML-Datei (*.xlsx;*.xml)|*.xlsx;*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if dialog.ShowModal() == wx.ID_OK:
-            self.file_path_tasks = dialog.GetPath()
-            if self.file_path_tasks.endswith(".xml"):
-                import_xml(self, [self.file_path_tasks])
-            else:
-                import_excel(self, self.file_path_tasks)
-    dialog.Destroy()
+        # Filtering the df for the selected user
+        if self.config.Read("user_choice") == "Alle":
+            display_tasks(self, df[df['Status'] == "Neu"])
+        else:
+            output_df = df[df['Verantwortlicher'] == self.config.Read("user_choice")]
+            display_tasks(self, output_df[output_df['Status'] == "Neu"])
 
 # Method to import XML file
 def import_xml(self, file_paths):
@@ -116,10 +124,13 @@ def import_excel(self, file_path):
 def display_tasks(self, df):
     self.tasks_ctrl.ClearAll()
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         self.tasks_ctrl.Append([row.iloc[0]]) 
         self.tasks_ctrl.Append([row.iloc[1]])
-        self.tasks_ctrl.Append([row.iloc[2]])
-        text="-------------"
-        self.tasks_ctrl.Append([text])
+        self.tasks_ctrl.Append([row.iloc[4]])
+        self.tasks_ctrl.Append([row.iloc[5]])
+        self.tasks_ctrl.Append(["-------------"])
+    try:
         self.tasks_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+    except Exception as e:
+        print(e)

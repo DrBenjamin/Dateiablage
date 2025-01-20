@@ -30,13 +30,26 @@ class PreferencesPage(wx.PreferencesPage):
         heading_user.SetFont(font)
         sizer.Add(heading_user, 0, wx.ALL, 5)
         # User choice
-        self.user_choice = wx.Choice(panel, choices=["Alle", "Asher", "Benjamin", "Larisa", "Listan", "Mahsa", "Marko", "Sandra"])
+        sizer.Add(wx.StaticText(panel,
+                                    label=f'Tickets für welchen User anzeigen?'),0, wx.ALL, 5)
+        self.user_choice = wx.Choice(panel, choices=["Alle", "Asher", "Benjamin", "Kanjo", "Larisa", "Listan", "Mahsa", "Marko", "Sandra M.", "Christian.Weingartner@cgm.com"])
         sizer.Add(self.user_choice, 0, wx.ALL, 5)
         # Load saved state
         user_state = self.config.Read("user_choice", "Alle")
         self.user_choice.SetStringSelection(user_state)
         # Bind event to save state
         self.user_choice.Bind(wx.EVT_CHOICE, self.on_user_choice)
+        
+        # Ticket status choice
+        sizer.Add(wx.StaticText(panel,
+                                    label=f'Tickets mit welchem Status anzeigen?'),0, wx.ALL, 5)
+        self.status_choice = wx.Choice(panel, choices=["Alle", "Fertig", "Neu"])
+        sizer.Add(self.status_choice, 0, wx.ALL, 5)
+        # Load saved state
+        status_state = self.config.Read("status_choice", "Alle")
+        self.user_choice.SetStringSelection(status_state)
+        # Bind event to save state
+        self.status_choice.Bind(wx.EVT_CHOICE, self.on_status_choice)
 
         # Adding preference control XML import
         heading_xml = wx.StaticText(panel, label="XML Import Einstellungen")
@@ -112,6 +125,11 @@ class PreferencesPage(wx.PreferencesPage):
     # Method to handle the Preferences page user choice
     def on_user_choice(self, event):
         self.config.Write("user_choice", self.user_choice.GetString(self.user_choice.GetSelection()))
+        self.config.Flush()
+
+    # Method to handle the Preferences page user choice
+    def on_status_choice(self, event):
+        self.config.Write("status_choice", self.status_choice.GetString(self.status_choice.GetSelection()))
         self.config.Flush()
 
     # Method to handle the Preferences page xml checkbox

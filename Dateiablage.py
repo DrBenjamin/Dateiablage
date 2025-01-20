@@ -15,7 +15,10 @@ from src.learning import (
     on_item_selected,
     on_import_csv
 )
-from src.tasks import on_import_task
+from src.tasks import (
+    on_import_task,
+    display_tasks
+)
 from src.files import (
     on_browse_source,
     on_browse_jira,
@@ -26,7 +29,6 @@ from src.files import (
 
 # Method to handle the import of JIRA tickets
 def on_import_jira(self, event = None):
-    print("Import JIRA")
     # Calling the `on_create_folder_structure` method
     self.on_create_folder_structure(event)
 
@@ -38,7 +40,7 @@ def on_import_jira(self, event = None):
     self.file_path_elearning = None
 
     # Calling the `on_import_task` method
-    #self.on_import_task(event, self.file_path_elearning)
+    self.on_import_tasks(event, self.df_tasks)
 
 class MyFrame(wx.Frame):
     def __init__(self, *args, **kw):
@@ -53,7 +55,7 @@ class MyFrame(wx.Frame):
         self.on_refresh = types.MethodType(on_refresh, self)
         self.on_preferences = types.MethodType(on_preferences, self)
         self.on_export = types.MethodType(on_export, self)
-        self.on_import_excel = types.MethodType(on_import_task, self)
+        self.on_import_tasks = types.MethodType(on_import_task, self)
         self.on_browse_source = types.MethodType(on_browse_source, self)
         self.on_browse_jira = types.MethodType(on_browse_jira, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)
@@ -71,6 +73,8 @@ class MyFrame(wx.Frame):
         # Set default values if they do not exist
         if not self.config.HasEntry("user_choice"):
             self.config.Write("user_choice", "Alle")
+        if not self.config.HasEntry("status_choice"):
+            self.config.Write("status_choice", "Alle")
         if not self.config.HasEntry("xml_import_enabled"):
             self.config.WriteBool("xml_import_enabled", True)
         if not self.config.HasEntry("xml_import_one_file"):
@@ -83,9 +87,11 @@ class MyFrame(wx.Frame):
             self.config.Write("drive_mapping_letter", "")
         # Overiding the save values for testing
         #self.config.WriteBool("xml_import_one_file", True)
+        #self.config.Write("user_choice", "Alle")
 
         # Definition of global variables
         self.file_path_tasks = []
+        self.df_tasks = None
         self.file_path = None
         self.file_path_elearning = None
         self.folder_path = None
@@ -178,7 +184,7 @@ class MyFrame(wx.Frame):
         # Binding the Import CSV menu item to the `on_import_csv`` method
         self.Bind(wx.EVT_MENU, self.on_import_csv, import_definition)
         # Binding the Import Excel menu item to the `on_import_excel` method
-        self.Bind(wx.EVT_MENU, self.on_import_excel, import_tasks)
+        self.Bind(wx.EVT_MENU, self.on_import_tasks, import_tasks)
         # Binding the Browse menu item to the `on_browse_source` method
         self.Bind(wx.EVT_MENU, self.on_browse_source, browse_item)
         # Binding the Browse menu item to the on_browse_jira method

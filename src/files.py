@@ -151,6 +151,7 @@ def import_xml(self, file_paths):
                     df.set_index('ID', inplace = True)
                     df_list.append(df) 
                 except Exception as e:
+                    print(df)
                     wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
 
             # Setting variables for status message and ID
@@ -294,8 +295,9 @@ def import_xml(self, file_paths):
         writing_tree(tree)
         f.close()
 
-    # Writing the dataframe to TXT file
-    output_df.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}.txt"), sep = "\t", index = False)
+    # Writing the dataframe to global variable and TXT file
+    self.df_tasks = output_df
+    self.df_tasks.to_string(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}.txt"))
 
     # Informing the user
     wx.MessageBox(f"{number_of_items} Ordner wurden in `{self.root_folder_name}` erfolgreich erstellt.", "Information", wx.OK | wx.ICON_INFORMATION)

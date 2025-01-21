@@ -42,7 +42,7 @@ exe = EXE(
     upx_exclude=[],
     runtime_tmpdir=None,
     console=False,  # Set to False for GUI apps
-    icon=os.path.join('_internal/images', 'icon.ico'),  # Path to your .ico file
+    icon=os.path.join('_internal/images', 'icon.ico')
 )
 
 coll = COLLECT(
@@ -54,4 +54,16 @@ coll = COLLECT(
     upx=True,
     upx_exclude=[],
     name='Dateiablage'
+)
+
+app = BUNDLE(
+    coll,
+    name='Dateiablage.app',
+    icon=os.path.join('_internal/images', 'icon.icns'),
+    info_plist={
+        'CFBundleName': 'Dateiablage',
+        'CFBundleShortVersionString': '0.1.0',
+        'CFBundleVersion': '0.1.0',
+        'CFBundleIdentifier': 'org.seriousbenentertainment.dateiablage'
+    }
 )

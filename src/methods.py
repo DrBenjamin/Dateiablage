@@ -81,12 +81,12 @@ def convert_srt_to_vtt(file_path):
     
 # Method to handle `Über die App` menu item
 def on_about(self, event):
-    # Erstelle ein neues benutzerdefiniertes Fenster
+    # Creating a new user-defined window
     frame = wx.Frame(None, title="Über die App", size=(500, 400))
     panel = wx.Panel(frame)
     sizer = wx.BoxSizer(wx.VERTICAL)
 
-    # Nachricht hinzufügen
+    # Adding message
     message = (
         "Name der Anwendung:\n"
         "Dateiablage\n\n"
@@ -103,23 +103,23 @@ def on_about(self, event):
     message_label = wx.StaticText(panel, label=message)
     sizer.Add(message_label, 0, wx.ALL, 10)
 
-    # Weblink zur Support-Seite hinzufügen
+    # Adding web link to support page
     support_label = wx.StaticText(panel, label="Weitere Informationen finden Sie auf unserer Support-Seite.")
     support_label.SetForegroundColour((0, 0, 255))  # Link-Farbe (Blau)
     font = support_label.GetFont()
     font.SetUnderlined(True)  # Unterstrichen hinzufügen
     support_label.SetFont(font)
 
-    # Klick-Event für den Link
+    # Adding click event for the link
     support_label.Bind(wx.EVT_LEFT_DOWN, lambda event: webbrowser.open("https://www.cgm.com/corp_de/unternehmen/kontakt.html"))
     sizer.Add(support_label, 0, wx.ALL, 10)
 
-    # Freundlicher Hinweis
+    # Adding message
     thanks_label = wx.StaticText(panel, label="Vielen Dank, dass Sie unsere Anwendung verwenden!")
     thanks_label.SetForegroundColour((0, 128, 0))  # Grüne Farbe für Freundlichkeit
     sizer.Add(thanks_label, 0, wx.ALL, 10)
 
-    # Sizer setzen und Fenster anzeigen
+    # Setting sizer and display window
     panel.SetSizer(sizer)
     frame.Show()
 
@@ -147,13 +147,9 @@ def on_refresh(self, event):
         print(f"Error: {e}")
     try:
         if self.df_tasks is not None:
-            on_import_task(self, self.df_tasks)
+            on_import_tasks(self, None)
     except Exception as e:
         print(f"Error: {e}")
-
-# Method to handle the Exit menu item
-def on_exit(self, event):
-    self.Close(True)
 
 # Method to handle the Export file list
 def on_export(self, event):
@@ -175,3 +171,7 @@ def export_docx(self, data):
     with open("Export_Dateiliste.docx", "wb") as docx_file:
         docx_file.write(buffer.getvalue())
     buffer.close()
+
+# Method to handle the Exit menu item
+def on_exit(self, event):
+    self.Close(True)

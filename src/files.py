@@ -309,7 +309,7 @@ def on_file_selected(self, event):
     file_path = self.file_listbox.GetString(file_index)
     self.file_path = file_path
     file_name = os.path.basename(self.file_path)
-    print(file_name)
+    #print(file_name)
 
 # Method to handle the list control item activated event
 def on_file_activated(self, event):
@@ -331,7 +331,7 @@ def on_file_activated(self, event):
 
 # Method to list the files in the selected folder
 def list_files(self, folder_path, filter_text=None):
-    # Clear the existing file list
+    # Clearing the existing file list
     self.file_list = []
     for root, dirs, files in os.walk(folder_path):
         for name in dirs:

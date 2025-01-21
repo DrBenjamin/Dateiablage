@@ -86,10 +86,12 @@ class PreferencesPage(wx.PreferencesPage):
         heading.SetFont(font)
         sizer.Add(heading, 0, wx.ALL, 5)
         # SRT Konverter checkbox
+        sizer.Add(wx.StaticText(panel,
+                                    label=f'Sicherheitsabfrage vor dem Überschreiben?'),0, wx.ALL, 5)
         self.srt_checkbox = wx.CheckBox(panel, label="SRT Konverter")
         sizer.Add(self.srt_checkbox, 0, wx.ALL, 5)
         # Load saved state
-        srt_state = self.config.ReadBool("srt_converter_enabled", False)
+        srt_state = self.config.ReadBool("srt_converter_overwrite", False)
         self.srt_checkbox.SetValue(srt_state)
         # Bind event to save state
         self.srt_checkbox.Bind(wx.EVT_CHECKBOX, self.on_srt_checkbox)
@@ -144,7 +146,7 @@ class PreferencesPage(wx.PreferencesPage):
 
     # Method to handle the Preferences page srt checkbox
     def on_srt_checkbox(self, event):
-        self.config.WriteBool("srt_converter_enabled", self.srt_checkbox.IsChecked())
+        self.config.WriteBool("srt_converter_overwrite", self.srt_checkbox.IsChecked())
         self.config.Flush()
 
     # Method to handle the Preferences page Drive mapping checkbox

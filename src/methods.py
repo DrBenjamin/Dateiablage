@@ -37,28 +37,29 @@ def on_copy_path(self, event):
 def on_convert(self, event):
     try:
         if self.file_path.endswith(".srt"):
-            convert_srt_to_vtt(self.file_path)
+            convert_srt_to_vtt(self.file_path, overwrite = self.config.ReadBool("srt_converter_overwrite"))
         else:
             wx.MessageBox("Dateiendung wird nicht unterstützt", "Error", wx.OK | wx.ICON_ERROR)
     except Exception as e:
         wx.MessageBox(f"Datei konnte nicht konvertiert werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 # Method to convert srt into vtt 
-def convert_srt_to_vtt(file_path):
+def convert_srt_to_vtt(file_path, overwrite = False):
     vtt_file_path = file_path.rsplit(".", 1)[0] + ".vtt"
-    
+
     if os.path.exists(vtt_file_path):
         file_name = os.path.basename(vtt_file_path)
-        response = wx.MessageBox(
-            f"Die Datei '{file_name}' existiert bereits. Möchten Sie sie ersetzen?",
-            "Datei existiert",
-            wx.YES_NO | wx.ICON_QUESTION
-        )
-        if response == wx.NO:
-            return
-        
+        if not overwrite:
+            response = wx.MessageBox(
+                f"Die Datei '{file_name}' existiert bereits. Möchten Sie sie ersetzen?",
+                "Datei existiert",
+                wx.YES_NO | wx.ICON_QUESTION
+            )
+            if response == wx.NO:
+                return
+
         os.remove(vtt_file_path)
-        
+
     with open(file_path, "r") as f, open(vtt_file_path, "w") as vtt_file:
         vtt_file.write("WEBVTT\n\n")
         first_line = True
@@ -71,14 +72,14 @@ def convert_srt_to_vtt(file_path):
             if "-->" in line:  # convert time format "," into "."
                 line = line.replace(",", ".")
             vtt_file.write(line)
-    
-    file_name = os.path.basename(vtt_file_path)        
+
+    file_name = os.path.basename(vtt_file_path)
     wx.MessageBox(
         f"Die Datei wurde erfolgreich konvertiert und gespeichert als:\n{file_name}",
         "Erfolg",
         wx.OK | wx.ICON_INFORMATION
     )
-    
+
 # Method to handle `Über die App` menu item
 def on_about(self, event):
     # Creating a new user-defined window

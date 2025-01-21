@@ -87,8 +87,8 @@ class PreferencesPage(wx.PreferencesPage):
         sizer.Add(heading, 0, wx.ALL, 5)
         # SRT Konverter checkbox
         sizer.Add(wx.StaticText(panel,
-                                    label=f'Sicherheitsabfrage vor dem Überschreiben?'),0, wx.ALL, 5)
-        self.srt_checkbox = wx.CheckBox(panel, label="SRT Konverter")
+                                    label=f'Automatisches Überschreiben vorhandener `VTT`Dateien?'),0, wx.ALL, 5)
+        self.srt_checkbox = wx.CheckBox(panel, label="Automatisches Überschreiben")
         sizer.Add(self.srt_checkbox, 0, wx.ALL, 5)
         # Load saved state
         srt_state = self.config.ReadBool("srt_converter_overwrite", False)

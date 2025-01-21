@@ -1,4 +1,24 @@
 import wx
+import pandas as pd
+
+# Method to handle the open JIRA tickets CSV file
+def on_import_tasks_from_csv(self, event, df = None):
+    # Method to import the CSV file
+    def import_csv(self, file_path):
+        try:
+            open_tasks = pd.read_csv(file_path)
+            self.on_import_tasks(event, open_tasks)
+            wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
+        except Exception as e:
+            print(e)
+            wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
+
+    # Lading pandas dataframe from the saved CSV file
+    dialog = wx.FileDialog(self, "Importiere offene Aufgaben", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+    if dialog.ShowModal() == wx.ID_OK:
+        file_path = dialog.GetPath()
+        import_csv(self, file_path)
+    dialog.Destroy()
 
 def on_import_tasks(self, event, df = None):
     # Filtering the df for the selected user

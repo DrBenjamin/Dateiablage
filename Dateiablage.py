@@ -1,6 +1,5 @@
 import wx # wxPython / Phoenix
 import types
-import pandas as pd
 from src.methods import (
     on_refresh,
     on_export,
@@ -17,7 +16,8 @@ from src.learning import (
     on_import_csv
 )
 from src.tasks import (
-    on_import_tasks
+    on_import_tasks,
+    on_import_tasks_from_csv
 )
 from src.files import (
     on_browse_source,
@@ -27,7 +27,7 @@ from src.files import (
     on_create_folder_structure
 )
 
-# Method to handle the import of JIRA tickets
+# Method to handle the Create e-Learning
 def on_import_jira(self, event = None):
     # Calling the `on_browse_jira` method
     self.on_browse_jira(event)
@@ -45,35 +45,17 @@ def on_import_jira(self, event = None):
     # Calling the `on_import_tasks` method
     self.on_import_tasks(event, self.df_tasks)
 
-# Method to handle the open JIRA tickets csv file
-def on_import_tasks_from_csv(self, event, df = None):
-    # Method to import the CSV file
-    def import_csv(self, file_path):
-        try:
-            open_tasks = pd.read_csv(file_path)
-            self.on_import_tasks(event, open_tasks)
-            wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
-        except Exception as e:
-            print(e)
-            wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
-
-    # Lading pandas dataframe from the saved CSV file
-    dialog = wx.FileDialog(self, "Importiere offene Aufgaben", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-    if dialog.ShowModal() == wx.ID_OK:
-        file_path = dialog.GetPath()
-        import_csv(self, file_path)
-    dialog.Destroy()
-
 ## Creating the main frame
 class MyFrame(wx.Frame):
     def __init__(self, parent, title, size, config):
         super(MyFrame, self).__init__(parent=parent, title=title, size=size)
         self.config = config
 
+        ## Binding of methods from this file
         # Binding function to `self`
         self.on_import_jira = types.MethodType(on_import_jira, self)
-        self.on_import_tasks_from_csv = types.MethodType(on_import_tasks_from_csv, self)
-        
+
+        ## Binding of methods from other files
         # Assigning imported functions as methods
         self.on_import_csv = types.MethodType(on_import_csv, self)
         self.on_exit = types.MethodType(on_exit, self)
@@ -81,6 +63,7 @@ class MyFrame(wx.Frame):
         self.on_preferences = types.MethodType(on_preferences, self)
         self.on_export = types.MethodType(on_export, self)
         self.on_import_tasks = types.MethodType(on_import_tasks, self)
+        self.on_import_tasks_from_csv = types.MethodType(on_import_tasks_from_csv, self)
         self.on_browse_source = types.MethodType(on_browse_source, self)
         self.on_browse_jira = types.MethodType(on_browse_jira, self)
         self.on_item_selected = types.MethodType(on_item_selected, self)

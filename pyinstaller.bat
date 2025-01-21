@@ -16,7 +16,7 @@ if exist Dateiablage.exe (
 )
 
 REM 2) Run PyInstaller with Dateiablage.spec
-python -m PyInstaller Dateiablage.spec
+python -m PyInstaller --noconfirm Dateiablage.spec
 
 REM 3) Copy Dateiablage.exe to the current directory
 xcopy /y /i /e "dist\Dateiablage\Dateiablage.exe" "%~dp0"
@@ -45,17 +45,4 @@ if exist build (
 REM 9) Remove the redundant _internal directory
 if exist _internal\_internal (
     rd /s /q _internal\_internal
-)
-
-REM 10) Copy the Release to Sharepoint
-set /p COPYTO="Do you want to copy the build to SharePoint? (Y/N): "
-if /I "%COPYTO%"=="Y" (
-    echo Copying build to SharePoint...
-    set "TARGET_PATH=%USERPROFILE%\OneDrive - CGM\UKE_Videos\8. Turtorials_Videobearbeitung\Dateiablage\"
-    del /q "%TARGET_PATH%Dateiablage.exe"
-    xcopy /y /i /e "Dateiablage.exe" "%TARGET_PATH%"
-    rd /s /q "%TARGET_PATH%_internal"
-    xcopy /y /i /e "_internal" "%TARGET_PATH%_internal"
-) else (
-    echo Skipping copy to SharePoint.
 )

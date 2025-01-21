@@ -29,6 +29,9 @@ from src.files import (
 
 # Method to handle the import of JIRA tickets
 def on_import_jira(self, event = None):
+    # Calling the `on_browse_jira` method
+    self.on_browse_jira(event)
+
     # Calling the `on_create_folder_structure` method
     self.on_create_folder_structure(event)
 
@@ -61,6 +64,7 @@ def on_import_tasks_from_csv(self, event, df = None):
         import_csv(self, file_path)
     dialog.Destroy()
 
+## Creating the main frame
 class MyFrame(wx.Frame):
     def __init__(self, parent, title, size, config):
         super(MyFrame, self).__init__(parent=parent, title=title, size=size)
@@ -105,14 +109,13 @@ class MyFrame(wx.Frame):
         file_menu = wx.Menu()
         import_definition = file_menu.Append(wx.ID_ANY, "&Wähle e-Learning Definition")
         import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle JIRA offene Aufgaben")
-        import_jira = file_menu.Append(wx.ID_ANY, "&Wähle JIRA e-Learning Export")
         browse_item = file_menu.Append(wx.ID_ANY, "&Wähle Quellverzeichnis")
         exit_app = file_menu.Append(wx.ID_EXIT, "&Beenden")
         menu_bar.Append(file_menu, "&Datei")
         
         # Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
-        folder_structure = edit_menu.Append(wx.ID_ANY, "Ordnerstruktur anlegen")
+        folder_structure = edit_menu.Append(wx.ID_ANY, "Erstelle e-Learning")
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
         copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Pfad")
         convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere srt in vtt")
@@ -180,35 +183,38 @@ class MyFrame(wx.Frame):
         # Setting the sizer for the frame and fit the panel
         panel.SetSizer(vbox)
 
-        ## Binding of methods to menu items
+        ## Binding of `Datei` methods to menu items
         # Binding the Import CSV menu item to the `on_import_csv`` method
         self.Bind(wx.EVT_MENU, self.on_import_csv, import_definition)
+        # Binding the Import tasks menu item to the `on_import_task` method
+        self.Bind(wx.EVT_MENU, self.on_import_tasks_from_csv, import_tasks)
         # Binding the Browse menu item to the `on_browse_source` method
         self.Bind(wx.EVT_MENU, self.on_browse_source, browse_item)
-        # Binding the Browse menu item to the on_browse_jira method
-        self.Bind(wx.EVT_MENU, self.on_browse_jira, import_jira)
-        # Binding the Import tasks menu item to the on_import_task method
-        self.Bind(wx.EVT_MENU, self.on_import_tasks_from_csv, import_tasks)
-        # Bindung the Export menu item to the on_export method
-        self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
         # Binding the Exit menu item to the on_exit method
         self.Bind(wx.EVT_MENU, self.on_exit, exit_app)
+
+        ## Binding of `Bearbeiten` methods to menu items
+        # Binding the Create e-Learning menu item to the `on_import_jira` method
+        self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
+        # Bindung the Export menu item to the `on_export` method
+        self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
+        # Binding the Copy menu to the `on_copy` path method
+        self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
+        # Binding the Convert menu to the `on_convert` method
+        self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)
         # Binding the Refresh menu item to the on_refresh method
         self.Bind(wx.EVT_MENU, self.on_refresh, refresh_ctrl_lists)
         # Binding the Preferences menu item to the on_preferences method
         self.Bind(wx.EVT_MENU, self.on_preferences, preferences)
+
+        ## Binding of `Hilfemenü` methods to menu items
         # Binding the Contact menu to the on_contact method
         self.Bind(wx.EVT_MENU, self.on_contact, help_contact)
         # Binding the über die App menu to the on_about method 
         self.Bind(wx.EVT_MENU, self.on_about, help_about)
-        # Binding the Convert menu to the on_convert method
-        self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)
-        # Binding the Copy menu to the on_copy_path method
-        self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
-        # Binding the right-click event
+
+        ## Binding the right-click event
         self.file_listbox.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click)
-        # Binding the Create folder structure menu item to the on_create_folder_structure method
-        self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
 
         ## Bindings of events
         # Binding the list control to the on_item_activated method
@@ -220,7 +226,7 @@ class MyFrame(wx.Frame):
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
 
-# Creating the wx App
+## Creating the wx App
 class MyApp(wx.App):
     def OnInit(self):
         # Initialize config
@@ -252,7 +258,7 @@ class MyApp(wx.App):
         self.SetTopWindow(frame)
         return True
 
-# Initializing the wx App
+## Initializing the wx App
 app = MyApp(False)
 print("App start")
 app.MainLoop()

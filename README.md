@@ -17,5 +17,9 @@ python Dateiablage.py
 To build the executable, run the following command:
 
 ```bash
+# Windows
 pyinstaller.bat
+
+# MacOS & Linux
+python -m PyInstaller Dateiablage.spec
 ```

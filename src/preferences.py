@@ -26,7 +26,7 @@ class PreferencesPage(wx.StockPreferencesPage):
         sizer = wx.BoxSizer(wx.VERTICAL)
 
         # Adding preference control user settings
-        heading_user = wx.StaticText(panel, label="Benutzer & Status")
+        heading_user = wx.StaticText(panel, label="Jira")
         font = heading_user.GetFont()
         font.PointSize += 2
         heading_user.SetFont(font)

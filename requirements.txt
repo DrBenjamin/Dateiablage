@@ -4,3 +4,4 @@ xlsxwriter
 openpyxl
 xlrd
 python-docx
+bs4

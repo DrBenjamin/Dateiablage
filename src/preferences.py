@@ -43,7 +43,7 @@ class PreferencesPage(wx.PreferencesPage):
         # Ticket status choice
         sizer.Add(wx.StaticText(panel,
                                     label=f'Tickets mit welchem Status anzeigen?'),0, wx.ALL, 5)
-        self.status_choice = wx.Choice(panel, choices=["Alle", "Fertig", "Neu"])
+        self.status_choice = wx.Choice(panel, choices=["Alle", "Fertig", "In Bearbeitung", "Neu"])
         sizer.Add(self.status_choice, 0, wx.ALL, 5)
         # Load saved state
         status_state = self.config.Read("status_choice", "Alle")

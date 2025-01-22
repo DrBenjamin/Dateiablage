@@ -209,7 +209,7 @@ class MyFrame(wx.Frame):
 
         ## Bindings of events
         # Binding the list control to the on_item_activated method
-        #self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
+        self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_item_activated method
         #self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_file_selected method

@@ -7,6 +7,7 @@ import pandas as pd
 import re
 import html
 import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
 
 number_of_items = 0
 root_folder_name = None
@@ -113,28 +114,48 @@ def import_xml(self, file_paths):
                     jira_ticket = dict_task.get("key", "")
                     snippet = dict_task.get("description", "")
 
-                    # Converting HTML entities like &lt; &gt; to < >
+                    # Extracting the `Beschreibung` field
                     snippet_decoded = snippet.replace("&lt;", "<").replace("&gt;", ">")
-                    pattern = re.compile(
-                        r"<b>Zuordnung:</b>\s*(.*?)</li>.*?"
-                        r"<b>Typ:</b>\s*(.*?)</li>.*?"
-                        r"<b>Reihenfolge:</b>\s*(.*?)</li>",
-                        re.DOTALL
-                    )
-                    match = pattern.search(snippet_decoded)
-                    parent = match.group(1).strip()
-                    type = match.group(2).strip()
-                    order = match.group(3).strip()
+                    fields = {
+                        "Zuordnung": "-",
+                        "Typ": "-",
+                        "Reihenfolge": "-",
+                    }
+                    soup = BeautifulSoup(snippet_decoded, "html.parser")
+                    for b_tag in soup.find_all("b"):
+                        text = b_tag.parent.get_text(strip=True)
+                        for field_name in fields:
+                            if text.startswith(field_name + ":"):
+                                fields[field_name] = text.split(":", 1)[1].strip()
+                    parent = fields["Zuordnung"]
+                    type = fields["Typ"]
+                    order = fields["Reihenfolge"]
 
-                    # Extracting path in the e-learning structure field
+                    # Extracting the `Dokumentation Lösung` field
                     customfield_raw = customfields[index]
-                    snippet_customfield_decoded = html.unescape(customfield_raw.replace("&lt;", "<").replace("&gt;", ">"))
-                    pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>")
-                    ort_elearning = pattern_ort.search(snippet_customfield_decoded).group(1).strip()
-
-                    # Extracting the last part of the path if not `ROOT`
-                    if "/" in ort_elearning:
-                        ort_elearning = ort_elearning.split("/")[-1]
+                    snippet_customfield = html.unescape(customfield_raw)
+                    snippet_customfield_decoded = snippet_customfield.replace("&lt;", "<").replace("&gt;", ">")
+                    soup = BeautifulSoup(snippet_customfield_decoded, "html.parser")
+                    fields = {
+                        "Ort im e-Learning": "-",
+                        "Medium": "-",
+                        "System": "-",
+                        "Station": "-",
+                        "Einstieg": "-",
+                        "Beschreibung": "-",
+                    }
+                    for li in soup.find_all("li"):
+                        text = li.get_text(strip=True)
+                        for field_name in fields:
+                            if text.startswith(field_name + ":"):
+                                fields[field_name] = text.split(":", 1)[1].strip()
+                                break
+                    ort = fields["Ort im e-Learning"].split("/")[-1]
+                    medium = fields["Medium"]
+                    system = fields["System"]
+                    station = fields["Station"]
+                    einstieg = fields["Einstieg"]
+                    beschreibung = fields["Beschreibung"]
 
                     # Building the DataFrame
                     df = pd.DataFrame({
@@ -143,15 +164,21 @@ def import_xml(self, file_paths):
                         'Titel': [dict_task.get("summary", "")],
                         'Status': [dict_task.get("status", "")],
                         'Verantwortlicher': [dict_task.get("assignee", "")],
-                        'Aufgabe': [ort_elearning],
+                        'Aufgabe': [ort],
+                        'Medium': [medium],
+                        'System': [system],
+                        'Station': [station],
+                        'Einstieg': [einstieg],
+                        'Beschreibung': [beschreibung],
                         'Zuordnung': [parent],
                         'Typ': [type],
                         'Reihenfolge': [order]
                     })
                     df.set_index('ID', inplace = True)
-                    df_list.append(df) 
+                    df_list.append(df)
                 except Exception as e:
-                    print(df)
+                    #print(df_list)
+                    print(e)
                     wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
 
             # Setting variables for status message and ID
@@ -165,29 +192,48 @@ def import_xml(self, file_paths):
                 snippet = dict_task['channel']['item']['description']
                 customfield_raw = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
 
-                # Converting HTML entities like &lt; &gt; to < >
+                # Extracting the `Beschreibung` field
                 snippet_decoded = snippet.replace("&lt;", "<").replace("&gt;", ">")
-                pattern = re.compile(
-                    r"<b>Zuordnung:</b>\s*(.*?)</li>.*?"
-                    r"<b>Typ:</b>\s*(.*?)</li>.*?"
-                    r"<b>Reihenfolge:</b>\s*(.*?)</li>",
-                    re.DOTALL
-                )
-                match = pattern.search(snippet_decoded)
-                parent = match.group(1).strip()
-                type = match.group(2).strip()
-                order = match.group(3).strip()
+                fields = {
+                    "Zuordnung": "-",
+                    "Typ": "-",
+                    "Reihenfolge": "-",
+                }
+                soup = BeautifulSoup(snippet_decoded, "html.parser")
+                for b_tag in soup.find_all("b"):
+                    text = b_tag.parent.get_text(strip=True)
+                    for field_name in fields:
+                        if text.startswith(field_name + ":"):
+                            fields[field_name] = text.split(":", 1)[1].strip()
+                parent = fields["Zuordnung"]
+                type = fields["Typ"]
+                order = fields["Reihenfolge"]
 
-                # Extracting path in the e-learning structure field
-                snippet_customfield_decoded = html.unescape(customfield_raw[0].replace("&lt;", "<").replace("&gt;", ">"))
-                pattern_ort = re.compile(r"<li><b>Ort im e-Learning:</b>\s*(.*?)</li>",
-                                            re.DOTALL)
-                match_ort = pattern_ort.search(snippet_customfield_decoded)
-                ort_elearning = match_ort.group(1).strip()
-
-                # Extracting the last part of the path if not `ROOT`
-                if "/" in ort_elearning:
-                    ort_elearning = ort_elearning.split("/")[-1]
+                # Extracting the `Dokumentation Lösung` field
+                customfield_raw = html.unescape(customfield_raw[0])
+                snippet_customfield = html.unescape(customfield_raw)
+                snippet_customfield_decoded = snippet_customfield.replace("&lt;", "<").replace("&gt;", ">")
+                soup = BeautifulSoup(snippet_customfield_decoded, "html.parser")
+                fields = {
+                    "Ort im e-Learning": "-",
+                    "Medium": "-",
+                    "System": "-",
+                    "Station": "-",
+                    "Einstieg": "-",
+                    "Beschreibung": "-",
+                }
+                for li in soup.find_all("li"):
+                    text = li.get_text(strip=True)
+                    for field_name in fields:
+                        if text.startswith(field_name + ":"):
+                            fields[field_name] = text.split(":", 1)[1].strip()
+                            break
+                ort = fields["Ort im e-Learning"].split("/")[-1]
+                medium = fields["Medium"]
+                system = fields["System"]
+                station = fields["Station"]
+                einstieg = fields["Einstieg"]
+                beschreibung = fields["Beschreibung"]
 
                 # Building the DataFrame
                 df = pd.DataFrame({
@@ -196,7 +242,12 @@ def import_xml(self, file_paths):
                                             'Titel': [dict_task['channel']['item']['summary']],
                                             'Status': [dict_task['channel']['item']['status']],
                                             'Verantwortlicher':[dict_task['channel']['item']['assignee']],
-                                            'Aufgabe': [ort_elearning],
+                                            'Aufgabe': [ort],
+                                            'Medium': [medium],
+                                            'System': [system],
+                                            'Station': [station],
+                                            'Einstieg': [einstieg],
+                                            'Beschreibung': [beschreibung],
                                             'Zuordnung': [parent],
                                             'Typ': [type],
                                             'Reihenfolge': [order]
@@ -337,7 +388,7 @@ def list_files(self, folder_path, filter_text=None):
     for root, dirs, files in os.walk(folder_path):
         for name in dirs:
             dir_path = os.path.join(root, name)
-            if filter_text is None or filter_text is not None:
+            if filter_text is None: #or filter_text is not None:
                 self.file_list.append(dir_path)
                 files = [
                     f 

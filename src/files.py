@@ -347,7 +347,7 @@ def import_xml(self, file_paths):
     # Writing the dataframe to global variable and TXT file
     self.df_tasks = output_df
     self.df_tasks.to_string(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
-    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_offene_Aufgaben.csv"), sep = ",", index = False)
+    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
 
     # Informing the user
     wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{self.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)

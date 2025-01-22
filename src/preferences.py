@@ -61,7 +61,7 @@ class PreferencesPage(wx.StockPreferencesPage):
         sizer.Add(heading_xml, 0, wx.ALL, 5)
         # XML Import checkbox
         sizer.Add(wx.StaticText(panel,
-                                    label=f'`XML`-Dateien statt Exceldokument für Aufgaben?'),0, wx.ALL, 5)
+                                    label=f'XML-Dateien statt Exceldokument für organisatorische Aufgaben?'),0, wx.ALL, 5)
         self.xml_checkbox = wx.CheckBox(panel, label="XML Datei(en) verwenden!")
         sizer.Add(self.xml_checkbox, 0, wx.ALL, 5)
         # Load saved state

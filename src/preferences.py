@@ -1,30 +1,32 @@
 import wx # wxPython / Phoenix
-import os
 import subprocess
 
 # Method to handle the Preferences menu item
 def on_preferences(self, event):
     dialog = wx.PreferencesEditor()
     dialog.AddPage(PreferencesPage(self.config))
+    self.preferences_dialog = dialog
     dialog.Show(self)
 
-class PreferencesPage(wx.PreferencesPage):
+class PreferencesPage(wx.StockPreferencesPage):
     def __init__(self, config):
-        super().__init__()
+        super().__init__(wx.StockPreferencesPage.Kind_General)
         self.config = config
 
     def GetName(self):
         return "Einstellungen"
 
     def GetIcon(self):
-        return wx.BitmapBundle.FromBitmap(wx.Bitmap('images/preferences.png', wx.BITMAP_TYPE_PNG))
+        bitmap = wx.ArtProvider.GetBitmap(wx.ART_HELP_SIDE_PANEL, wx.ART_OTHER, (32, 32))
+        #bitmap = wx.ArtProvider.GetBitmap(wx.ART_INFORMATION, wx.ART_OTHER, (32, 32))
+        return wx.BitmapBundle.FromBitmap(bitmap)
 
     def CreateWindow(self, parent):
         panel = wx.Panel(parent)
         sizer = wx.BoxSizer(wx.VERTICAL)
 
         # Adding preference control user settings
-        heading_user = wx.StaticText(panel, label="Benutzereinstellungen")
+        heading_user = wx.StaticText(panel, label="Jira")
         font = heading_user.GetFont()
         font.PointSize += 2
         heading_user.SetFont(font)
@@ -52,15 +54,15 @@ class PreferencesPage(wx.PreferencesPage):
         self.status_choice.Bind(wx.EVT_CHOICE, self.on_status_choice)
 
         # Adding preference control XML import
-        heading_xml = wx.StaticText(panel, label="XML Import Einstellungen")
+        heading_xml = wx.StaticText(panel, label="Import")
         font = heading_xml.GetFont()
         font.PointSize += 2
         heading_xml.SetFont(font)
         sizer.Add(heading_xml, 0, wx.ALL, 5)
         # XML Import checkbox
         sizer.Add(wx.StaticText(panel,
-                                    label=f'XML statt Excel für die Aufgaben verwenden?'),0, wx.ALL, 5)
-        self.xml_checkbox = wx.CheckBox(panel, label="XML Dateien importieren")
+                                    label=f'XML-Dateien statt Exceldokument für organisatorische Aufgaben?'),0, wx.ALL, 5)
+        self.xml_checkbox = wx.CheckBox(panel, label="XML Datei(en) verwenden!")
         sizer.Add(self.xml_checkbox, 0, wx.ALL, 5)
         # Load saved state
         xml_state = self.config.ReadBool("xml_import_enabled", False)
@@ -70,8 +72,8 @@ class PreferencesPage(wx.PreferencesPage):
 
         # XML Import for JIRA Tickets checkbox
         sizer.Add(wx.StaticText(panel,
-                                    label=f'Eine XML Datei statt einzelne JIRA Tickets verwenden?'),0, wx.ALL, 5)
-        self.xml_checkbox_jira = wx.CheckBox(panel, label="XML nur eine Datei importieren")
+                                    label=f'Einzelne Datei statt eine Datei pro Ticket verwenden?'),0, wx.ALL, 5)
+        self.xml_checkbox_jira = wx.CheckBox(panel, label="Eine Datei mit allen Tickets importieren!")
         sizer.Add(self.xml_checkbox_jira, 0, wx.ALL, 5)
         # Load saved state
         xml_state_jira = self.config.ReadBool("xml_import_one_file", False)
@@ -80,15 +82,15 @@ class PreferencesPage(wx.PreferencesPage):
         self.xml_checkbox_jira.Bind(wx.EVT_CHECKBOX, self.on_xml_jira_checkbox)
 
         # Adding preference control srt converter
-        heading = wx.StaticText(panel, label="SRT Konverter Einstellungen")
+        heading = wx.StaticText(panel, label="Untertitel Konverter")
         font = heading.GetFont()
         font.PointSize += 2
         heading.SetFont(font)
         sizer.Add(heading, 0, wx.ALL, 5)
         # SRT Konverter checkbox
         sizer.Add(wx.StaticText(panel,
-                                    label=f'Automatisches Überschreiben vorhandener `VTT`Dateien?'),0, wx.ALL, 5)
-        self.srt_checkbox = wx.CheckBox(panel, label="Automatisches Überschreiben")
+                                    label=f'Automatisches Überschreiben vorhandener `VTT`-Dateien?'),0, wx.ALL, 5)
+        self.srt_checkbox = wx.CheckBox(panel, label="Automatisches Überschreiben aktivieren!")
         sizer.Add(self.srt_checkbox, 0, wx.ALL, 5)
         # Load saved state
         srt_state = self.config.ReadBool("srt_converter_overwrite", False)
@@ -97,28 +99,29 @@ class PreferencesPage(wx.PreferencesPage):
         self.srt_checkbox.Bind(wx.EVT_CHECKBOX, self.on_srt_checkbox)
 
         # Adding preference control Drive mapping
-        heading_drive = wx.StaticText(panel, label="Virtuelles Laufwerk")
-        font = heading_drive.GetFont()
-        font.PointSize += 2
-        heading_drive.SetFont(font)
-        sizer.Add(heading_drive, 0, wx.ALL, 5)
-        # Drive mapping checkbox
-        self.drive_checkbox = wx.CheckBox(panel, label="Laufwerk mappen")
-        sizer.Add(self.drive_checkbox, 0, wx.ALL, 5)
-        # Load saved state
-        drive_state = self.config.ReadBool("drive_mapping_enabled", False)
-        self.drive_checkbox.SetValue(drive_state)
-        # Bind event to save state
-        self.drive_checkbox.Bind(wx.EVT_CHECKBOX, self.on_drive_checkbox)
-        # Showing drive letter
-        if self.drive_checkbox.IsChecked() and self.config.Read("drive_mapping_letter") != "":
-            sizer.Add(wx.StaticText(panel,
-                                    label=f'Laufwerk {self.config.Read("drive_mapping_letter")} wurde gemappt.'),
-                      0, wx.ALL, 5)
-        else:
-            sizer.Add(wx.StaticText(panel,
-                                    label='Kein Laufwerk gemappt.'),
-                      0, wx.ALL, 5)
+        if wx.Platform == "__WXMSW__":
+            heading_drive = wx.StaticText(panel, label="Virtuelles Laufwerk")
+            font = heading_drive.GetFont()
+            font.PointSize += 2
+            heading_drive.SetFont(font)
+            sizer.Add(heading_drive, 0, wx.ALL, 5)
+            # Drive mapping checkbox
+            self.drive_checkbox = wx.CheckBox(panel, label="Laufwerk mappen!")
+            sizer.Add(self.drive_checkbox, 0, wx.ALL, 5)
+            # Load saved state
+            drive_state = self.config.ReadBool("drive_mapping_enabled", False)
+            self.drive_checkbox.SetValue(drive_state)
+            # Bind event to save state
+            self.drive_checkbox.Bind(wx.EVT_CHECKBOX, self.on_drive_checkbox)
+            # Showing drive letter
+            if self.drive_checkbox.IsChecked() and self.config.Read("drive_mapping_letter") != "":
+                sizer.Add(wx.StaticText(panel,
+                                        label=f'Laufwerk {self.config.Read("drive_mapping_letter")} wurde gemappt.'),
+                        0, wx.ALL, 5)
+            else:
+                sizer.Add(wx.StaticText(panel,
+                                        label='Kein Laufwerk gemappt.'),
+                        0, wx.ALL, 5)
 
         # Setting the sizer for the panel
         panel.SetSizer(sizer)

@@ -32,37 +32,35 @@ def on_browse_source(self, event, folder_path = None):
         dialog = wx.DirDialog(None, "Wähle einen Quell-Ordner (e-Learnings) aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
             self.folder_path = dialog.GetPath()
-            if self.config.ReadBool("drive_mapping_enabled", True):
-                if self.config.Read("drive_mapping_letter") == "":
-                    letters = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-                    for letter in letters:
-                        if os.path.exists(f"{letter}:"):
-                            continue
-                        else:
-                            try:
-                                # Mapping the folder to drive letter
-                                subprocess.run(['subst', f"{letter}:", self.folder_path],
-                                            check=True)
-
-                                # Writing registry file
-                                with open(f"{self.folder_path}\\MapVirtualDrive.reg", "w") as f:
-                                    path_to_folder = self.folder_path.replace("\\", "\\\\")
-                                    f.write(
-    f"""Windows Registry Editor Version 5.00\n\n\
-    [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]
-    "Virtual Drive"="subst {letter}: \\"{path_to_folder}\\""
-    """)
-
-                                # Importing registry file
-                                subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDrive.reg"], check=True)
-                            except:
-                                continue
-                            self.config.Write("drive_mapping_letter", letter)
-                            break
-                list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
-            else:
-                list_files(self, self.folder_path)
         dialog.Destroy()
+    if self.config.ReadBool("drive_mapping_enabled", True):
+        if self.config.Read("drive_mapping_letter") == "":
+            letters = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+            for letter in letters:
+                if os.path.exists(f"{letter}:"):
+                    continue
+                else:
+                    try:
+                        # Mapping the folder to drive letter
+                        subprocess.run(['subst', f"{letter}:", self.folder_path],
+                                    check=True)
+
+                        # Writing registry file
+                        with open(f"{self.folder_path}\\MapVirtualDrive.reg", "w") as f:
+                            path_to_folder = self.folder_path.replace("\\", "\\\\")
+                            f.write(
+f"""Windows Registry Editor Version 5.00\n\n\
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]
+"Virtual Drive"="subst {letter}: \\"{path_to_folder}\\""
+""")
+
+                        # Importing registry file
+                        subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDrive.reg"], check=True)
+                    except:
+                        continue
+                    self.config.Write("drive_mapping_letter", letter)
+                    break
+        list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
     else:
         list_files(self, folder_path)
 
@@ -349,7 +347,7 @@ def import_xml(self, file_paths):
     # Writing the dataframe to global variable and TXT file
     self.df_tasks = output_df
     self.df_tasks.to_string(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
-    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_offene_Aufgaben.csv"), sep = ",", index = False)
+    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
 
     # Informing the user
     wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{self.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)

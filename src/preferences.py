@@ -18,7 +18,6 @@ class PreferencesPage(wx.StockPreferencesPage):
 
     def GetIcon(self):
         bitmap = wx.ArtProvider.GetBitmap(wx.ART_HELP_SIDE_PANEL, wx.ART_OTHER, (32, 32))
-        #bitmap = wx.ArtProvider.GetBitmap(wx.ART_INFORMATION, wx.ART_OTHER, (32, 32))
         return wx.BitmapBundle.FromBitmap(bitmap)
 
     def CreateWindow(self, parent):

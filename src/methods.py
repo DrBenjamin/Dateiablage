@@ -92,7 +92,7 @@ def on_about(self, event):
         "Name der Anwendung:\n"
         "Dateiablage\n\n"
         "Versionsnummer:\n"
-        "0.1.0\n\n"
+        "0.1.0 (build 2025-01-22)\n\n"
         "Das Unternehmen:\n"
         "CompuGroup Medical\n\n"
         "**** Beschreibung ****\n"

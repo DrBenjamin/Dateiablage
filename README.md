@@ -1,6 +1,6 @@
 # Dateiablage
 
-Tool to organize files to publish content in an e-Learning.
+Tool for organizing the file storage of e-learning content.
 
 ## Setup
 

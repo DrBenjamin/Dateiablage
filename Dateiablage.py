@@ -249,7 +249,11 @@ class MyApp(wx.App):
 
         ## Setting icon
         frame.Show(True)
-        frame.SetIcon(wx.Icon("_internal/images/icon.ico", wx.BITMAP_TYPE_ICO))
+        if wx.Platform == "__WXMAC__":
+                frame.SetIcon(wx.Icon("_internal/images/icon.icns", wx.BITMAP_TYPE_ICON))
+        else:
+            frame.SetIcon(wx.Icon("_internal/images/icon.ico", wx.BITMAP_TYPE_ICO))
+
         self.SetTopWindow(frame)
         return True
 

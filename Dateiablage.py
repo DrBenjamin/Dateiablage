@@ -10,7 +10,6 @@ from src.methods import (
     on_export,
     on_exit
 )
-from src.preferences import on_preferences
 from src.learning import (
     on_import_csv,
     on_item_selected
@@ -26,6 +25,7 @@ from src.files import (
     on_file_selected,
     on_file_activated
 )
+from src.preferences import on_preferences
 
 # Method to handle the Create e-Learning
 def on_import_jira(self, event = None):
@@ -239,10 +239,10 @@ class MyApp(wx.App):
         if not self.config.HasEntry("drive_mapping_letter"):
             self.config.Write("drive_mapping_letter", "")
 
-        # Overiding the save values for testing
-        #self.config.WriteBool("srt_converter_overwrite", True)
-        #self.config.WriteBool("xml_import_one_file", True)
-        #self.config.Write("user_choice", "Alle")
+        # OS specific settings
+        if not wx.Platform == "__WXMSW__":
+            self.config.WriteBool("drive_mapping_enabled", False)
+            self.config.Write("drive_mapping_letter", "")
 
         ## Creating the frame
         frame = MyFrame(None, title="Dateiablage", size=(1024, 768), config=self.config)
@@ -250,7 +250,7 @@ class MyApp(wx.App):
         ## Setting icon
         frame.Show(True)
         if wx.Platform == "__WXMAC__":
-                frame.SetIcon(wx.Icon("_internal/images/icon.icns", wx.BITMAP_TYPE_ICON))
+            frame.SetIcon(wx.Icon("_internal/images/icon.icns", wx.BITMAP_TYPE_ICON))
         else:
             frame.SetIcon(wx.Icon("_internal/images/icon.ico", wx.BITMAP_TYPE_ICO))
 

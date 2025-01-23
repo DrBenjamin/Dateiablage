@@ -33,6 +33,8 @@ def on_browse_source(self, event, folder_path = None):
         if dialog.ShowModal() == wx.ID_OK:
             self.folder_path = dialog.GetPath()
         dialog.Destroy()
+    else:
+        self.folder_path = folder_path
     if self.config.ReadBool("drive_mapping_enabled", True):
         if self.config.Read("drive_mapping_letter") == "":
             letters = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -62,7 +64,7 @@ f"""Windows Registry Editor Version 5.00\n\n\
                     break
         list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
     else:
-        list_files(self, folder_path)
+        list_files(self, self.folder_path)
 
 # Method to handle the Browse menu item
 def on_browse_target(self, event):
@@ -383,6 +385,7 @@ def on_file_activated(self, event):
 def list_files(self, folder_path, filter_text=None):
     # Clearing the existing file list
     self.file_list = []
+    print(folder_path)
     for root, dirs, files in os.walk(folder_path):
         for name in dirs:
             dir_path = os.path.join(root, name)

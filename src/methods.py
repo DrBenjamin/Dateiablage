@@ -43,7 +43,7 @@ def on_convert(self, event):
     except Exception as e:
         wx.MessageBox(f"Datei konnte nicht konvertiert werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
-# Method to convert srt into vtt 
+# Method to convert subtitles (srt into vtt)
 def convert_srt_to_vtt(file_path, overwrite = False):
     vtt_file_path = file_path.rsplit(".", 1)[0] + ".vtt"
 
@@ -57,7 +57,6 @@ def convert_srt_to_vtt(file_path, overwrite = False):
             )
             if response == wx.NO:
                 return
-
         os.remove(vtt_file_path)
 
     with open(file_path, "r") as f, open(vtt_file_path, "w") as vtt_file:

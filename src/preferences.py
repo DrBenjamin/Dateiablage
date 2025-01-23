@@ -1,5 +1,6 @@
 import wx # wxPython / Phoenix
 import subprocess
+from src.files import on_browse_source
 
 # Method to handle the Preferences menu item
 def on_preferences(self, event):
@@ -153,7 +154,9 @@ class PreferencesPage(wx.StockPreferencesPage):
 
     # Method to handle the Preferences page Drive mapping checkbox
     def on_drive_checkbox(self, event):
-        if not self.drive_checkbox.IsChecked():
+        if self.drive_checkbox.IsChecked():
+            on_browse_source(self, folder_path = None)
+        else:
             try:
                 # Unmapping the drive
                 subprocess.run(['subst', '/d', f"{self.config.Read('drive_mapping_letter')}:"])

@@ -339,7 +339,7 @@ def import_xml(self, file_paths):
     create_folders(tree, self.folder_path_elearning)
 
     # Writing the tree to CSV file
-    self.file_path_elearning = os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_e-Learning_Definition.csv")
+    self.file_path_elearning = os.path.join(self.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_e-Learning_Definition.csv")
     with open(self.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema",0\n')
         def writing_tree(node_dict, indent=0):
@@ -351,8 +351,8 @@ def import_xml(self, file_paths):
 
     # Writing the dataframe to global variable and TXT file
     self.df_tasks = output_df
-    self.df_tasks.to_string(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
-    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, f"{sanitize_path(self.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
+    self.df_tasks.to_string(os.path.join(self.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
+    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
 
     # Informing the user
     wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{self.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)
@@ -362,9 +362,6 @@ def on_file_selected(self, event):
     file_index = event.GetSelection()
     file_path = self.file_listbox.GetString(file_index)
     self.file_path = file_path
-    file_name = os.path.basename(self.file_path)
-    #print(self.file_path)
-    #print(file_name)
 
 # Method to handle the list control item activated event
 def on_file_activated(self, event):
@@ -388,7 +385,6 @@ def on_file_activated(self, event):
 def list_files(self, folder_path, filter_text=None):
     # Clearing the existing file list
     self.file_list = []
-    print(folder_path)
     for root, dirs, files in os.walk(folder_path):
         for name in dirs:
             dir_path = os.path.join(root, name)

@@ -62,7 +62,10 @@ f"""Windows Registry Editor Version 5.00\n\n\
                         continue
                     self.config.Write("drive_mapping_letter", letter)
                     break
-        list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
+        last_folder = os.path.basename(self.folder_path)
+        if not last_folder:
+            last_folder = os.path.basename(os.path.dirname(self.folder_path))
+        list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\{last_folder}')
     else:
         list_files(self, self.folder_path)
 

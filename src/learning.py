@@ -19,7 +19,7 @@ def on_item_selected(self, event):
     item_text = self.learning_ctrl.GetItemText(item_index)
     self.SetTitle(f"Dateiablage - {item_text.strip()}")
     list_files(self, self.folder_path, item_text.strip())
-    
+
 # Method to import the CSV file
 def import_csv(self, file_path, message = True):
     try:
@@ -35,11 +35,10 @@ def import_csv(self, file_path, message = True):
 def display_learning(self, df):
     self.learning_ctrl.ClearAll()
     self.learning_ctrl.AppendColumn("Struktur")
-
     for _, row in df.iterrows():
         text = row.iloc[0]
         level = row.iloc[1]
-        indent = ' ' * (((level + 4) * 4) - 12)  # Iident based on the level
+        indent = ' ' * (((level + 4) * 4) - 12)  # ident based on the level
         self.learning_ctrl.Append([f"{indent}{text}"])
 
     # Adjusting the column width to fit automatically the content

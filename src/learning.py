@@ -11,7 +11,7 @@ def on_import_csv(self, event, file_path = None):
             import_csv(self, file_path)
         dialog.Destroy()
     else:
-        import_csv(self, file_path, None)
+        import_csv(self, file_path, message = None)
 
 # Method to handle the list control item activated event
 def on_item_selected(self, event):

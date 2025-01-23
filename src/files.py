@@ -57,15 +57,12 @@ f"""Windows Registry Editor Version 5.00\n\n\
 """)
 
                         # Importing registry file
-                        subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDrive.reg"], check=True)
+                        subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDrive.reg"], check = True)
                     except:
                         continue
                     self.config.Write("drive_mapping_letter", letter)
                     break
-        last_folder = os.path.basename(self.folder_path)
-        if not last_folder:
-            last_folder = os.path.basename(os.path.dirname(self.folder_path))
-        list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\{last_folder}')
+        list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
     else:
         list_files(self, self.folder_path)
 
@@ -382,7 +379,7 @@ def on_file_activated(self, event):
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 # Method to list the files in the selected folder
-def list_files(self, folder_path, filter_text=None):
+def list_files(self, folder_path, filter_text = None):
     # Clearing the existing file list
     self.file_list = []
     for root, dirs, files in os.walk(folder_path):

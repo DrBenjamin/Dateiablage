@@ -1,5 +1,6 @@
 import wx # wxPython / Phoenix
 import types
+import src.globals as g
 from src.methods import (
     on_right_click,
     on_copy_path,
@@ -45,6 +46,16 @@ def on_import_jira(self, event = None):
     # Calling the `on_import_tasks` method
     self.on_import_tasks(None)
 
+# Method to handle the Preferences menu item
+def on_preferences_open(self, event):
+    # Calling the `on_preferences` method
+    self.on_preferences(event)
+
+    # Calling the `on_browse_source` method
+    if g.mapping:
+        self.on_browse_source(event)
+        g.mapping = False
+
 ## Creating the main frame
 class MyFrame(wx.Frame):
     def __init__(self, parent, title, size, config):
@@ -54,6 +65,7 @@ class MyFrame(wx.Frame):
         ## Binding of methods from this file
         # Binding function as method to `self`
         self.on_import_jira = types.MethodType(on_import_jira, self)
+        self.on_preferences_open = types.MethodType(on_preferences_open, self)
 
         ## Binding functions from other files as methods to `self`
         # Methods from `methods.py`
@@ -196,7 +208,7 @@ class MyFrame(wx.Frame):
         # Binding the Refresh menu item to the on_refresh method
         self.Bind(wx.EVT_MENU, self.on_refresh, refresh_ctrl_lists)
         # Binding the Preferences menu item to the on_preferences method
-        self.Bind(wx.EVT_MENU, self.on_preferences, preferences)
+        self.Bind(wx.EVT_MENU, self.on_preferences_open, preferences)
 
         ## Binding of `Hilfemenü` methods to menu items
         # Binding the Contact menu to the on_contact method

@@ -142,7 +142,7 @@ def on_refresh(self, event):
     except Exception as e:
         print(f"Error: {e}")
     try:
-        if self.definition_csv is not None:
+        if g.df_elearning is not None:
             display_learning(self, g.df_definition)
     except Exception as e:
         print(f"Error: {e}")

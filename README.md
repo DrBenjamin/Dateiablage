@@ -23,3 +23,22 @@ pyinstaller.bat
 # MacOS & Linux
 python -m PyInstaller Dateiablage.spec
 ```
+
+## OS specific notes
+
+### Windows
+
+To remove virtual drives manually, run the following command:
+
+```bash
+subst /d <drive letter>
+```
+
+### MacOS
+
+To run the executable, you need to allow it after the first start in the Privacy 
+settings.
+
+### Linux
+
+Add the icon manaually to the executable.

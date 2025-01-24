@@ -37,11 +37,11 @@ def on_import_jira(self, event = None):
     self.on_create_folder_structure(event)
 
     # Calling the `on_browse_source` method
-    self.on_browse_source(event, self.folder_path_elearning)
+    self.on_browse_source(event, g.folder_path_elearning)
 
     # Calling the `on_import_csv` method
-    self.on_import_csv(event, self.file_path_elearning)
-    self.file_path_elearning = None
+    self.on_import_csv(event, g.file_path_elearning)
+    g.file_path_elearning = None
 
     # Calling the `on_import_tasks` method
     self.on_import_tasks(None)
@@ -96,15 +96,6 @@ class MyFrame(wx.Frame):
         # Method from `preferences.py`
         self.on_preferences = types.MethodType(on_preferences, self)
 
-        ## Definition of global variables
-        self.file_path_tasks = []
-        self.df_tasks = None
-        self.file_path = None
-        self.file_path_elearning = None
-        self.folder_path = None
-        self.folder_path_elearning = None
-        self.folder_path_jira = None
-
         ## Creating a menu bar
         menu_bar = wx.MenuBar()
 
@@ -128,8 +119,8 @@ class MyFrame(wx.Frame):
 
         ## Creating the `Hilfemenü` menu
         help_menu = wx.Menu()
-        help_contact = help_menu.Append(wx.ID_ANY, "&Kontakt") # Information on how users can receive support.
-        help_about = help_menu.Append(wx.ID_ANY, "&Über die App") # Informationen über die Anwendung.
+        help_contact = help_menu.Append(wx.ID_ANY, "&Kontakt")
+        help_about = help_menu.Append(wx.ID_ANY, "&Über die App")
         menu_bar.Append(help_menu, "&Hilfe")
 
         ## Setting the menu bar
@@ -223,7 +214,7 @@ class MyFrame(wx.Frame):
         # Binding the list control to the on_item_activated method
         self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_item_activated method
-        #self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
+        self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_file_selected method
         self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_selected)
         # Binding the list control to the on_file_activated method
@@ -251,7 +242,7 @@ class MyApp(wx.App):
         if not self.config.HasEntry("drive_mapping_letter"):
             self.config.Write("drive_mapping_letter", "")
 
-        # OS specific settings
+        # Adding OS specific settings
         if not wx.Platform == "__WXMSW__":
             self.config.WriteBool("drive_mapping_enabled", False)
             self.config.Write("drive_mapping_letter", "")

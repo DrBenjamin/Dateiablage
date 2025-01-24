@@ -1,11 +1,12 @@
 import wx
 import io
+import os
+import webbrowser
+import src.globals as g
 from docx import Document
 from src.files import list_files
 from src.tasks import on_import_tasks
 from src.learning import display_learning
-import os
-import webbrowser
 
 # Method to handle the right click event
 def on_right_click(self, event):
@@ -26,9 +27,9 @@ def on_right_click(self, event):
 
 # Method to handle the Copy Path menu item
 def on_copy_path(self, event):
-    if self.file_path is not None:
+    if g.file_path is not None:
         wx.TheClipboard.Open()
-        wx.TheClipboard.SetData(wx.TextDataObject(self.file_path))
+        wx.TheClipboard.SetData(wx.TextDataObject(g.file_path))
         wx.TheClipboard.Close()
     else:
         wx.MessageBox("Keine Datei ausgewählt", "Error", wx.OK | wx.ICON_ERROR)
@@ -36,8 +37,8 @@ def on_copy_path(self, event):
 # Method to handle the Convert menu item
 def on_convert(self, event):
     try:
-        if self.file_path.endswith(".srt"):
-            convert_srt_to_vtt(self.file_path, overwrite = self.config.ReadBool("srt_converter_overwrite"))
+        if g.file_path.endswith(".srt"):
+            convert_srt_to_vtt(g.file_path, overwrite = self.config.ReadBool("srt_converter_overwrite"))
         else:
             wx.MessageBox("Dateiendung wird nicht unterstützt", "Error", wx.OK | wx.ICON_ERROR)
     except Exception as e:
@@ -130,23 +131,23 @@ def on_contact(self, event):
 
 # Method to handle the Refresh menu item
 def on_refresh(self, event):
-    # Clear the ctrl lists
+    # Clearing the ctrl lists
     self.learning_ctrl.DeleteAllItems()
     self.tasks_ctrl.DeleteAllItems()
 
     # Refresh the ctrl lists
     try:
-        if self.folder_path is not None:
-            list_files(self, self.folder_path)
+        if g.folder_path is not None:
+            list_files(self, g.folder_path)
     except Exception as e:
         print(f"Error: {e}")
     try:
         if self.definition_csv is not None:
-            display_learning(self, self.definition_csv)
+            display_learning(self, g.df_definition)
     except Exception as e:
         print(f"Error: {e}")
     try:
-        if self.df_tasks is not None:
+        if g.df_tasks is not None:
             on_import_tasks(self, None)
     except Exception as e:
         print(f"Error: {e}")

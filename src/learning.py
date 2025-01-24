@@ -1,5 +1,6 @@
 import wx
 import pandas as pd
+import src.globals as g
 from src.files import list_files
 
 # Method to handle the Import learning definition
@@ -18,13 +19,13 @@ def on_item_selected(self, event):
     item_index = event.GetIndex()
     item_text = self.learning_ctrl.GetItemText(item_index)
     self.SetTitle(f"Dateiablage - {item_text.strip()}")
-    list_files(self, self.folder_path, item_text.strip())
+    list_files(self, g.folder_path, item_text.strip())
 
 # Method to import the CSV file
 def import_csv(self, file_path, message = True):
     try:
-        self.definition_csv = pd.read_csv(file_path)
-        display_learning(self, self.definition_csv)
+        g.df_elearning = pd.read_csv(file_path)
+        display_learning(self, g.df_elearning)
         if message:
             wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
     except Exception as e:

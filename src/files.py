@@ -7,6 +7,7 @@ import pandas as pd
 import re
 import html
 import xml.etree.ElementTree as ET
+import src.globals as g
 from bs4 import BeautifulSoup
 
 number_of_items = 0
@@ -18,10 +19,10 @@ def on_create_folder_structure(self, event):
     on_browse_target(self, event)
     file_path_jira = []
     if self.config.ReadBool("xml_import_one_file"):
-        file_path_jira.append(self.folder_path_jira[0])
+        file_path_jira.append(g.folder_path_jira[0])
     else:
-        for name in os.listdir(self.folder_path_jira):
-            file_path = os.path.join(self.folder_path_jira, name)
+        for name in os.listdir(g.folder_path_jira):
+            file_path = os.path.join(g.folder_path_jira, name)
             if os.path.isfile(file_path) and name.endswith(".xml"):
                 file_path_jira.append(file_path)
     import_xml(self, file_path_jira)
@@ -31,10 +32,10 @@ def on_browse_source(self, event, folder_path = None):
     if folder_path is None:
         dialog = wx.DirDialog(None, "Wähle einen Quell-Ordner (e-Learnings) aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
-            self.folder_path = dialog.GetPath()
+            g.folder_path = dialog.GetPath()
         dialog.Destroy()
     else:
-        self.folder_path = folder_path
+        g.folder_path = folder_path
     if self.config.ReadBool("drive_mapping_enabled", True):
         if self.config.Read("drive_mapping_letter") == "":
             letters = ['D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -44,12 +45,12 @@ def on_browse_source(self, event, folder_path = None):
                 else:
                     try:
                         # Mapping the folder to drive letter
-                        subprocess.run(['subst', f"{letter}:", self.folder_path],
+                        subprocess.run(['subst', f"{letter}:", g.folder_path],
                                     check=True)
 
                         # Writing registry file
-                        with open(f"{self.folder_path}\\MapVirtualDrive.reg", "w") as f:
-                            path_to_folder = self.folder_path.replace("\\", "\\\\")
+                        with open(f"{g.folder_path}\\MapVirtualDrive.reg", "w") as f:
+                            path_to_folder = g.folder_path.replace("\\", "\\\\")
                             f.write(
 f"""Windows Registry Editor Version 5.00\n\n\
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run]
@@ -57,31 +58,31 @@ f"""Windows Registry Editor Version 5.00\n\n\
 """)
 
                         # Importing registry file
-                        subprocess.run(["regedit", "/s", f"{self.folder_path}\\MapVirtualDrive.reg"], check = True)
+                        subprocess.run(["regedit", "/s", f"{g.folder_path}\\MapVirtualDrive.reg"], check = True)
                     except:
                         continue
                     self.config.Write("drive_mapping_letter", letter)
                     break
         list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
     else:
-        list_files(self, self.folder_path)
+        list_files(self, g.folder_path)
 
 # Method to handle the Browse menu item
 def on_browse_target(self, event):
     dialog = wx.DirDialog(None, "Wähle einen Ziel-Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
-        self.folder_path_elearning = dialog.GetPath()
+        g.folder_path_elearning = dialog.GetPath()
 
 # Method to handle the Import tasks excel
 def on_browse_jira(self, event):
     if self.config.ReadBool("xml_import_one_file"):
         dialog = wx.FileDialog(None, "Wähle die JIRA Tickets (aus einer Exportdatei) aus:", wildcard="XML files (*.xml)|*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
         if dialog.ShowModal() == wx.ID_OK:
-            self.folder_path_jira = dialog.GetPaths()
+            g.folder_path_jira = dialog.GetPaths()
     else:
         dialog = wx.DirDialog(None, "Wähle den Ordner der JIRA Tickets aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
-            self.folder_path_jira = dialog.GetPath()
+            g.folder_path_jira = dialog.GetPath()
 
 # Method to import XML file
 def import_xml(self, file_paths):
@@ -333,11 +334,11 @@ def import_xml(self, file_paths):
     tree = build_hierarchical_tree(output_df)
 
     # Creating the folder structure
-    create_folders(tree, self.folder_path_elearning)
+    create_folders(tree, g.folder_path_elearning)
 
     # Writing the tree to CSV file
-    self.file_path_elearning = os.path.join(self.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_e-Learning_Definition.csv")
-    with open(self.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
+    g.file_path_elearning = os.path.join(g.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_e-Learning_Definition.csv")
+    with open(g.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema",0\n')
         def writing_tree(node_dict, indent=0):
             for name, sub in node_dict.items():
@@ -347,9 +348,9 @@ def import_xml(self, file_paths):
         f.close()
 
     # Writing the dataframe to global variable and TXT file
-    self.df_tasks = output_df
-    self.df_tasks.to_string(os.path.join(self.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
-    self.df_tasks.to_csv(os.path.join(self.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
+    g.df_tasks = output_df
+    g.df_tasks.to_string(os.path.join(g.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
+    g.df_tasks.to_csv(os.path.join(g.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
 
     # Informing the user
     wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{self.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)
@@ -358,23 +359,23 @@ def import_xml(self, file_paths):
 def on_file_selected(self, event):
     file_index = event.GetSelection()
     file_path = self.file_listbox.GetString(file_index)
-    self.file_path = file_path
+    g.file_path = file_path
 
 # Method to handle the list control item activated event
 def on_file_activated(self, event):
     if platform.system() == "Windows":
         try:
-            os.startfile(f'"{self.file_path}"')
+            os.startfile(f'"{g.file_path}"')
         except Exception as e:
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
     elif platform.system() == "Darwin":  # macOS
         try:
-            subprocess.call(["open", self.file_path])
+            subprocess.call(["open", g.file_path])
         except Exception as e:
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
     else:  # Linux
         try:
-            subprocess.call(["xdg-open", self.file_path])
+            subprocess.call(["xdg-open", g.file_path])
         except Exception as e:
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
 

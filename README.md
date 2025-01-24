@@ -14,7 +14,13 @@ python Dateiablage.py
 
 ## Building
 
-To build the executable, run the following command:
+Add the following images to the `_internal/images` folder:
+
+- icon.ico (128x128) for Windows
+- icon.icns (128x128) for MacOS
+- logo.png (not more than 200px either dimension) for the GUI
+
+To build the executables, run the following command:
 
 ```bash
 # Windows

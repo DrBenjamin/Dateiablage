@@ -1,5 +1,5 @@
+## Modules
 import wx
-import io
 import os
 import webbrowser
 import src.globals as g

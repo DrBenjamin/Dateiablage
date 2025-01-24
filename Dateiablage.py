@@ -1,3 +1,4 @@
+## Modules
 import wx # wxPython / Phoenix
 import types
 import src.globals as g
@@ -242,7 +243,7 @@ class MyApp(wx.App):
         if not self.config.HasEntry("drive_mapping_letter"):
             self.config.Write("drive_mapping_letter", "")
 
-        # Adding OS specific settings
+        # Adding os specific settings
         if not wx.Platform == "__WXMSW__":
             self.config.WriteBool("drive_mapping_enabled", False)
             self.config.Write("drive_mapping_letter", "")

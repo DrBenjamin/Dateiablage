@@ -4,6 +4,7 @@ import os
 import webbrowser
 import src.globals as g
 from docx import Document
+from docx.shared import RGBColor
 from src.files import list_files
 from src.tasks import on_import_tasks
 from src.learning import display_learning
@@ -157,21 +158,41 @@ def on_export(self, event):
     export_docx(self, self.file_list)
 
 # Method to export the file list to a Word document
-def export_docx(self, data):
+def export_docx(self, file_list):
     document = Document()
 
     # Adding header
-    document.add_heading('Dateiliste', 0)
+    heading = document.add_heading('Dateiliste', level=1)
+    heading.style.font.color.rgb = RGBColor(0, 102, 204)  # Set font color to blue
     paragraph = document.add_paragraph()
-    paragraph.add_run(data)
+    paragraph.add_run(file_list)
     document.add_page_break()
-
-    ## Creating a Word file using python-docx as engine
-    buffer = io.BytesIO()
-    document.save(buffer)
-    with open("Export_Dateiliste.docx", "wb") as docx_file:
-        docx_file.write(buffer.getvalue())
-    buffer.close()
+    
+    # All the files are in the same folder, extract the folder path
+    folder_path = os.path.dirname(file_list[0]) if file_list else "Ordnerpfad unbekannt"
+    
+    # Add folder path as the first line
+    document.add_paragraph(folder_path)
+    
+    # Add each file in the list on a new line
+    for file_path in file_list:
+        file_name = os.path.basename(file_path)  # Extract only the file name
+        document.add_paragraph(file_name)
+     
+    # Save the document
+    save_dialog = wx.FileDialog(
+        None, "Speichern unter", wildcard="Word-Dokument (*.docx)|*.docx",
+        style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
+    )
+    
+    if save_dialog.ShowModal() == wx.ID_OK:
+        try:
+            save_path = save_dialog.GetPath()
+            document.save(save_path)
+            wx.MessageBox(f"Die Dateiliste wurde erfolgreich exportiert:\n{save_path}",
+                      "Export erfolgreich", wx.OK | wx.ICON_INFORMATION)
+        except:
+            wx.MessageBox("Der Export wurde abgebrochen.", "Abbruch", wx.OK | wx.ICON_WARNING)
 
 # Method to handle the Exit menu item
 def on_exit(self, event):

@@ -9,6 +9,7 @@ file_path_tasks = []
 df_tasks = None
 
 # File Explorer
+file_list = []
 file_path = None
 folder_path = None
 folder_path_jira = None

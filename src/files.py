@@ -382,17 +382,17 @@ def on_file_activated(self, event):
 # Method to list the files in the selected folder
 def list_files(self, folder_path, filter_text = None):
     # Clearing the existing file list
-    self.file_list = []
+    g.file_list = []
     for root, dirs, files in os.walk(folder_path):
         for name in dirs:
             dir_path = os.path.join(root, name)
             if filter_text is None: #or filter_text is not None:
-                self.file_list.append(dir_path)
+                g.file_list.append(dir_path)
                 files = [
                     f 
                     for f in os.listdir(dir_path)
                 ]
-                self.file_list.extend(os.path.join(dir_path, f) for f in files)
+                g.file_list.extend(os.path.join(dir_path, f) for f in files)
             else:
                 # Adding all subdirectories of the matching directory
                 normalized_filter_text = unicodedata.normalize('NFC', filter_text)
@@ -401,10 +401,10 @@ def list_files(self, folder_path, filter_text = None):
                     for sub_root, sub_dirs, sub_files in os.walk(dir_path):
                         for sub_name in sub_dirs:
                             dir_path = os.path.join(sub_root, sub_name)
-                            self.file_list.append(os.path.join(sub_root, sub_name))
+                            g.file_list.append(os.path.join(sub_root, sub_name))
                             sub_files = [
                                 f 
                                 for f in os.listdir(dir_path)
                             ]
-                            self.file_list.extend(os.path.join(dir_path, f) for f in sub_files)
-    self.file_listbox.Set(self.file_list)
+                            g.file_list.extend(os.path.join(dir_path, f) for f in sub_files)
+    self.file_listbox.Set(g.file_list)

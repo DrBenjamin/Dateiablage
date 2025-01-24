@@ -155,7 +155,7 @@ def on_refresh(self, event):
 
 # Method to handle the Export file list
 def on_export(self, event):
-    export_docx(self, self.file_list)
+    export_docx(self, g.file_list)
 
 # Method to export the file list to a Word document
 def export_docx(self, file_list):

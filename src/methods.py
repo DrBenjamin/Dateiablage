@@ -84,7 +84,7 @@ def convert_srt_to_vtt(file_path, overwrite = False):
 # Method to handle `Über die App` menu item
 def on_about(self, event):
     # Creating a new user-defined window
-    frame = wx.Frame(None, title="Über die App", size=(500, 400))
+    frame = wx.Frame(None, title="Über die App", size=(400, 550))
     panel = wx.Panel(frame)
     sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -92,8 +92,19 @@ def on_about(self, event):
     message = (
         "Name der Anwendung:\n"
         "Dateiablage\n\n"
+    )
+    message_label = wx.StaticText(panel, label = message)
+    sizer.Add(message_label, 0, wx.ALL, 10)
+
+    # Adding logo
+    logo = wx.Bitmap("_internal/images/logo.png", wx.BITMAP_TYPE_PNG)
+    logo_image = wx.StaticBitmap(panel, bitmap=logo)
+    sizer.Add(logo_image, 0, wx.ALL, 10)
+
+    # Adding 2nd message
+    message2 = (
         "Versionsnummer:\n"
-        "0.1.0 (build 2025-01-22)\n\n"
+        "0.1.0 (build 2025-01-24)\n\n"
         "Das Unternehmen:\n"
         "CompuGroup Medical\n\n"
         "**** Beschreibung ****\n"
@@ -102,8 +113,8 @@ def on_about(self, event):
         "**** Support ****\n"
         "Bei Fragen oder technischen Problemen kontaktieren Sie bitte unseren Support.\n\n"
     )
-    message_label = wx.StaticText(panel, label=message)
-    sizer.Add(message_label, 0, wx.ALL, 10)
+    message_label2 = wx.StaticText(panel, label = message2)
+    sizer.Add(message_label2, 0, wx.ALL, 10)
 
     # Adding web link to support page
     support_label = wx.StaticText(panel, label="Weitere Informationen finden Sie auf unserer Support-Seite.")

@@ -32,6 +32,9 @@ python -m PyInstaller Dateiablage.spec
 
 ## OS specific notes
 
+All executables are built with PyInstaller and sneed to be build on the target 
+system.
+
 ### Windows
 
 To remove virtual drives manually, run the following command:

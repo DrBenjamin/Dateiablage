@@ -155,7 +155,7 @@ def on_refresh(self, event):
         print(f"Error: {e}")
     try:
         if g.df_elearning is not None:
-            display_learning(self, g.df_definition)
+            display_learning(self, g.df_elearning)
     except Exception as e:
         print(f"Error: {e}")
     try:

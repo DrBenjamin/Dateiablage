@@ -104,157 +104,79 @@ def import_xml(self, file_paths):
         with open(file_path, 'r') as file:
             xml_string = file.read()
 
-        # Iterating through the XML file
+        # Helper function to parse JIRA ticket
+        def parse_jira_ticket(dict_task, customfield_raw, counter):
+            jira_ticket = dict_task.get("key", "")
+            snippet = dict_task.get("description", "")
+            snippet_decoded = html.unescape(snippet.replace("&lt;", "<").replace("&gt;", ">"))
+
+            # Parse description
+            desc_fields = {"Zuordnung": "-", "Typ": "-", "Reihenfolge": "-"}
+            soup_desc = BeautifulSoup(snippet_decoded, "html.parser")
+            for b_tag in soup_desc.find_all("b"):
+                text = b_tag.parent.get_text(strip=True)
+                for f_name in desc_fields:
+                    if text.startswith(f_name + ":"):
+                        desc_fields[f_name] = text.split(":", 1)[1].strip()
+
+            # Parse customfield
+            snippet_customfield_decoded = html.unescape(customfield_raw).replace("&lt;", "<").replace("&gt;", ">")
+            soup_cf = BeautifulSoup(snippet_customfield_decoded, "html.parser")
+            cf_fields = {
+                "Ort im e-Learning": "-",
+                "Medium": "-",
+                "System": "-",
+                "Station": "-",
+                "Einstieg": "-",
+                "Beschreibung": "-",
+            }
+            for li in soup_cf.find_all("li"):
+                text = li.get_text(strip=True)
+                for f_name in cf_fields:
+                    if text.startswith(f_name + ":"):
+                        cf_fields[f_name] = text.split(":", 1)[1].strip()
+                        break
+
+            # Build DataFrame
+            return pd.DataFrame({
+                "ID": counter,
+                "Ticket": jira_ticket,
+                "Titel": [dict_task.get("summary", "")],
+                "Status": [dict_task.get("status", "")],
+                "Verantwortlicher": [dict_task.get("assignee", "")],
+                "Aufgabe": [cf_fields["Ort im e-Learning"].split("/")[-1]],
+                "Medium": [cf_fields["Medium"]],
+                "System": [cf_fields["System"]],
+                "Station": [cf_fields["Station"]],
+                "Einstieg": [cf_fields["Einstieg"]],
+                "Beschreibung": [cf_fields["Beschreibung"]],
+                "Zuordnung": [desc_fields["Zuordnung"]],
+                "Typ": [desc_fields["Typ"]],
+                "Reihenfolge": [desc_fields["Reihenfolge"]],
+            }).set_index("ID")
+    
+        # Iterating through the XML file (one file)
         if self.config.ReadBool("xml_import_one_file"):
             items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
             customfields = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
             for index, item_block in enumerate(items):
                 try:
-                    # Reconstructing a valid fragment
                     item_xml = f"<item>{item_block}</item>"
-                    dict_task = xml_to_dict(item_xml)  # Parsing each item separately
-                    jira_ticket = dict_task.get("key", "")
-                    snippet = dict_task.get("description", "")
-
-                    # Extracting the `Beschreibung` field
-                    snippet_decoded = snippet.replace("&lt;", "<").replace("&gt;", ">")
-                    fields = {
-                        "Zuordnung": "-",
-                        "Typ": "-",
-                        "Reihenfolge": "-",
-                    }
-                    soup = BeautifulSoup(snippet_decoded, "html.parser")
-                    for b_tag in soup.find_all("b"):
-                        text = b_tag.parent.get_text(strip=True)
-                        for field_name in fields:
-                            if text.startswith(field_name + ":"):
-                                fields[field_name] = text.split(":", 1)[1].strip()
-                    parent = fields["Zuordnung"]
-                    type = fields["Typ"]
-                    order = fields["Reihenfolge"]
-
-                    # Extracting the `Dokumentation Lösung` field
-                    customfield_raw = customfields[index]
-                    snippet_customfield = html.unescape(customfield_raw)
-                    snippet_customfield_decoded = snippet_customfield.replace("&lt;", "<").replace("&gt;", ">")
-                    soup = BeautifulSoup(snippet_customfield_decoded, "html.parser")
-                    fields = {
-                        "Ort im e-Learning": "-",
-                        "Medium": "-",
-                        "System": "-",
-                        "Station": "-",
-                        "Einstieg": "-",
-                        "Beschreibung": "-",
-                    }
-                    for li in soup.find_all("li"):
-                        text = li.get_text(strip=True)
-                        for field_name in fields:
-                            if text.startswith(field_name + ":"):
-                                fields[field_name] = text.split(":", 1)[1].strip()
-                                break
-                    ort = fields["Ort im e-Learning"].split("/")[-1]
-                    medium = fields["Medium"]
-                    system = fields["System"]
-                    station = fields["Station"]
-                    einstieg = fields["Einstieg"]
-                    beschreibung = fields["Beschreibung"]
-
-                    # Building the DataFrame
-                    df = pd.DataFrame({
-                        'ID': counter,
-                        'Ticket': [dict_task.get("key", "")],
-                        'Titel': [dict_task.get("summary", "")],
-                        'Status': [dict_task.get("status", "")],
-                        'Verantwortlicher': [dict_task.get("assignee", "")],
-                        'Aufgabe': [ort],
-                        'Medium': [medium],
-                        'System': [system],
-                        'Station': [station],
-                        'Einstieg': [einstieg],
-                        'Beschreibung': [beschreibung],
-                        'Zuordnung': [parent],
-                        'Typ': [type],
-                        'Reihenfolge': [order]
-                    })
-                    df.set_index('ID', inplace = True)
+                    dict_task = xml_to_dict(item_xml)
+                    df = parse_jira_ticket(dict_task, customfields[index], counter)
                     df_list.append(df)
                 except Exception as e:
-                    #print(df_list)
-                    print(e)
                     wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
 
-            # Setting variables for status message and ID
+            # Setting variable for status message
             number_of_items = index + 1
-            counter += 1
+
+        # Iterating through the XML files (multi files)
         else:
             try:
-                # Reconstructing a valid fragment
-                dict_task = xml_to_dict(xml_string)
-                jira_ticket = dict_task['channel']['item']['key']
-                snippet = dict_task['channel']['item']['description']
-                customfield_raw = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)
-
-                # Extracting the `Beschreibung` field
-                snippet_decoded = snippet.replace("&lt;", "<").replace("&gt;", ">")
-                fields = {
-                    "Zuordnung": "-",
-                    "Typ": "-",
-                    "Reihenfolge": "-",
-                }
-                soup = BeautifulSoup(snippet_decoded, "html.parser")
-                for b_tag in soup.find_all("b"):
-                    text = b_tag.parent.get_text(strip=True)
-                    for field_name in fields:
-                        if text.startswith(field_name + ":"):
-                            fields[field_name] = text.split(":", 1)[1].strip()
-                parent = fields["Zuordnung"]
-                type = fields["Typ"]
-                order = fields["Reihenfolge"]
-
-                # Extracting the `Dokumentation Lösung` field
-                customfield_raw = html.unescape(customfield_raw[0])
-                snippet_customfield = html.unescape(customfield_raw)
-                snippet_customfield_decoded = snippet_customfield.replace("&lt;", "<").replace("&gt;", ">")
-                soup = BeautifulSoup(snippet_customfield_decoded, "html.parser")
-                fields = {
-                    "Ort im e-Learning": "-",
-                    "Medium": "-",
-                    "System": "-",
-                    "Station": "-",
-                    "Einstieg": "-",
-                    "Beschreibung": "-",
-                }
-                for li in soup.find_all("li"):
-                    text = li.get_text(strip=True)
-                    for field_name in fields:
-                        if text.startswith(field_name + ":"):
-                            fields[field_name] = text.split(":", 1)[1].strip()
-                            break
-                ort = fields["Ort im e-Learning"].split("/")[-1]
-                medium = fields["Medium"]
-                system = fields["System"]
-                station = fields["Station"]
-                einstieg = fields["Einstieg"]
-                beschreibung = fields["Beschreibung"]
-
-                # Building the DataFrame
-                df = pd.DataFrame({
-                                            'ID': counter,
-                                            'Ticket': jira_ticket,
-                                            'Titel': [dict_task['channel']['item']['summary']],
-                                            'Status': [dict_task['channel']['item']['status']],
-                                            'Verantwortlicher':[dict_task['channel']['item']['assignee']],
-                                            'Aufgabe': [ort],
-                                            'Medium': [medium],
-                                            'System': [system],
-                                            'Station': [station],
-                                            'Einstieg': [einstieg],
-                                            'Beschreibung': [beschreibung],
-                                            'Zuordnung': [parent],
-                                            'Typ': [type],
-                                            'Reihenfolge': [order]
-                                        })
-                df.set_index('ID', inplace = True)
+                dict_task = xml_to_dict(xml_string)["channel"]["item"]
+                customfield_raw = re.findall(r'<customfield id="customfield_10083" key="com.atlassian.jira.plugin.system.customfieldtypes:textarea">(.*?)</customfield>', xml_string, re.DOTALL)[0]
+                df = parse_jira_ticket(dict_task, customfield_raw, counter)
                 df_list.append(df)
 
                 # Setting variable for status message

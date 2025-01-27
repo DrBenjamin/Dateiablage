@@ -1,5 +1,6 @@
 ## Modules
 import wx # wxPython / Phoenix
+import os
 import types
 import src.globals as g
 from src.methods import (
@@ -38,7 +39,7 @@ def on_import_jira(self, event = None):
     self.on_create_folder_structure(event)
 
     # Calling the `on_browse_source` method
-    self.on_browse_source(event, g.folder_path_elearning)
+    self.on_browse_source(event, g.folder_path)
 
     # Calling the `on_import_csv` method
     self.on_import_csv(event, g.file_path_elearning)

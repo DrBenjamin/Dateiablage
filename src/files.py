@@ -63,7 +63,9 @@ f"""Windows Registry Editor Version 5.00\n\n\
                         continue
                     self.config.Write("drive_mapping_letter", letter)
                     break
-        list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
+            list_files(self, f'{self.config.Read("drive_mapping_letter")}:\\')
+            return
+        list_files(self, g.folder_path)
     else:
         list_files(self, g.folder_path)
 
@@ -166,9 +168,6 @@ def import_xml(self, file_paths):
                     df = parse_jira_ticket(dict_task, customfields[index], counter)
                     df_list.append(df)
                 except Exception as e:
-                    print(e)
-                    print(index)
-                    print(df)
                     wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
 
             # Setting variable for status message
@@ -251,7 +250,8 @@ def import_xml(self, file_paths):
     create_folders(tree, g.folder_path_elearning)
 
     # Writing the tree to CSV file
-    g.file_path_elearning = os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name), f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
+    g.folder_path = os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name))
+    g.file_path_elearning = os.path.join(g.folder_path, f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
     with open(g.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema",0\n')
         def writing_tree(node_dict, indent=0):

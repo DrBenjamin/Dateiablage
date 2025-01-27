@@ -12,6 +12,7 @@ file_path = None # storing the path to the selected file in the File Explorer
 folder_path = None # storing the path to the selected root folder for the File Explorer
 folder_path_jira = None # storing the path to the JIRA tickets (multi file import)
 folder_path_elearning = None # storing the path to the new e-Learning folder
+root_folder_name = None # storing the name of the root folder for folder creation
 
 # Preferences
 mapping = False # needed for initial mapping of drive letter

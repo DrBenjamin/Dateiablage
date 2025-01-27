@@ -12,7 +12,6 @@ import src.globals as g
 from bs4 import BeautifulSoup
 
 number_of_items = 0
-root_folder_name = None
 jira_ticket = None
 
 # Method to create the folder structur
@@ -97,6 +96,58 @@ def import_xml(self, file_paths):
             else:
                 result[child.tag] = xml_to_dict(ET.tostring(child))
         return result
+
+    # Helper function to parse JIRA ticket
+    def parse_jira_ticket(dict_task, customfield_raw, counter):
+        jira_ticket = dict_task.get("key", "Leeres Feld")
+        snippet = dict_task.get("description", "")
+        snippet_decoded = html.unescape(snippet.replace("&lt;", "<").replace("&gt;", ">"))
+
+        # Parse description
+        desc_fields = {"Zuordnung": "-", "Typ": "-", "Reihenfolge": "-"}
+        soup_desc = BeautifulSoup(snippet_decoded, "html.parser")
+        for b_tag in soup_desc.find_all("b"):
+            text = b_tag.parent.get_text(strip=True)
+            for f_name in desc_fields:
+                if text.startswith(f_name + ":"):
+                    desc_fields[f_name] = text.split(":", 1)[1].strip()
+
+        # Parse customfield
+        snippet_customfield_decoded = html.unescape(customfield_raw).replace("&lt;", "<").replace("&gt;", ">")
+        soup_cf = BeautifulSoup(snippet_customfield_decoded, "html.parser")
+        cf_fields = {
+            "Ort im e-Learning": "-",
+            "Medium": "-",
+            "System": "-",
+            "Station": "-",
+            "Einstieg": "-",
+            "Beschreibung": "-",
+        }
+        for li in soup_cf.find_all("li"):
+            text = li.get_text(strip=True)
+            for f_name in cf_fields:
+                if text.startswith(f_name + ":"):
+                    cf_fields[f_name] = text.split(":", 1)[1].strip()
+                    break
+
+        # Build DataFrame
+        return pd.DataFrame({
+            "ID": counter,
+            "Ticket": jira_ticket,
+            "Titel": [dict_task.get("summary", "")],
+            "Status": [dict_task.get("status", "")],
+            "Verantwortlicher": [dict_task.get("assignee", "")],
+            "Aufgabe": [cf_fields["Ort im e-Learning"].split("/")[-1]],
+            "Medium": [cf_fields["Medium"]],
+            "System": [cf_fields["System"]],
+            "Station": [cf_fields["Station"]],
+            "Einstieg": [cf_fields["Einstieg"]],
+            "Beschreibung": [cf_fields["Beschreibung"]],
+            "Zuordnung": [desc_fields["Zuordnung"]],
+            "Typ": [desc_fields["Typ"]],
+            "Reihenfolge": [desc_fields["Reihenfolge"]],
+        }).set_index("ID")
+
     df_list = []
     counter = 0
     for file_path in file_paths:
@@ -104,57 +155,6 @@ def import_xml(self, file_paths):
         with open(file_path, 'r') as file:
             xml_string = file.read()
 
-        # Helper function to parse JIRA ticket
-        def parse_jira_ticket(dict_task, customfield_raw, counter):
-            jira_ticket = dict_task.get("key", "")
-            snippet = dict_task.get("description", "")
-            snippet_decoded = html.unescape(snippet.replace("&lt;", "<").replace("&gt;", ">"))
-
-            # Parse description
-            desc_fields = {"Zuordnung": "-", "Typ": "-", "Reihenfolge": "-"}
-            soup_desc = BeautifulSoup(snippet_decoded, "html.parser")
-            for b_tag in soup_desc.find_all("b"):
-                text = b_tag.parent.get_text(strip=True)
-                for f_name in desc_fields:
-                    if text.startswith(f_name + ":"):
-                        desc_fields[f_name] = text.split(":", 1)[1].strip()
-
-            # Parse customfield
-            snippet_customfield_decoded = html.unescape(customfield_raw).replace("&lt;", "<").replace("&gt;", ">")
-            soup_cf = BeautifulSoup(snippet_customfield_decoded, "html.parser")
-            cf_fields = {
-                "Ort im e-Learning": "-",
-                "Medium": "-",
-                "System": "-",
-                "Station": "-",
-                "Einstieg": "-",
-                "Beschreibung": "-",
-            }
-            for li in soup_cf.find_all("li"):
-                text = li.get_text(strip=True)
-                for f_name in cf_fields:
-                    if text.startswith(f_name + ":"):
-                        cf_fields[f_name] = text.split(":", 1)[1].strip()
-                        break
-
-            # Build DataFrame
-            return pd.DataFrame({
-                "ID": counter,
-                "Ticket": jira_ticket,
-                "Titel": [dict_task.get("summary", "")],
-                "Status": [dict_task.get("status", "")],
-                "Verantwortlicher": [dict_task.get("assignee", "")],
-                "Aufgabe": [cf_fields["Ort im e-Learning"].split("/")[-1]],
-                "Medium": [cf_fields["Medium"]],
-                "System": [cf_fields["System"]],
-                "Station": [cf_fields["Station"]],
-                "Einstieg": [cf_fields["Einstieg"]],
-                "Beschreibung": [cf_fields["Beschreibung"]],
-                "Zuordnung": [desc_fields["Zuordnung"]],
-                "Typ": [desc_fields["Typ"]],
-                "Reihenfolge": [desc_fields["Reihenfolge"]],
-            }).set_index("ID")
-    
         # Iterating through the XML file (one file)
         if self.config.ReadBool("xml_import_one_file"):
             items = re.findall(r"<item>(.*?)</item>", xml_string, re.DOTALL)
@@ -166,6 +166,9 @@ def import_xml(self, file_paths):
                     df = parse_jira_ticket(dict_task, customfields[index], counter)
                     df_list.append(df)
                 except Exception as e:
+                    print(e)
+                    print(index)
+                    print(df)
                     wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
 
             # Setting variable for status message
@@ -193,64 +196,52 @@ def import_xml(self, file_paths):
             path_str = path_str.replace(c, "_")
         return path_str
 
-    # Method for normalizing names
-    def normalize_name(name: str) -> str:
-        # Removing everything up to the first colon (":") and any trailing space
-        #name = re.sub(r'^.*?:\s*', '', name)
-        return name.strip()
-
     # Method to build hierarchical tree
     def build_hierarchical_tree(output_df):
         item_map = {}
         
         # Normalizing names
         for _, row in output_df.iterrows():
-            child_name = normalize_name(row["Aufgabe"])
+            child_name = row["Aufgabe"].strip()
+            parent_name = row["Zuordnung"].strip()
             item_map[child_name] = {
-                "parent": row["Zuordnung"],
+                "parent": parent_name,
                 "order": row["Reihenfolge"]
             }
 
-        # Method to check if the item is root
-        def is_root(name):
-            return item_map[name]["parent"] == "ROOT"
-
-        # Collecting all roots (`Zuordnung` == "ROOT")
-        roots = [name for name in item_map if is_root(name)]
-        roots.sort(key=lambda x: item_map[x]["order"])  # sort top-level items by their order
-        if not roots:
-            wx.MessageBox(f"Keine Zuordnung mit 'ROOT' gefunden: {e}", "Error", wx.OK | wx.ICON_ERROR)
-            return {}
-        elif len(roots) > 1:
-            wx.MessageBox(f"Mehrfach Zuordnung mit 'ROOT' gefunden: {e}", "Error", wx.OK | wx.ICON_ERROR)
-            return {}
+        # Collecting root (`Zuordnung` == "ROOT")
+        g.root_folder_name = [
+            name
+            for name, info in item_map.items()
+            if info["parent"] == "ROOT"
+        ][0]
 
         # Method to get children
         def get_children(name):
-            # Recursively gather children
             children = [
-                child 
-                for child, info in item_map.items()
-                if info["parent"] == name
-            ]
-            children.sort(key=lambda x: item_map[x]["order"])  # sorting siblings by order
-            return {child: get_children(child) for child in children} if children else {}
+                                child
+                                for child, info in item_map.items()
+                                if info["parent"] == name
+                             ]
+            children.sort(key=lambda x: item_map[x]["order"])
+            return {
+                        child: get_children(child) 
+                        for child in children
+                    } if children else {}
 
         # Building the overall tree
         tree = {}
-        for root in roots:
-            tree[root] = get_children(root)
-        self.root_folder_name = roots[0]
+        tree[g.root_folder_name] = get_children(g.root_folder_name)
         return tree
 
     # Method to create folders
     def create_folders(node_dict, parent_path):
         for name, sub in node_dict.items():
-            # Sanitize folder names
             sanitized_name = sanitize_path(name)
             folder_path = os.path.join(parent_path, sanitized_name)
             os.makedirs(folder_path, exist_ok=True)
-            if sub:  # only recurse if there are subfolders
+            # Calling recursivly if there are subfolders
+            if sub:
                 create_folders(sub, folder_path)
 
     # Building the hierarchical tree
@@ -260,7 +251,7 @@ def import_xml(self, file_paths):
     create_folders(tree, g.folder_path_elearning)
 
     # Writing the tree to CSV file
-    g.file_path_elearning = os.path.join(g.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_e-Learning_Definition.csv")
+    g.file_path_elearning = os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name), f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
     with open(g.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema",0\n')
         def writing_tree(node_dict, indent=0):
@@ -272,11 +263,11 @@ def import_xml(self, file_paths):
 
     # Writing the dataframe to global variable and TXT file
     g.df_tasks = output_df
-    g.df_tasks.to_string(os.path.join(g.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_Protokoll.txt"))
-    g.df_tasks.to_csv(os.path.join(g.folder_path_elearning, sanitize_path(self.root_folder_name), f"{sanitize_path(self.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
+    g.df_tasks.to_string(os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name), f"{sanitize_path(g.root_folder_name)}_Protokoll.txt"))
+    g.df_tasks.to_csv(os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name), f"{sanitize_path(g.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
 
     # Informing the user
-    wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{self.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)
+    wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{g.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)
 
 # Method to handle selected file
 def on_file_selected(self, event):

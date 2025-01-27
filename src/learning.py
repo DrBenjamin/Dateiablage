@@ -40,7 +40,7 @@ def display_learning(self, df):
     for _, row in df.iterrows():
         text = row.iloc[0]
         level = row.iloc[1]
-        indent = ' ' * (((level + 4) * 4) - 12)  # ident based on the level
+        indent = ' ' * (((level + 4) * 4) - 16)  # ident based on the level
         self.learning_ctrl.Append([f"{indent}{text}"])
 
     # Adjusting the column width to fit automatically the content

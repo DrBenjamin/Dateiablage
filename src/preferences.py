@@ -1,3 +1,5 @@
+## Description: This file contains the methods to handle the preferences.
+## `src/preferences.py`
 ## Modules
 import wx # wxPython / Phoenix
 import subprocess

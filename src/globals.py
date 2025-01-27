@@ -1,4 +1,5 @@
-## Global variables for the project
+## Description: This file contains the global variables of the application.
+## `src/globals.py`
 # e-Learning
 file_path_elearning = None # storing the path to e-Learning definition file (CSV)
 df_elearning = None # storing the dataframe of the e-Learning definition file

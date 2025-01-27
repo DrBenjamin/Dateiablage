@@ -1,3 +1,5 @@
+## Description: This file contains the methods to handle the e-Leanring structure list.
+## `src/learning.py`
 ## Modules
 import wx
 import pandas as pd

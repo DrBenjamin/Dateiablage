@@ -1,3 +1,5 @@
+## Description: This file contains the methods to handle the Task list.
+## `src/tasks.py`
 ## Modules
 import wx
 import pandas as pd

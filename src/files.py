@@ -1,3 +1,5 @@
+## Description: This file contains the methods to handle the file operations in the application.
+## `src/files.py`
 ## Modules
 import wx
 import os

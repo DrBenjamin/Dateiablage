@@ -1,3 +1,5 @@
+## Description: This file contains the main class of the application.
+## `Dateiablage.py`
 ## Modules
 import wx # wxPython / Phoenix
 import os

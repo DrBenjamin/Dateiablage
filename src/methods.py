@@ -1,3 +1,5 @@
+## Description: This file contains various methods of the application.
+## `src/methods.py`
 ## Modules
 import wx
 import os

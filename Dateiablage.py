@@ -42,6 +42,7 @@ def on_import_jira(self, event = None):
 
     # Calling the `on_browse_source` method
     self.on_browse_source(event, g.folder_path)
+    self.SetTitle(f"Dateiablage - {g.root_folder_name}")
 
     # Calling the `on_import_csv` method
     self.on_import_csv(event, g.file_path_elearning)

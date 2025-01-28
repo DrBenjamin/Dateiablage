@@ -40,15 +40,17 @@ def on_import_tasks(self, event):
             display_tasks(self, output_df[output_df['Status'] == self.config.Read("status_choice")])
 
 # Method to display the data in the tasks control
-def display_tasks(self, df):
+def display_tasks(self, df, ticket = None):
     self.tasks_ctrl.ClearAll()
-
-    for _, row in df.iterrows():
+    if ticket is not None:
+        df = df[df['Ticket'] == ticket]
+    for index, row in df.iterrows():
         self.tasks_ctrl.Append([row.iloc[0]]) 
         self.tasks_ctrl.Append([row.iloc[1]])
         self.tasks_ctrl.Append([row.iloc[4]])
         self.tasks_ctrl.Append([row.iloc[5]])
-        self.tasks_ctrl.Append(["-------------"])
+        if index < len(df) - 1:
+            self.tasks_ctrl.Append(["-------------"])
     try:
         self.tasks_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
     except Exception as e:

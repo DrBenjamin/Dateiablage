@@ -192,7 +192,7 @@ def import_xml(self, file_paths):
 
     # Method to sanitize path
     def sanitize_path(path_str):
-        invalid_chars = r'<>:"/\|?*' # Invalid Windows path chars: < > : " / \ | ? *
+        invalid_chars = r'<>:"/\|?*' # removing invalid path chars
         for c in invalid_chars:
             path_str = path_str.replace(c, "_")
         return path_str
@@ -205,11 +205,12 @@ def import_xml(self, file_paths):
         for _, row in output_df.iterrows():
             child_name = row["Aufgabe"].strip()
             parent_name = row["Zuordnung"].strip()
-            ticket_name = row["Ticket"].strip()
+            ticket = row["Ticket"].strip()
+            order_number = row["Reihenfolge"].strip()
             item_map[child_name] = {
                 "parent": parent_name,
-                "ticket": ticket_name,
-                "order": row["Reihenfolge"]
+                "ticket": ticket,
+                "order": order_number
             }
 
         # Collecting root (`Zuordnung` == "ROOT")
@@ -220,32 +221,38 @@ def import_xml(self, file_paths):
         ][0]
 
         # Method to get children
-        def get_children(name):
+        def get_children(name, ticket = False):
             children = [
                                 child
                                 for child, info in item_map.items()
                                 if info["parent"] == name
                              ]
             children.sort(key=lambda x: item_map[x]["order"])
-            return {
-                        child: get_children(child) 
-                        for child in children
-                    } if children else {}
+
+            # Building a dictionary
+            node_dict = {}
+            for child in children:
+                node_dict[child] = [get_children(child), item_map[child]["ticket"]]
+
+            return node_dict
 
         # Building the overall tree
         tree = {}
-        tree[g.root_folder_name] = get_children(g.root_folder_name)
+        root_ticket = item_map[g.root_folder_name]["ticket"]
+        tree = {g.root_folder_name: [get_children(g.root_folder_name), root_ticket]}
         return tree
 
     # Method to create folders
     def create_folders(node_dict, parent_path):
         for name, sub in node_dict.items():
+            child_dict, _ticket = sub
             sanitized_name = sanitize_path(name)
             folder_path = os.path.join(parent_path, sanitized_name)
-            os.makedirs(folder_path, exist_ok=True)
+            os.makedirs(folder_path, exist_ok = True)
+
             # Calling recursivly if there are subfolders
-            if sub:
-                create_folders(sub, folder_path)
+            if child_dict:
+                create_folders(child_dict, folder_path)
 
     # Building the hierarchical tree
     tree = build_hierarchical_tree(output_df)
@@ -257,12 +264,11 @@ def import_xml(self, file_paths):
     g.folder_path = os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name))
     g.file_path_elearning = os.path.join(g.folder_path, f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
     with open(g.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
-        f.write(f'"Thema",0\n')
+        f.write(f'"Thema","Ticket","Order"\n')
         def writing_tree(node_dict, indent = 0):
             for name, sub in node_dict.items():
-                print(sub)
-                f.write(f'"{name} (xy)",{indent}\n')
-                writing_tree(sub, indent + 1)
+                f.write(f'"{name}","{sub[1]}",{indent}\n')
+                writing_tree(sub[0], indent + 1)
         writing_tree(tree)
         f.close()
 

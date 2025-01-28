@@ -205,8 +205,10 @@ def import_xml(self, file_paths):
         for _, row in output_df.iterrows():
             child_name = row["Aufgabe"].strip()
             parent_name = row["Zuordnung"].strip()
+            ticket_name = row["Ticket"].strip()
             item_map[child_name] = {
                 "parent": parent_name,
+                "ticket": ticket_name,
                 "order": row["Reihenfolge"]
             }
 
@@ -256,9 +258,10 @@ def import_xml(self, file_paths):
     g.file_path_elearning = os.path.join(g.folder_path, f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
     with open(g.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema",0\n')
-        def writing_tree(node_dict, indent=0):
+        def writing_tree(node_dict, indent = 0):
             for name, sub in node_dict.items():
-                f.write(f'"{name}",{indent}\n')
+                print(sub)
+                f.write(f'"{name} (xy)",{indent}\n')
                 writing_tree(sub, indent + 1)
         writing_tree(tree)
         f.close()

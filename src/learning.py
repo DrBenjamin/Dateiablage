@@ -23,10 +23,11 @@ def on_elearning_item_selected(self, event):
     item_index = event.GetIndex()
     item_text = self.learning_ctrl.GetItemText(item_index, 0)
     ticket = self.learning_ctrl.GetItemText(item_index, 1)
+    level = self.learning_ctrl.GetItemText(item_index, 2)
     if g.ticket_chosen:
         g.ticket_chosen = False
         display_tasks(self, g.df_tasks)
-    #list_files(self, g.folder_path, item_text.strip())
+    list_files(self, g.folder_path, item_text.strip(), level)
     self.SetTitle(f"Dateiablage - {g.root_folder_name} - {item_text.strip()} ({ticket})")
 
 # Method to handle the list control double click event
@@ -57,6 +58,7 @@ def display_learning(self, df):
     self.learning_ctrl.ClearAll()
     self.learning_ctrl.InsertColumn(0, "Thema")
     self.learning_ctrl.InsertColumn(1, "Ticket")
+    self.learning_ctrl.InsertColumn(2, "Level")
     for _, row in df.iterrows():
         text = row.iloc[0]
         ticket = row.iloc[1]
@@ -64,7 +66,9 @@ def display_learning(self, df):
         indent = ' ' * (((level + 4) * 4) - 16)
         index = self.learning_ctrl.InsertItem(self.learning_ctrl.GetItemCount(), f"{indent}{text}")
         self.learning_ctrl.SetItem(index, 1, ticket)
+        self.learning_ctrl.SetItem(index, 2, str(level))
 
     # Adjusting the column width to fit automatically the content
     self.learning_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-    self.learning_ctrl.SetColumnWidth(1, 0) # hide the ticket column
+    self.learning_ctrl.SetColumnWidth(1, 0) # hiding the ticket column
+    self.learning_ctrl.SetColumnWidth(2, 0) # hiding the level column

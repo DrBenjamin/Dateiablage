@@ -305,16 +305,21 @@ def on_file_activated(self, event):
             wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
 # Method to list the files in the selected folder
-def list_files(self, folder_path, filter_text = None):
-    #folder_path = sanitize_path(folder_path)
-    print(folder_path)
+def list_files(self, folder_path, filter_text = None, level = None):
+    if filter_text is not None:
+        filter_text = sanitize_path(filter_text)
+    print("Filter: ", filter_text)
+    if level is not None:
+        level = int(level)
 
     # Clearing the existing file list
     g.file_list = []
     for root, dirs, files in os.walk(folder_path):
         for name in dirs:
             dir_path = os.path.join(root, name)
-            if filter_text is None: #or filter_text is not None:
+
+            # Adding all files and directories
+            if filter_text is None or level < 1:
                 g.file_list.append(dir_path)
                 files = [
                     f 
@@ -324,16 +329,19 @@ def list_files(self, folder_path, filter_text = None):
 
             # Adding all subdirectories of the matching directory
             else:
-                normalized_filter_text = unicodedata.normalize('NFC', filter_text)
-                normalized_name = unicodedata.normalize('NFC', name)
-                if normalized_filter_text in normalized_name:
+                if re.fullmatch(filter_text, name):
                     for sub_root, sub_dirs, sub_files in os.walk(dir_path):
+                        files = [
+                            f 
+                            for f in os.listdir(sub_root)
+                        ]
                         for sub_name in sub_dirs:
-                            dir_path = os.path.join(sub_root, sub_name)
+                            sub_dir_path = os.path.join(sub_root, sub_name)
                             g.file_list.append(os.path.join(sub_root, sub_name))
                             sub_files = [
                                 f 
-                                for f in os.listdir(dir_path)
+                                for f in os.listdir(sub_dir_path)
                             ]
-                            g.file_list.extend(os.path.join(dir_path, f) for f in sub_files)
+                            files.extend(sub_files)
+                        g.file_list.extend(os.path.join(dir_path, f) for f in files)
     self.file_listbox.Set(g.file_list)

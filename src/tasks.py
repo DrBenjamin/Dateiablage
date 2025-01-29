@@ -18,7 +18,7 @@ def on_import_tasks_from_csv(self, event):
             print(e)
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
 
-    # Lading pandas dataframe from the saved CSV file
+    # Loading pandas dataframe from the saved CSV file
     dialog = wx.FileDialog(self, "Importiere offene Aufgaben", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
     if dialog.ShowModal() == wx.ID_OK:
         file_path = dialog.GetPath()

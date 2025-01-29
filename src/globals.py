@@ -3,6 +3,7 @@
 # e-Learning
 file_path_elearning = None # storing the path to e-Learning definition file (CSV)
 df_elearning = None # storing the dataframe of the e-Learning definition file
+ticket_chosen = False # storing if a single ticket was chosen
 
 # Tasks
 df_tasks = None # storing the dataframe of the tasks file

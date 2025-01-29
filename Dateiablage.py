@@ -17,7 +17,8 @@ from src.methods import (
 )
 from src.learning import (
     on_import_csv,
-    on_item_selected
+    on_elearning_item_selected,
+    on_elearning_item_activated
 )
 from src.tasks import (
     on_import_tasks_from_csv,
@@ -85,7 +86,8 @@ class MyFrame(wx.Frame):
 
         # Methods from `learning.py`
         self.on_import_csv = types.MethodType(on_import_csv, self)
-        self.on_item_selected = types.MethodType(on_item_selected, self)
+        self.on_elearning_item_selected = types.MethodType(on_elearning_item_selected, self)
+        self.on_elearning_item_activated = types.MethodType(on_elearning_item_activated, self)
 
         # Methods from `tasks.py`
         self.on_import_tasks_from_csv = types.MethodType(on_import_tasks_from_csv, self)
@@ -216,10 +218,11 @@ class MyFrame(wx.Frame):
         self.file_listbox.Bind(wx.EVT_CONTEXT_MENU, self.on_right_click)
 
         ## Bindings of events
+        # Binding the list control to the  `on_elearning_item_selected` and `on_elearning_item_activated` method
+        self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_elearning_item_selected)
+        self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_elearning_item_activated)
         # Binding the list control to the on_item_activated method
-        self.learning_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
-        # Binding the list control to the on_item_activated method
-        self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
+        #self.tasks_ctrl.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_item_selected)
         # Binding the list control to the on_file_selected method
         self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_selected)
         # Binding the list control to the on_file_activated method

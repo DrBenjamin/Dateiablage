@@ -19,12 +19,22 @@ def on_import_csv(self, event, file_path = None):
         import_csv(self, file_path, message = None)
 
 # Method to handle the list control item activated event
-def on_item_selected(self, event):
+def on_elearning_item_selected(self, event):
     item_index = event.GetIndex()
     item_text = self.learning_ctrl.GetItemText(item_index, 0)
     ticket = self.learning_ctrl.GetItemText(item_index, 1)
+    if g.ticket_chosen:
+        g.ticket_chosen = False
+        display_tasks(self, g.df_tasks)
+    #list_files(self, g.folder_path, item_text.strip())
+    self.SetTitle(f"Dateiablage - {g.root_folder_name} - {item_text.strip()} ({ticket})")
+
+# Method to handle the list control double click event
+def on_elearning_item_activated(self, event):
+    item_index = event.GetIndex()
+    ticket = self.learning_ctrl.GetItemText(item_index, 1)
     display_tasks(self, g.df_tasks, ticket)
-    list_files(self, g.folder_path, item_text.strip())
+    g.ticket_chosen = True
 
 # Method to import the CSV file
 def import_csv(self, file_path, message = True):

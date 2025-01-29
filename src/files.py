@@ -88,6 +88,13 @@ def on_browse_jira(self, event):
         if dialog.ShowModal() == wx.ID_OK:
             g.folder_path_jira = dialog.GetPath()
 
+# Method to sanitize path
+def sanitize_path(path_str):
+    invalid_chars = r'<>:"/\|?*' # removing invalid path chars
+    for c in invalid_chars:
+        path_str = path_str.replace(c, "_")
+    return path_str
+
 # Method to import XML file
 def import_xml(self, file_paths):
     output_df = pd.DataFrame()
@@ -189,13 +196,6 @@ def import_xml(self, file_paths):
                 wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
     output_df = pd.concat(df_list)
     output_df.reset_index(drop=True, inplace=True)
-
-    # Method to sanitize path
-    def sanitize_path(path_str):
-        invalid_chars = r'<>:"/\|?*' # removing invalid path chars
-        for c in invalid_chars:
-            path_str = path_str.replace(c, "_")
-        return path_str
 
     # Method to build hierarchical tree
     def build_hierarchical_tree(output_df):
@@ -306,6 +306,9 @@ def on_file_activated(self, event):
 
 # Method to list the files in the selected folder
 def list_files(self, folder_path, filter_text = None):
+    #folder_path = sanitize_path(folder_path)
+    print(folder_path)
+
     # Clearing the existing file list
     g.file_list = []
     for root, dirs, files in os.walk(folder_path):
@@ -318,8 +321,9 @@ def list_files(self, folder_path, filter_text = None):
                     for f in os.listdir(dir_path)
                 ]
                 g.file_list.extend(os.path.join(dir_path, f) for f in files)
+
+            # Adding all subdirectories of the matching directory
             else:
-                # Adding all subdirectories of the matching directory
                 normalized_filter_text = unicodedata.normalize('NFC', filter_text)
                 normalized_name = unicodedata.normalize('NFC', name)
                 if normalized_filter_text in normalized_name:

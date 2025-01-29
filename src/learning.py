@@ -18,7 +18,7 @@ def on_import_csv(self, event, file_path = None):
     else:
         import_csv(self, file_path, message = None)
 
-# Method to handle the list control item activated event
+# Method to handle the list control item selected event
 def on_elearning_item_selected(self, event):
     item_index = event.GetIndex()
     item_text = self.learning_ctrl.GetItemText(item_index, 0)
@@ -48,7 +48,7 @@ def import_csv(self, file_path, message = True):
             g.root_folder_name = g.root_folder_name.replace(c, "_")
         self.SetTitle(f"Dateiablage - {g.root_folder_name}")
         if message:
-            wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(f'{len(g.df_elearning)} Elemente aus Datei "{file_path}" erfolgreich importiert!', "Erfolg", wx.OK | wx.ICON_INFORMATION)
     except Exception as e:
         print(e)
         wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)

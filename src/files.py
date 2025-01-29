@@ -308,7 +308,6 @@ def on_file_activated(self, event):
 def list_files(self, folder_path, filter_text = None, level = None):
     if filter_text is not None:
         filter_text = sanitize_path(filter_text)
-    print("Filter: ", filter_text)
     if level is not None:
         level = int(level)
 

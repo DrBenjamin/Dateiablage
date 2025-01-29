@@ -13,7 +13,7 @@ def on_import_tasks_from_csv(self, event):
             open_tasks = pd.read_csv(file_path)
             g.df_tasks = open_tasks
             self.on_import_tasks(event)
-            wx.MessageBox(f"Datei erfolgreich importiert: {file_path}", "Erfolg", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(f"{len(g.df_tasks)} Elemente aus Datei {file_path} erfolgreich importiert!", "Erfolg", wx.OK | wx.ICON_INFORMATION)
         except Exception as e:
             print(e)
             wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)
@@ -26,7 +26,7 @@ def on_import_tasks_from_csv(self, event):
     dialog.Destroy()
 
 def on_import_tasks(self, event):
-    # Filtering the df for the selected user
+    # Filtering the JIRA tickets dataframe for the selected user and status
     if self.config.Read("user_choice") == "Alle":
         if self.config.Read("status_choice") == "Alle":
             display_tasks(self, g.df_tasks)
@@ -39,9 +39,22 @@ def on_import_tasks(self, event):
             output_df = g.df_tasks[g.df_tasks['Verantwortlicher'] == self.config.Read("user_choice")]
             display_tasks(self, output_df[output_df['Status'] == self.config.Read("status_choice")])
 
+# Method to handle the list control item selected event
+def on_task_item_selected(self, event):
+    item_index = event.GetIndex()
+    item_text = self.tasks_ctrl.GetItemText(item_index)
+    #print("Single Click: ", item_text)
+
+# Method to handle the list control double click event
+def on_task_item_activated(self, event):
+    item_index = event.GetIndex()
+    item_text = self.tasks_ctrl.GetItemText(item_index)
+    #print("Double Click: ", item_text)
+
 # Method to display the data in the tasks control
 def display_tasks(self, df, ticket = None):
     self.tasks_ctrl.ClearAll()
+    df = df.reset_index(drop=True)
     if ticket is not None:
         df = df[df['Ticket'] == ticket]
     for index, row in df.iterrows():

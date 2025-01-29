@@ -37,7 +37,7 @@ class PreferencesPage(wx.StockPreferencesPage):
         # User choice
         sizer.Add(wx.StaticText(panel,
                                     label=f'Tickets für welchen User anzeigen?'),0, wx.ALL, 5)
-        self.user_choice = wx.Choice(panel, choices=["Alle", "Asher", "Benjamin", "Kanjo", "Larisa", "Listan", "Mahsa", "Marko", "Sandra M.", "Christian.Weingartner@cgm.com"])
+        self.user_choice = wx.Choice(panel, choices=["Alle", "Jayachandran Arhsuthdan", "Benjamin Groß", "Marko Werth", "Sandra Mann", "Christian.Weingartner@cgm.com"])
         sizer.Add(self.user_choice, 0, wx.ALL, 5)
         # Load saved state
         user_state = self.config.Read("user_choice", "Alle")

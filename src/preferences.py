@@ -126,9 +126,31 @@ class PreferencesPage(wx.StockPreferencesPage):
                                         label='Kein Laufwerk gemappt.'),
                         0, wx.ALL, 5)
 
+        # Adding preference control date
+        heading = wx.StaticText(panel, label="Dateinamen mit Datum")
+        font = heading.GetFont()
+        font.PointSize += 2
+        heading.SetFont(font)
+        sizer.Add(heading, 0, wx.ALL, 5)
+        # Date checkbox
+        sizer.Add(wx.StaticText(panel,
+                                    label=f'Heutiges Datum verwenden?'),0, wx.ALL, 5)
+        self.date_checkbox = wx.CheckBox(panel, label="Datum von heute aktivieren!")
+        sizer.Add(self.date_checkbox, 0, wx.ALL, 5)
+        # Load saved state
+        date_state = self.config.ReadBool("date_today", False)
+        self.date_checkbox.SetValue(date_state)
+        # Bind event to save state
+        self.date_checkbox.Bind(wx.EVT_CHECKBOX, self.on_date_checkbox)
+
         # Setting the sizer for the panel
         panel.SetSizer(sizer)
         return panel
+
+    # Method to handle the Preferences page user choice
+    def on_date_checkbox(self, event):
+        self.config.WriteBool("date_today", self.date_checkbox.IsChecked())
+        self.config.Flush()
 
     # Method to handle the Preferences page user choice
     def on_user_choice(self, event):

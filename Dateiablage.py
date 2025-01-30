@@ -27,6 +27,7 @@ from src.tasks import (
     on_task_item_activated
 )
 from src.files import (
+    on_date_to_files,
     on_create_folder_structure,
     on_browse_source,
     on_browse_jira,
@@ -98,6 +99,7 @@ class MyFrame(wx.Frame):
         self.on_task_item_activated = types.MethodType(on_task_item_activated, self)
 
         # Methods from `files.py`
+        self.on_date_to_files = types.MethodType(on_date_to_files, self)
         self.on_create_folder_structure = types.MethodType(on_create_folder_structure, self)
         self.on_browse_source = types.MethodType(on_browse_source, self)
         self.on_browse_jira = types.MethodType(on_browse_jira, self)
@@ -115,6 +117,7 @@ class MyFrame(wx.Frame):
         import_definition = file_menu.Append(wx.ID_ANY, "&Wähle e-Learning Definition")
         import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle organisatorische Aufgaben")
         browse_item = file_menu.Append(wx.ID_ANY, "&Wähle Quellverzeichnis")
+        file_menu.AppendSeparator()
         exit_app = file_menu.Append(wx.ID_EXIT, "&Beenden")
         menu_bar.Append(file_menu, "&Datei")
 
@@ -122,8 +125,11 @@ class MyFrame(wx.Frame):
         edit_menu = wx.Menu()
         folder_structure = edit_menu.Append(wx.ID_ANY, "Erstelle e-Learning")
         export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
-        copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Pfad")
+        edit_menu.AppendSeparator()
+        file_date = edit_menu.Append(wx.ID_ANY, "Datum zum Detainamen")
         convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere Untertitel")
+        edit_menu.AppendSeparator()
+        copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Pfad")
         refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisieren")
         preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
@@ -201,6 +207,8 @@ class MyFrame(wx.Frame):
         ## Binding of `Bearbeiten` methods to menu items
         # Binding the Create e-Learning menu item to the `on_import_jira` method
         self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
+        # Binding the add date to file menu item to the `on_date_to_file` method
+        self.Bind(wx.EVT_MENU, self.on_date_to_files, file_date)
         # Bindung the Export menu item to the `on_export` method
         self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
         # Binding the Copy menu to the `on_copy` path method
@@ -254,6 +262,8 @@ class MyApp(wx.App):
             self.config.WriteBool("drive_mapping_enabled", False)
         if not self.config.HasEntry("drive_mapping_letter"):
             self.config.Write("drive_mapping_letter", "")
+        if not self.config.HasEntry("date_today"):
+            self.config.WriteBool("date_today", False)
 
         # Adding os specific settings
         if not wx.Platform == "__WXMSW__":

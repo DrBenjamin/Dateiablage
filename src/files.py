@@ -5,8 +5,8 @@ import wx
 import os
 import subprocess
 import platform
-import unicodedata
 import pandas as pd
+import datetime
 import re
 import html
 import xml.etree.ElementTree as ET
@@ -15,6 +15,35 @@ from bs4 import BeautifulSoup
 
 number_of_items = 0
 jira_ticket = None
+
+# Method to add date to files
+def on_date_to_files(self, event):
+    counter = 0
+    for file_path in g.file_list:
+        if not os.path.isfile(file_path):
+            continue
+
+        try:
+            file_name = os.path.basename(file_path)
+            if re.search(r"\d{4}-\d{2}-\d{2}", file_name): # skipping file names with date in it (e.g. 2021-01-01)
+                continue
+            if self.config.ReadBool("date_today"):
+                file_date_str = datetime.datetime.now().strftime('%Y-%m-%d')
+            else:
+                file_date = os.path.getmtime(file_path)
+                file_date_str = datetime.datetime.fromtimestamp(file_date).strftime('%Y-%m-%d')
+            
+            # Splitting the filename into name and extension
+            name, ext = os.path.splitext(file_name)
+            
+            # Creating the new filename with the date string before the extension
+            new_file_name = f"{name}_{file_date_str}{ext}"
+            new_file_path = os.path.join(os.path.dirname(file_path), new_file_name)
+            os.rename(file_path, new_file_path)
+            counter += 1
+        except Exception as e:
+            wx.MessageBox(f'Datei "{name}" konnte nicht umbenannt werden: {e}', "Error", wx.OK | wx.ICON_ERROR)
+    wx.MessageBox(f"{counter} Dateien wurden erfolgreich umbenannt.", "Information", wx.OK | wx.ICON_INFORMATION)
 
 # Method to create the folder structur
 def on_create_folder_structure(self, event):
@@ -330,6 +359,7 @@ def list_files(self, folder_path, filter_text = None, level = None):
             else:
                 if re.fullmatch(filter_text, name):
                     for sub_root, sub_dirs, sub_files in os.walk(dir_path):
+                        files = []
                         files = [
                             f 
                             for f in os.listdir(sub_root)

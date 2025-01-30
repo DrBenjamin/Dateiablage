@@ -153,33 +153,23 @@ def check_folder_completeness(self, event):
     present_files = []
     missing_files = []
 
-    # Überprüfen, ob der Ordnerpfad gesetzt ist
-    if g.folder_path is None or not os.path.exists(g.folder_path):
-        wx.MessageBox("Der Ordnerpfad ist ungültig oder nicht gesetzt!", "Fehler", wx.OK | wx.ICON_ERROR)
-        return
-
-    # Durchsuche den Ordner nach den benötigten Dateitypen
+    # Searching the folder for the required file types
     for ext in required_extensions:
-        # Flag, um zu überprüfen, ob die Datei vorhanden ist
         found = False
         for file in g.file_list:
             if file.endswith(ext):
                 found = True
                 present_files.append(ext)
                 break
-        
-        # Wenn die Datei nicht gefunden wurde, zum missing_files hinzufügen
         if not found:
             missing_files.append(ext)
 
-    # Erstelle die Nachricht basierend auf den Ergebnissen
+    # Creating the message based on the results
     if not missing_files:
         message = "Der Ordner enthält alle benötigten Dateien: " + ", ".join(present_files)
     else:
         message = "Fehlende Dateien:\n" + "\n".join(missing_files)
         message += "\n\nVorhandene Dateien:\n" + "\n".join(present_files)
-    
-    # Zeige das Ergebnis in einer MessageBox an
     wx.MessageBox(message, "Vollständigkeitsprüfung", wx.OK | wx.ICON_INFORMATION)
 
 # Method to handle the Refresh menu item

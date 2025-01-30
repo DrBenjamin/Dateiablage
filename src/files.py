@@ -350,7 +350,7 @@ def list_files(self, folder_path, filter_text = None, level = None):
             if filter_text is None or level < 1:
                 g.file_list.append(dir_path)
                 files = [
-                    f 
+                    f
                     for f in os.listdir(dir_path)
                 ]
                 g.file_list.extend(os.path.join(dir_path, f) for f in files)
@@ -368,7 +368,7 @@ def list_files(self, folder_path, filter_text = None, level = None):
                             sub_dir_path = os.path.join(sub_root, sub_name)
                             g.file_list.append(os.path.join(sub_root, sub_name))
                             sub_files = [
-                                f 
+                                f
                                 for f in os.listdir(sub_dir_path)
                             ]
                             files.extend(sub_files)

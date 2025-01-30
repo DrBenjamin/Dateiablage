@@ -127,14 +127,14 @@ class PreferencesPage(wx.StockPreferencesPage):
                         0, wx.ALL, 5)
 
         # Adding preference control date
-        heading = wx.StaticText(panel, label="Dateinamen mit Datum")
+        heading = wx.StaticText(panel, label="Dateinamen")
         font = heading.GetFont()
         font.PointSize += 2
         heading.SetFont(font)
         sizer.Add(heading, 0, wx.ALL, 5)
         # Date checkbox
         sizer.Add(wx.StaticText(panel,
-                                    label=f'Heutiges Datum verwenden?'),0, wx.ALL, 5)
+                                    label=f'Welches Datum verwenden?'),0, wx.ALL, 5)
         self.date_checkbox = wx.CheckBox(panel, label="Datum von heute aktivieren!")
         sizer.Add(self.date_checkbox, 0, wx.ALL, 5)
         # Load saved state

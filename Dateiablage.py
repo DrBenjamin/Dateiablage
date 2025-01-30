@@ -13,7 +13,8 @@ from src.methods import (
     on_about,
     on_contact,
     on_export,
-    on_exit
+    on_exit,
+    on_check_completeness
 )
 from src.learning import (
     on_import_csv,
@@ -78,6 +79,7 @@ class MyFrame(wx.Frame):
 
         ## Binding functions from other files as methods to `self`
         # Methods from `methods.py`
+        self.on_check_completeness = types.MethodType(on_check_completeness, self)
         self.on_right_click = types.MethodType(on_right_click, self)
         self.on_copy_path = types.MethodType(on_copy_path, self)
         self.on_convert = types.MethodType(on_convert, self)
@@ -128,6 +130,7 @@ class MyFrame(wx.Frame):
         edit_menu.AppendSeparator()
         file_date = edit_menu.Append(wx.ID_ANY, "Datum zum Detainamen")
         convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere Untertitel")
+        check_messing_files = edit_menu.Append(wx.ID_ANY, "Vollständigkeitsprüfung")
         edit_menu.AppendSeparator()
         copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Pfad")
         refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisieren")
@@ -211,6 +214,8 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_date_to_files, file_date)
         # Bindung the Export menu item to the `on_export` method
         self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
+        # Binding the Check Completeness menu item to the `on_check_completeness` method
+        self.Bind(wx.EVT_MENU, self.on_check_completeness, check_messing_files)
         # Binding the Copy menu to the `on_copy` path method
         self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
         # Binding the Convert menu to the `on_convert` method

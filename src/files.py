@@ -396,37 +396,32 @@ def list_files(self, folder_path, filter_text = None, level = None):
 
     # Clearing the existing file list
     g.file_list = []
+
+    # Iterating through the folder
     for root, dirs, files in os.walk(folder_path):
-        for name in dirs:
-            dir_path = os.path.join(root, name)
+        if filter_text is None or level < 1:
+            for d in dirs:
+                g.file_list.append(os.path.join(root, d))
+            for f in files:
+                g.file_list.append(os.path.join(root, f))
+            g.folder_path_import = folder_path
 
-            # Adding all files and directories
-            if filter_text is None or level < 1:
-                g.file_list.append(dir_path)
-                files = [
-                    f
-                    for f in os.listdir(dir_path)
-                ]
-                g.file_list.extend(os.path.join(dir_path, f) for f in files)
-                g.folder_path_import = folder_path
+        # Iterating through the folder with a filter
+        else:
+            for d in dirs:
+                if re.fullmatch(filter_text, d):
+                    dir_path = os.path.join(root, d)
+                    subfiles = []
+                    for subroot, subdirs, subf in os.walk(dir_path):
+                        for subdir in subdirs:
+                            g.file_list.append(os.path.join(subroot, subdir))
+                        for sf in subf:
+                            subfiles.append(os.path.join(subroot, sf))
+                    g.file_list.extend(subfiles)
+                    g.folder_path_import = dir_path
 
-            # Adding all subdirectories of the matching directory
-            else:
-                if re.fullmatch(filter_text, name):
-                    for sub_root, sub_dirs, sub_files in os.walk(dir_path):
-                        files = []
-                        files = [
-                            f 
-                            for f in os.listdir(sub_root)
-                        ]
-                        for sub_name in sub_dirs:
-                            sub_dir_path = os.path.join(sub_root, sub_name)
-                            g.file_list.append(os.path.join(sub_root, sub_name))
-                            sub_files = [
-                                f
-                                for f in os.listdir(sub_dir_path)
-                            ]
-                            files.extend(sub_files)
-                        g.file_list.extend(os.path.join(dir_path, f) for f in files)
-                        g.folder_path_import = dir_path
+    # Sorting the file list
+    g.file_list.sort()
+
+    # Displaying in the File Explorer
     self.file_listbox.Set(g.file_list)

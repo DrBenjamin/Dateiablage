@@ -28,6 +28,7 @@ from src.tasks import (
     on_task_item_activated
 )
 from src.files import (
+    on_import_files,
     on_date_to_files,
     on_create_folder_structure,
     on_browse_source,
@@ -101,6 +102,7 @@ class MyFrame(wx.Frame):
         self.on_task_item_activated = types.MethodType(on_task_item_activated, self)
 
         # Methods from `files.py`
+        self.on_import_files = types.MethodType(on_import_files, self)
         self.on_date_to_files = types.MethodType(on_date_to_files, self)
         self.on_create_folder_structure = types.MethodType(on_create_folder_structure, self)
         self.on_browse_source = types.MethodType(on_browse_source, self)
@@ -125,17 +127,23 @@ class MyFrame(wx.Frame):
 
         ## Creating the `Bearbeiten` menu
         edit_menu = wx.Menu()
-        folder_structure = edit_menu.Append(wx.ID_ANY, "Erstelle e-Learning")
-        export_file_list = edit_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
-        edit_menu.AppendSeparator()
-        file_date = edit_menu.Append(wx.ID_ANY, "Datum zum Detainamen")
-        convert_srt_in_vtt = edit_menu.Append(wx.ID_ANY, "Konvertiere Untertitel")
+        file_date = edit_menu.Append(wx.ID_ANY, "Datum zum Dateinamen")
         check_messing_files = edit_menu.Append(wx.ID_ANY, "Vollständigkeitsprüfung")
         edit_menu.AppendSeparator()
         copy_path = edit_menu.Append(wx.ID_ANY, "Kopiere Pfad")
         refresh_ctrl_lists = edit_menu.Append(wx.ID_ANY, "Aktualisieren")
+        edit_menu.AppendSeparator()
         preferences = edit_menu.Append(wx.ID_PREFERENCES, "Einstellungen")
         menu_bar.Append(edit_menu, "&Bearbeiten")
+
+        ## Creating the `Inhaltserstellung` menu
+        content_menu = wx.Menu()
+        folder_structure = content_menu.Append(wx.ID_ANY, "Erstelle e-Learning")
+        folder_content = content_menu.Append(wx.ID_ANY, "Importiere Inhalte")
+        content_menu.AppendSeparator()
+        convert_srt_in_vtt = content_menu.Append(wx.ID_ANY, "Konvertiere Untertitel")
+        export_file_list = content_menu.Append(wx.ID_ANY, "Exportiere Dateiliste")
+        menu_bar.Append(content_menu, "&Inhaltserstellung")
 
         ## Creating the `Hilfemenü` menu
         help_menu = wx.Menu()
@@ -208,22 +216,26 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_exit, exit_app)
 
         ## Binding of `Bearbeiten` methods to menu items
-        # Binding the Create e-Learning menu item to the `on_import_jira` method
-        self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
         # Binding the add date to file menu item to the `on_date_to_file` method
         self.Bind(wx.EVT_MENU, self.on_date_to_files, file_date)
-        # Bindung the Export menu item to the `on_export` method
-        self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
         # Binding the Check Completeness menu item to the `on_check_completeness` method
         self.Bind(wx.EVT_MENU, self.on_check_completeness, check_messing_files)
         # Binding the Copy menu to the `on_copy` path method
         self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
-        # Binding the Convert menu to the `on_convert` method
-        self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)
         # Binding the Refresh menu item to the on_refresh method
         self.Bind(wx.EVT_MENU, self.on_refresh, refresh_ctrl_lists)
         # Binding the Preferences menu item to the on_preferences method
         self.Bind(wx.EVT_MENU, self.on_preferences_open, preferences)
+
+        ## Binding of `Inhaltserstellung` methods to menu items
+        # Binding the Create e-Learning menu item to the `on_import_jira` method
+        self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
+        # Binding the Import Content menu item to the `on_import_files` method
+        self.Bind(wx.EVT_MENU, self.on_import_files, folder_content)
+        # Binding the Convert menu to the `on_convert` method
+        self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)
+        # Bindung the Export menu item to the `on_export` method
+        self.Bind(wx.EVT_MENU, self.on_export, export_file_list)
 
         ## Binding of `Hilfemenü` methods to menu items
         # Binding the Contact menu to the on_contact method

@@ -3,6 +3,7 @@
 ## Modules
 import wx
 import os
+import shutil
 import subprocess
 import platform
 import pandas as pd
@@ -15,6 +16,35 @@ from bs4 import BeautifulSoup
 
 number_of_items = 0
 jira_ticket = None
+
+# Method to import files
+def on_import_files(self, event):
+    wildcard = "Alle Dateien (*.*)|*.*"  # Beispiel-Wildcard
+    dialog = wx.FileDialog(self, "Bitte wählen Sie e-Learning-Dateien aus:",
+        wildcard=wildcard,
+        style=wx.FD_OPEN | wx.FD_MULTIPLE
+    )
+    if dialog.ShowModal() == wx.ID_OK:
+        g.file_list_import = dialog.GetPaths()
+    dialog.Destroy()
+    print(g.folder_path_import)
+    print(g.file_list_import)
+
+    # Copying the files to the target folder
+    for file_path in g.file_list_import:
+        try:
+            file_name = os.path.basename(file_path)
+            _, suffix = os.path.splitext(file_name)
+            file_name = f"{os.path.basename(g.folder_path_import)}{suffix}"
+            new_file_path = os.path.join(g.folder_path_import, file_name)
+            if os.path.isfile(new_file_path):
+                wx.MessageBox(f'Datei "{file_name}" existiert bereits im Ziel-Ordner.',
+                              "Error", wx.OK | wx.ICON_ERROR)
+                continue
+            shutil.copy2(file_path, new_file_path)
+        except Exception as e:
+            wx.MessageBox(f'Datei "{file_name}" konnte nicht kopiert werden: {e}',
+                          "Error", wx.OK | wx.ICON_ERROR)
 
 # Method to add date to files
 def on_date_to_files(self, event):
@@ -42,8 +72,10 @@ def on_date_to_files(self, event):
             os.rename(file_path, new_file_path)
             counter += 1
         except Exception as e:
-            wx.MessageBox(f'Datei "{name}" konnte nicht umbenannt werden: {e}', "Error", wx.OK | wx.ICON_ERROR)
-    wx.MessageBox(f"{counter} Dateien wurden erfolgreich umbenannt.", "Information", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(f'Datei "{name}" konnte nicht umbenannt werden: {e}',
+                          "Error", wx.OK | wx.ICON_ERROR)
+    wx.MessageBox(f"{counter} Dateien wurden erfolgreich umbenannt.", "Information",
+                  wx.OK | wx.ICON_INFORMATION)
 
 # Method to create the folder structur
 def on_create_folder_structure(self, event):
@@ -61,7 +93,8 @@ def on_create_folder_structure(self, event):
 # Method to handle the Browse menu item
 def on_browse_source(self, event, folder_path = None):
     if folder_path is None:
-        dialog = wx.DirDialog(None, "Wähle einen Quell-Ordner (e-Learnings) aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        dialog = wx.DirDialog(None, "Wähle einen Quell-Ordner (e-Learnings) aus:",
+                              style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
             g.folder_path = dialog.GetPath()
         dialog.Destroy()
@@ -89,7 +122,9 @@ f"""Windows Registry Editor Version 5.00\n\n\
 """)
 
                         # Importing registry file
-                        subprocess.run(["regedit", "/s", f"{g.folder_path}\\MapVirtualDrive.reg"], check = True)
+                        subprocess.run(["regedit", "/s",
+                                        f"{g.folder_path}\\MapVirtualDrive.reg"],
+                                       check = True)
                     except:
                         continue
                     self.config.Write("drive_mapping_letter", letter)
@@ -102,18 +137,23 @@ f"""Windows Registry Editor Version 5.00\n\n\
 
 # Method to handle the Browse menu item
 def on_browse_target(self, event):
-    dialog = wx.DirDialog(None, "Wähle einen Ziel-Ordner aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+    dialog = wx.DirDialog(None, "Wähle einen Ziel-Ordner aus:",
+                          style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
     if dialog.ShowModal() == wx.ID_OK:
         g.folder_path_elearning = dialog.GetPath()
 
 # Method to handle the Import tasks excel
 def on_browse_jira(self, event):
     if self.config.ReadBool("xml_import_one_file"):
-        dialog = wx.FileDialog(None, "Wähle die JIRA Tickets (aus einer Exportdatei) aus:", wildcard="XML files (*.xml)|*.xml", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
+        dialog = wx.FileDialog(None,
+                               "Wähle die JIRA Tickets (aus einer Exportdatei) aus:",
+                               wildcard="XML files (*.xml)|*.xml",
+                               style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
         if dialog.ShowModal() == wx.ID_OK:
             g.folder_path_jira = dialog.GetPaths()
     else:
-        dialog = wx.DirDialog(None, "Wähle den Ordner der JIRA Tickets aus:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        dialog = wx.DirDialog(None, "Wähle den Ordner der JIRA Tickets aus:",
+                              style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
             g.folder_path_jira = dialog.GetPath()
 
@@ -206,7 +246,8 @@ def import_xml(self, file_paths):
                     df = parse_jira_ticket(dict_task, customfields[index], counter)
                     df_list.append(df)
                 except Exception as e:
-                    wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
+                    wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!",
+                                  "Error", wx.OK | wx.ICON_ERROR)
 
             # Setting variable for status message
             number_of_items = index + 1
@@ -222,7 +263,8 @@ def import_xml(self, file_paths):
                 # Setting variable for status message
                 number_of_items = counter
             except Exception as e:
-                wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!", "Error", wx.OK | wx.ICON_ERROR)
+                wx.MessageBox(f"Ticket `{jira_ticket}` nicht importiert, bitte überprüfen!",
+                              "Error", wx.OK | wx.ICON_ERROR)
     output_df = pd.concat(df_list)
     output_df.reset_index(drop=True, inplace=True)
 
@@ -242,7 +284,7 @@ def import_xml(self, file_paths):
                 "order": order_number
             }
 
-        # Collecting root (`Zuordnung` == "ROOT")
+        # Collecting root
         g.root_folder_name = [
             name
             for name, info in item_map.items()
@@ -262,7 +304,6 @@ def import_xml(self, file_paths):
             node_dict = {}
             for child in children:
                 node_dict[child] = [get_children(child), item_map[child]["ticket"]]
-
             return node_dict
 
         # Building the overall tree
@@ -290,8 +331,10 @@ def import_xml(self, file_paths):
     create_folders(tree, g.folder_path_elearning)
 
     # Writing the tree to CSV file
-    g.folder_path = os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name))
-    g.file_path_elearning = os.path.join(g.folder_path, f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
+    g.folder_path = os.path.join(g.folder_path_elearning,
+                                 sanitize_path(g.root_folder_name))
+    g.file_path_elearning = os.path.join(g.folder_path,
+                                         f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
     with open(g.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema","Ticket","Order"\n')
         def writing_tree(node_dict, indent = 0):
@@ -303,11 +346,17 @@ def import_xml(self, file_paths):
 
     # Writing the dataframe to global variable and TXT file
     g.df_tasks = output_df
-    g.df_tasks.to_string(os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name), f"{sanitize_path(g.root_folder_name)}_Protokoll.txt"))
-    g.df_tasks.to_csv(os.path.join(g.folder_path_elearning, sanitize_path(g.root_folder_name), f"{sanitize_path(g.root_folder_name)}_organisatorische_Aufgaben.csv"), sep = ",", index = False)
+    g.df_tasks.to_string(os.path.join(g.folder_path_elearning,
+                                      sanitize_path(g.root_folder_name),
+                                      f"{sanitize_path(g.root_folder_name)}_Protokoll.txt"))
+    g.df_tasks.to_csv(os.path.join(g.folder_path_elearning,
+                                   sanitize_path(g.root_folder_name),
+                                   f"{sanitize_path(g.root_folder_name)}_organisatorische_Aufgaben.csv"),
+                      sep = ",", index = False)
 
     # Informing the user
-    wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{g.root_folder_name}` erfolgreich angelegt.", "Information", wx.OK | wx.ICON_INFORMATION)
+    wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{g.root_folder_name}` erfolgreich angelegt.",
+                  "Information", wx.OK | wx.ICON_INFORMATION)
 
 # Method to handle selected file
 def on_file_selected(self, event):
@@ -321,17 +370,20 @@ def on_file_activated(self, event):
         try:
             os.startfile(f'"{g.file_path}"')
         except Exception as e:
-            wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}",
+                          "Error", wx.OK | wx.ICON_ERROR)
     elif platform.system() == "Darwin":  # macOS
         try:
             subprocess.call(["open", g.file_path])
         except Exception as e:
-            wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}",
+                          "Error", wx.OK | wx.ICON_ERROR)
     else:  # Linux
         try:
             subprocess.call(["xdg-open", g.file_path])
         except Exception as e:
-            wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.MessageBox(f"Datei konnte nicht geöffnet werden: {e}",
+                          "Error", wx.OK | wx.ICON_ERROR)
 
 # Method to list the files in the selected folder
 def list_files(self, folder_path, filter_text = None, level = None):
@@ -354,6 +406,7 @@ def list_files(self, folder_path, filter_text = None, level = None):
                     for f in os.listdir(dir_path)
                 ]
                 g.file_list.extend(os.path.join(dir_path, f) for f in files)
+                g.folder_path_import = folder_path
 
             # Adding all subdirectories of the matching directory
             else:
@@ -373,4 +426,5 @@ def list_files(self, folder_path, filter_text = None, level = None):
                             ]
                             files.extend(sub_files)
                         g.file_list.extend(os.path.join(dir_path, f) for f in files)
+                        g.folder_path_import = dir_path
     self.file_listbox.Set(g.file_list)

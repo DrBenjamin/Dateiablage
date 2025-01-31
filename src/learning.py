@@ -10,7 +10,9 @@ from src.files import list_files
 # Method to handle the Import learning definition
 def on_import_csv(self, event, file_path = None):
     if file_path == None:
-        dialog = wx.FileDialog(self, "Importiere e-Learning Definition", wildcard="CSV files (*.csv)|*.csv|All files (*.*)|*.*", style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        dialog = wx.FileDialog(self, "Importiere e-Learning Definition",
+                               wildcard = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
+                               style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if dialog.ShowModal() == wx.ID_OK:
             file_path = dialog.GetPath()
             import_csv(self, file_path)
@@ -48,7 +50,8 @@ def import_csv(self, file_path, message = True):
             g.root_folder_name = g.root_folder_name.replace(c, "_")
         self.SetTitle(f"Dateiablage - {g.root_folder_name}")
         if message:
-            wx.MessageBox(f'{len(g.df_elearning)} Elemente aus Datei "{file_path}" erfolgreich importiert!', "Erfolg", wx.OK | wx.ICON_INFORMATION)
+            wx.MessageBox(f'{len(g.df_elearning)} Elemente aus Datei "{file_path}" erfolgreich importiert!',
+                          "Erfolg", wx.OK | wx.ICON_INFORMATION)
     except Exception as e:
         print(e)
         wx.MessageBox(f"Datei nicht importiert: {e}", "Error", wx.OK | wx.ICON_ERROR)

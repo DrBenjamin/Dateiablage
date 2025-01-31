@@ -202,6 +202,10 @@ def on_export(self, event):
 # Method to export files from multiple directories (non-recursive)
 def export_docx_multiple_dirs(self, directories):
     document = Document()
+    ignore_list = ["_Protokoll.txt",
+                    "_e-Learning_Definition.csv",
+                    "_organisatorische_Aufgaben.csv"
+]
 
     # Adding header
     header = document.add_heading('Dateiliste', level=0)
@@ -214,11 +218,9 @@ def export_docx_multiple_dirs(self, directories):
         try:
             if os.path.isdir(directory):
                 document.add_heading(f"Ordner: {os.path.basename(directory)}", level=2)
-                files = os.listdir(directory)
-                if files:
-                    document.add_paragraph("\n".join(files))
             else:
-                document.add_paragraph(os.path.basename(directory))
+                if not any(item in directory for item in ignore_list):
+                    document.add_paragraph(os.path.basename(directory))
         except Exception as e:
             document.add_paragraph(f"Fehler beim Zugriff auf {directory}: {e}")
 

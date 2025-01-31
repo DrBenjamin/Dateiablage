@@ -207,96 +207,46 @@ def export_docx_multiple_dirs(self, directories):
     # Adding header
     header = document.add_heading('Dateiliste', level=0)
     run = header.runs[0]
-   
 
-    document.add_paragraph("")  # Leerzeile
+    document.add_paragraph("")
+    document.add_heading(f"Ordner: {os.path.dirname(directories[0])}", level=1)
 
     for directory in directories:
-        # Add directory name as a heading
-        document.add_heading(f"Ordner: {directory}", level=1)
-
         try:
-            # Get list of files in the directory
-            files = os.listdir(directory)
-            if not files:
-                document.add_paragraph("Keine Dateien gefunden.")
+            # Getting list of files in the directory
+            if os.path.isdir(directory):
+                document.add_heading(f"Ordner: {os.path.basename(directory)}", level=2)
             else:
-                for file in files:
-                    if os.path.isfile(os.path.join(directory, file)):
-                        document.add_paragraph(file)
+                document.add_paragraph(os.path.basename(directory))
         except Exception as e:
             document.add_paragraph(f"Fehler beim Zugriff auf {directory}: {e}")
+        document.add_paragraph("")
 
-        document.add_paragraph("")  # Leerzeile nach jedem Ordner
-
-    # Prompt user for file save location
+    # Prompting user for file save location
     save_word_file(document)
 
-
-# Method to export files recursively from a single main directory
-def export_docx_recursive(main_directory):
-    document = Document()
-
-    # Adding header
-    header = document.add_heading('Dateiliste', level=0)
-    run = header.runs[0]
-    run.font.color.rgb = (0, 0, 255)  # Blau
-
-    document.add_paragraph("")  # Leerzeile
-
-    for root, dirs, files in os.walk(main_directory):
-        # Add current directory as a heading
-        document.add_heading(f"Ordner: {root}", level=1)
-
-        if not files:
-            document.add_paragraph("Keine Dateien gefunden.")
-        else:
-            for file in files:
-                document.add_paragraph(file)
-
-        document.add_paragraph("")  # Leerzeile nach jedem Ordner
-
-    # Prompt user for file save location
-    save_word_file(document)
-
-
-# Helper method to save the Word file
+# Method to save the Word file
 def save_word_file(document):
     with wx.FileDialog(
         None,
-        "Speicherort auswählen",
+        "Speicherort für Exportdatei auswählen",
         wildcard="Word Document (*.docx)|*.docx",
         style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
     ) as file_dialog:
         if file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # Cancelled by user
+            return  # cancelled by user
 
         save_path = file_dialog.GetPath()
 
-        # Save the document
+        # Saving the document
         document.save(save_path)
 
-        # Show success message
+        # Showing success message
         wx.MessageBox(
             f"Die Datei wurde erfolgreich exportiert nach:\n{save_path}",
             "Export erfolgreich",
             wx.OK | wx.ICON_INFORMATION,
         )
-
-# Example usage
-def on_export_multiple_dirs(event):
-    directories = [
-        "C:/Users/Benutzer/Ordner1",
-        "C:/Users/Benutzer/Ordner2",
-        "D:/Projekte/Ordner3"
-    ]
-    export_docx_multiple_dirs(directories)
-
-
-def on_export_recursive(event):
-    main_directory = "C:/Users/Benutzer/Hauptordner"
-    export_docx_recursive(main_directory)
-
 
 # Method to handle the Exit menu item
 def on_exit(self, event):

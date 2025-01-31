@@ -27,10 +27,9 @@ def on_import_files(self, event):
     if dialog.ShowModal() == wx.ID_OK:
         g.file_list_import = dialog.GetPaths()
     dialog.Destroy()
-    print(g.folder_path_import)
-    print(g.file_list_import)
 
     # Copying the files to the target folder
+    counter = 0
     for file_path in g.file_list_import:
         try:
             file_name = os.path.basename(file_path)
@@ -42,9 +41,12 @@ def on_import_files(self, event):
                               "Error", wx.OK | wx.ICON_ERROR)
                 continue
             shutil.copy2(file_path, new_file_path)
+            counter += 1
         except Exception as e:
             wx.MessageBox(f'Datei "{file_name}" konnte nicht kopiert werden: {e}',
                           "Error", wx.OK | wx.ICON_ERROR)
+    wx.MessageBox(f"{counter} Dateien wurden erfolgreich inmportiert.", "Information",
+                    wx.OK | wx.ICON_INFORMATION)
 
 # Method to add date to files
 def on_date_to_files(self, event):

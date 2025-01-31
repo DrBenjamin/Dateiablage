@@ -197,44 +197,106 @@ def on_refresh(self, event):
 
 # Method to handle the Export file list
 def on_export(self, event):
-    export_docx(self, g.file_list)
+    export_docx_multiple_dirs(self, g.file_list)
 
 # Method to export the file list to a Word document
-def export_docx(self, file_list):
+# Method to export files from multiple directories (non-recursive)
+def export_docx_multiple_dirs(self, directories):
     document = Document()
 
     # Adding header
-    heading = document.add_heading('Dateiliste', level=1)
-    heading.style.font.color.rgb = RGBColor(0, 102, 204)  # Set font color to blue
-    paragraph = document.add_paragraph()
-    paragraph.add_run(file_list)
-    document.add_page_break()
-    
-    # All the files are in the same folder, extract the folder path
-    folder_path = os.path.dirname(file_list[0]) if file_list else "Ordnerpfad unbekannt"
-    
-    # Add folder path as the first line
-    document.add_paragraph(folder_path)
-    
-    # Add each file in the list on a new line
-    for file_path in file_list:
-        file_name = os.path.basename(file_path)  # Extract only the file name
-        document.add_paragraph(file_name)
-     
-    # Save the document
-    save_dialog = wx.FileDialog(
-        None, "Speichern unter", wildcard="Word-Dokument (*.docx)|*.docx",
-        style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT
-    )
-    
-    if save_dialog.ShowModal() == wx.ID_OK:
+    header = document.add_heading('Dateiliste', level=0)
+    run = header.runs[0]
+   
+
+    document.add_paragraph("")  # Leerzeile
+
+    for directory in directories:
+        # Add directory name as a heading
+        document.add_heading(f"Ordner: {directory}", level=1)
+
         try:
-            save_path = save_dialog.GetPath()
-            document.save(save_path)
-            wx.MessageBox(f"Die Dateiliste wurde erfolgreich exportiert:\n{save_path}",
-                      "Export erfolgreich", wx.OK | wx.ICON_INFORMATION)
-        except:
-            wx.MessageBox("Der Export wurde abgebrochen.", "Abbruch", wx.OK | wx.ICON_WARNING)
+            # Get list of files in the directory
+            files = os.listdir(directory)
+            if not files:
+                document.add_paragraph("Keine Dateien gefunden.")
+            else:
+                for file in files:
+                    if os.path.isfile(os.path.join(directory, file)):
+                        document.add_paragraph(file)
+        except Exception as e:
+            document.add_paragraph(f"Fehler beim Zugriff auf {directory}: {e}")
+
+        document.add_paragraph("")  # Leerzeile nach jedem Ordner
+
+    # Prompt user for file save location
+    save_word_file(document)
+
+
+# Method to export files recursively from a single main directory
+def export_docx_recursive(main_directory):
+    document = Document()
+
+    # Adding header
+    header = document.add_heading('Dateiliste', level=0)
+    run = header.runs[0]
+    run.font.color.rgb = (0, 0, 255)  # Blau
+
+    document.add_paragraph("")  # Leerzeile
+
+    for root, dirs, files in os.walk(main_directory):
+        # Add current directory as a heading
+        document.add_heading(f"Ordner: {root}", level=1)
+
+        if not files:
+            document.add_paragraph("Keine Dateien gefunden.")
+        else:
+            for file in files:
+                document.add_paragraph(file)
+
+        document.add_paragraph("")  # Leerzeile nach jedem Ordner
+
+    # Prompt user for file save location
+    save_word_file(document)
+
+
+# Helper method to save the Word file
+def save_word_file(document):
+    with wx.FileDialog(
+        None,
+        "Speicherort auswählen",
+        wildcard="Word Document (*.docx)|*.docx",
+        style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+    ) as file_dialog:
+        if file_dialog.ShowModal() == wx.ID_CANCEL:
+            return  # Cancelled by user
+
+        save_path = file_dialog.GetPath()
+
+        # Save the document
+        document.save(save_path)
+
+        # Show success message
+        wx.MessageBox(
+            f"Die Datei wurde erfolgreich exportiert nach:\n{save_path}",
+            "Export erfolgreich",
+            wx.OK | wx.ICON_INFORMATION,
+        )
+
+# Example usage
+def on_export_multiple_dirs(event):
+    directories = [
+        "C:/Users/Benutzer/Ordner1",
+        "C:/Users/Benutzer/Ordner2",
+        "D:/Projekte/Ordner3"
+    ]
+    export_docx_multiple_dirs(directories)
+
+
+def on_export_recursive(event):
+    main_directory = "C:/Users/Benutzer/Hauptordner"
+    export_docx_recursive(main_directory)
+
 
 # Method to handle the Exit menu item
 def on_exit(self, event):

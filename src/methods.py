@@ -199,7 +199,6 @@ def on_refresh(self, event):
 def on_export(self, event):
     export_docx_multiple_dirs(self, g.file_list)
 
-# Method to export the file list to a Word document
 # Method to export files from multiple directories (non-recursive)
 def export_docx_multiple_dirs(self, directories):
     document = Document()
@@ -208,19 +207,20 @@ def export_docx_multiple_dirs(self, directories):
     header = document.add_heading('Dateiliste', level=0)
     run = header.runs[0]
 
-    document.add_paragraph("")
     document.add_heading(f"Ordner: {os.path.dirname(directories[0])}", level=1)
+    document.add_paragraph("")
 
     for directory in directories:
         try:
-            # Getting list of files in the directory
             if os.path.isdir(directory):
                 document.add_heading(f"Ordner: {os.path.basename(directory)}", level=2)
+                files = os.listdir(directory)
+                if files:
+                    document.add_paragraph("\n".join(files))
             else:
                 document.add_paragraph(os.path.basename(directory))
         except Exception as e:
             document.add_paragraph(f"Fehler beim Zugriff auf {directory}: {e}")
-        document.add_paragraph("")
 
     # Prompting user for file save location
     save_word_file(document)
@@ -230,23 +230,35 @@ def save_word_file(document):
     with wx.FileDialog(
         None,
         "Speicherort für Exportdatei auswählen",
+        defaultFile="Export_Dateiliste.docx",
         wildcard="Word Document (*.docx)|*.docx",
         style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
     ) as file_dialog:
         if file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # cancelled by user
+            return  # Benutzer hat den Speichervorgang abgebrochen
 
         save_path = file_dialog.GetPath()
-
-        # Saving the document
         document.save(save_path)
 
-        # Showing success message
         wx.MessageBox(
             f"Die Datei wurde erfolgreich exportiert nach:\n{save_path}",
             "Export erfolgreich",
             wx.OK | wx.ICON_INFORMATION,
         )
+
+        # **Datei nach dem Speichern automatisch öffnen**
+        try:
+            if os.name == "nt":  # Windows
+                os.startfile(save_path)
+            elif os.name == "posix":  # macOS/Linux
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, save_path])
+        except Exception as e:
+            wx.MessageBox(
+                f"Die Datei konnte nicht automatisch geöffnet werden:\n{e}",
+                "Fehler beim Öffnen",
+                wx.OK | wx.ICON_ERROR,
+            )
 
 # Method to handle the Exit menu item
 def on_exit(self, event):

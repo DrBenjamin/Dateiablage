@@ -151,6 +151,9 @@ class MyFrame(wx.Frame):
         help_about = help_menu.Append(wx.ID_ANY, "&Über die App")
         menu_bar.Append(help_menu, "&Hilfe")
 
+        font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        menu_bar.SetFont(font)
+
         ## Setting the menu bar
         self.SetMenuBar(menu_bar)
 
@@ -165,8 +168,7 @@ class MyFrame(wx.Frame):
         self.learning_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_REPORT
                                      |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID)
-        
-        
+
         self.tasks_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_LIST
                                      |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
@@ -182,6 +184,11 @@ class MyFrame(wx.Frame):
         learning_title.SetFont(wx.Font(wx.FontInfo(11).Bold()))
         task_title.SetFont(wx.Font(wx.FontInfo(11).Bold()))
         explorer_title.SetFont(wx.Font(wx.FontInfo(11).Bold()))
+
+        ## changing the text color to blue for the titles
+        learning_title.SetForegroundColour(wx.Colour(0, 51, 102))
+        task_title.SetForegroundColour(wx.Colour(0, 51, 102))
+        explorer_title.SetForegroundColour(wx.Colour(0, 51, 102))
 
         ## Creating a horizontal box sizer
         hbox = wx.BoxSizer(wx.HORIZONTAL)

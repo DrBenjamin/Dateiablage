@@ -337,6 +337,7 @@ def import_xml(self, file_paths):
                                  sanitize_path(g.root_folder_name))
     g.file_path_elearning = os.path.join(g.folder_path,
                                          f"{sanitize_path(g.root_folder_name)}_e-Learning_Definition.csv")
+    folders_created = 0
     with open(g.file_path_elearning, "w", encoding = "utf-8", errors = "replace") as f:
         f.write(f'"Thema","Ticket","Order"\n')
         def writing_tree(node_dict, indent = 0):
@@ -344,6 +345,9 @@ def import_xml(self, file_paths):
                 f.write(f'"{name}","{sub[1]}",{indent}\n')
                 writing_tree(sub[0], indent + 1)
         writing_tree(tree)
+        # Counting the length of the file
+        f.flush()
+        folders_created = len(open(g.file_path_elearning).readlines()) - 2
         f.close()
 
     # Writing the dataframe to global variable and TXT file
@@ -357,7 +361,7 @@ def import_xml(self, file_paths):
                       sep = ",", index = False)
 
     # Informing the user
-    wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und in `{g.root_folder_name}` erfolgreich angelegt.",
+    wx.MessageBox(f"{number_of_items} Tickets wurden erfasst und im Ordner `{g.root_folder_name}` wurden {folders_created} Unterordner erfolgreich angelegt.",
                   "Information", wx.OK | wx.ICON_INFORMATION)
 
 # Method to handle selected file

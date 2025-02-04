@@ -106,7 +106,7 @@ def on_about(self, event):
     # Adding 2nd message
     message2 = (
         "Versionsnummer:\n"
-        "0.1.0 (build 2025-01-31)\n\n"
+        "0.2.0 (build 2025-02-04)\n\n"
         "Das Unternehmen:\n"
         "CompuGroup Medical\n\n"
         "**** Beschreibung ****\n"

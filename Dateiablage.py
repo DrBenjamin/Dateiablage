@@ -157,7 +157,10 @@ class MyFrame(wx.Frame):
                         wx.FONTSTYLE_NORMAL,
                         wx.FONTWEIGHT_BOLD
                        )
-        menu_bar.SetFont(font)
+        try:
+            menu_bar.SetFont(font)
+        except Exception as e:
+            print(e)
 
         ## Setting the menu bar
         self.SetMenuBar(menu_bar)

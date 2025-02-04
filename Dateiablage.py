@@ -67,6 +67,22 @@ def on_preferences_open(self, event):
         self.on_browse_source(event)
         g.mapping = False
 
+# Method to handle the file renmaing
+def on_date_to_files_refresh(self, event):
+    # Calling the `on_date_to_files` method
+    self.on_date_to_files(event)
+
+    # Calling the `on_refresh` method
+    self.on_refresh(event)
+
+# Method to handle the import files
+def on_import_files_refresh(self, event):
+    # Calling the `on_import_files` method
+    self.on_import_files(event)
+
+    # Calling the `on_refresh` method
+    self.on_refresh(event)
+
 ## Creating the main frame
 class MyFrame(wx.Frame):
     def __init__(self, parent, title, size, config):
@@ -77,6 +93,8 @@ class MyFrame(wx.Frame):
         # Binding function as method to `self`
         self.on_import_jira = types.MethodType(on_import_jira, self)
         self.on_preferences_open = types.MethodType(on_preferences_open, self)
+        self.on_date_to_files_refresh = types.MethodType(on_date_to_files_refresh, self)
+        self.on_import_files_refresh = types.MethodType(on_import_files_refresh, self)
 
         ## Binding functions from other files as methods to `self`
         # Methods from `methods.py`
@@ -239,7 +257,7 @@ class MyFrame(wx.Frame):
 
         ## Binding of `Bearbeiten` methods to menu items
         # Binding the add date to file menu item to the `on_date_to_file` method
-        self.Bind(wx.EVT_MENU, self.on_date_to_files, file_date)
+        self.Bind(wx.EVT_MENU, self.on_date_to_files_refresh, file_date)
         # Binding the Check Completeness menu item to the `on_check_completeness` method
         self.Bind(wx.EVT_MENU, self.on_check_completeness, check_messing_files)
         # Binding the Copy menu to the `on_copy` path method
@@ -253,7 +271,7 @@ class MyFrame(wx.Frame):
         # Binding the Create e-Learning menu item to the `on_import_jira` method
         self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
         # Binding the Import Content menu item to the `on_import_files` method
-        self.Bind(wx.EVT_MENU, self.on_import_files, folder_content)
+        self.Bind(wx.EVT_MENU, self.on_import_files_refresh, folder_content)
         # Binding the Convert menu to the `on_convert` method
         self.Bind(wx.EVT_MENU, self.on_convert, convert_srt_in_vtt)
         # Bindung the Export menu item to the `on_export` method

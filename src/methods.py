@@ -6,14 +6,13 @@ import os
 import webbrowser
 import src.globals as g
 from docx import Document
-from docx.shared import RGBColor
 from src.files import list_files
 from src.tasks import on_import_tasks
 from src.learning import display_learning
 
 # Method to handle the right click event
 def on_right_click(self, event):
-    # Create the context menu
+    # Creating the context menu
     menu = wx.Menu()
     open_item = menu.Append(wx.ID_ANY, "Öffnen")
     copy_path = menu.Append(wx.ID_ANY, "Kopiere Pfad")
@@ -24,7 +23,7 @@ def on_right_click(self, event):
     self.Bind(wx.EVT_MENU, self.on_copy_path, copy_path)
     self.Bind(wx.EVT_MENU, self.on_convert, convert_item)
 
-    # Show the menu
+    # Showing the menu
     self.PopupMenu(menu, event.GetPosition())
     menu.Destroy()
 
@@ -41,7 +40,11 @@ def on_copy_path(self, event):
 def on_convert(self, event):
     try:
         if g.file_path.endswith(".srt"):
-            convert_srt_to_vtt(g.file_path, overwrite = self.config.ReadBool("srt_converter_overwrite"))
+            convert_srt_to_vtt(
+                    g.file_path,
+                    overwrite = self.config.ReadBool("srt_converter_overwrite")
+                )
+            self.on_refresh(None)
         else:
             wx.MessageBox("Dateiendung wird nicht unterstützt", "Error", wx.OK | wx.ICON_ERROR)
     except Exception as e:
@@ -68,11 +71,11 @@ def convert_srt_to_vtt(file_path, overwrite = False):
         first_line = True
         for line in f:
             if first_line:
-                first_line = False # skip the first line
+                first_line = False # skipping the first line
                 continue
-            if line.strip().isdigit():  # skip rows wth digits
+            if line.strip().isdigit():  # skipping rows wth digits
                 continue
-            if "-->" in line:  # convert time format "," into "."
+            if "-->" in line:  # converting time format "," into "."
                 line = line.replace(",", ".")
             vtt_file.write(line)
 
@@ -145,7 +148,7 @@ def on_contact(self, event):
 
 # Method to handle the Check Completeness menu item
 def on_check_completeness(self, event):
-    check_folder_completeness(self,event)
+    check_folder_completeness(self, event)
     
 # Method to check the completeness of the folder
 def check_folder_completeness(self, event):
@@ -178,7 +181,7 @@ def on_refresh(self, event):
     self.learning_ctrl.DeleteAllItems()
     self.tasks_ctrl.DeleteAllItems()
 
-    # Refresh the ctrl lists
+    # Refreshing the ctrl lists
     try:
         if g.folder_path is not None:
             list_files(self, g.folder_path)

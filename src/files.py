@@ -48,7 +48,7 @@ def on_import_files(self, event):
     wx.MessageBox(f"{counter} Dateien wurden erfolgreich inmportiert.", "Information",
                     wx.OK | wx.ICON_INFORMATION)
 
-# Method to add date to files
+# Method to add date to file names
 def on_date_to_files(self, event):
     counter = 0
     for file_path in g.file_list:

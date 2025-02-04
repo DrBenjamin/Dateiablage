@@ -22,10 +22,10 @@ def on_import_csv(self, event, file_path = None):
 
 # Method to handle the list control item selected event
 def on_elearning_item_selected(self, event):
-    item_index = event.GetIndex()
-    item_text = self.learning_ctrl.GetItemText(item_index, 0)
-    ticket = self.learning_ctrl.GetItemText(item_index, 1)
-    level = self.learning_ctrl.GetItemText(item_index, 2)
+    g.elearning_index = event.GetIndex()
+    item_text = self.learning_ctrl.GetItemText(g.elearning_index, 0)
+    ticket = self.learning_ctrl.GetItemText(g.elearning_index, 1)
+    level = self.learning_ctrl.GetItemText(g.elearning_index, 2)
     if g.ticket_chosen:
         g.ticket_chosen = False
         display_tasks(self, g.df_tasks)
@@ -75,3 +75,7 @@ def display_learning(self, df):
     self.learning_ctrl.SetColumnWidth(0, wx.LIST_AUTOSIZE)
     self.learning_ctrl.SetColumnWidth(1, 0) # hiding the ticket column
     self.learning_ctrl.SetColumnWidth(2, 0) # hiding the level column
+    
+    # Programmatically selecting the first item in the list
+    self.learning_ctrl.Select(g.elearning_index)
+    self.learning_ctrl.EnsureVisible(g.elearning_index)

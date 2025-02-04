@@ -151,7 +151,12 @@ class MyFrame(wx.Frame):
         help_about = help_menu.Append(wx.ID_ANY, "&Über die App")
         menu_bar.Append(help_menu, "&Hilfe")
 
-        font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        font = wx.Font(
+                        12,
+                        wx.FONTFAMILY_DEFAULT,
+                        wx.FONTSTYLE_NORMAL,
+                        wx.FONTWEIGHT_BOLD
+                       )
         menu_bar.SetFont(font)
 
         ## Setting the menu bar
@@ -165,9 +170,12 @@ class MyFrame(wx.Frame):
         vbox_tasks = wx.BoxSizer(wx.VERTICAL)
 
         ## Creating the list controls
-        self.learning_ctrl = wx.ListCtrl(panel,
-                                     style=wx.LC_REPORT
-                                     |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID)
+        self.learning_ctrl = wx.ListCtrl(
+                                            panel,
+                                            style=wx.LC_REPORT
+                                            |wx.BORDER_SUNKEN
+                                            |wx.LIST_ALIGN_SNAP_TO_GRID
+                                        )
 
         self.tasks_ctrl = wx.ListCtrl(panel,
                                      style=wx.LC_LIST
@@ -176,9 +184,13 @@ class MyFrame(wx.Frame):
         self.file_listbox = wx.ListBox(panel)
 
         ## Adding titles for the controls
-        learning_title = wx.StaticText(panel, label = "e-Learning", style=wx.ALIGN_LEFT)
-        task_title = wx.StaticText(panel, label = "Aufgaben", style=wx.ALIGN_RIGHT)
-        explorer_title = wx.StaticText(panel, label = "Dateien und Ordner", style=wx.ALIGN_LEFT)
+        learning_title = wx.StaticText(panel, label = "e-Learning",
+                                       style = wx.ALIGN_LEFT)
+        task_title = wx.StaticText(panel, label = "Aufgaben",
+                                   style = wx.ALIGN_RIGHT)
+        explorer_title = wx.StaticText(panel,
+                                       label = "Dateien und Ordner",
+                                       style = wx.ALIGN_LEFT)
 
         ## Setting font style
         learning_title.SetFont(wx.Font(wx.FontInfo(11).Bold()))
@@ -295,7 +307,9 @@ class MyApp(wx.App):
             self.config.Write("drive_mapping_letter", "")
 
         ## Creating the frame
-        frame = MyFrame(None, title="Dateiablage", size=(1024, 768), config=self.config)
+        frame = MyFrame(None, title = "Dateiablage",
+                        size = (1024, 768),
+                        config = self.config)
 
         ## Setting icon
         frame.Show(True)

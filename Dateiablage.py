@@ -36,6 +36,7 @@ from src.files import (
     on_file_selected,
     on_file_activated
 )
+from src.creator import on_new_elearning
 from src.preferences import on_preferences
 
 # Method to handle the Create e-Learning
@@ -128,6 +129,9 @@ class MyFrame(wx.Frame):
         self.on_file_selected = types.MethodType(on_file_selected, self)
         self.on_file_activated = types.MethodType(on_file_activated, self)
 
+        # Methods from `creator.py`
+        self.on_new_elearning = types.MethodType(on_new_elearning, self)
+
         # Method from `preferences.py`
         self.on_preferences = types.MethodType(on_preferences, self)
 
@@ -156,7 +160,8 @@ class MyFrame(wx.Frame):
 
         ## Creating the `Inhaltserstellung` menu
         content_menu = wx.Menu()
-        folder_structure = content_menu.Append(wx.ID_ANY, "Erstelle e-Learning")
+        folder_structure = content_menu.Append(wx.ID_ANY, "Erstelle e-Learning aus JIRA")
+        new_elearning = content_menu.Append(wx.ID_ANY, "Erstelle neues e-Learning")
         folder_content = content_menu.Append(wx.ID_ANY, "Importiere Inhalte")
         content_menu.AppendSeparator()
         convert_srt_in_vtt = content_menu.Append(wx.ID_ANY, "Konvertiere Untertitel")
@@ -270,6 +275,8 @@ class MyFrame(wx.Frame):
         ## Binding of `Inhaltserstellung` methods to menu items
         # Binding the Create e-Learning menu item to the `on_import_jira` method
         self.Bind(wx.EVT_MENU, self.on_import_jira, folder_structure)
+        # Binding the Create new e-Learning menu item to the `on_new_elearning` method
+        self.Bind(wx.EVT_MENU, self.on_new_elearning, new_elearning)
         # Binding the Import Content menu item to the `on_import_files` method
         self.Bind(wx.EVT_MENU, self.on_import_files_refresh, folder_content)
         # Binding the Convert menu to the `on_convert` method

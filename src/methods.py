@@ -3,6 +3,8 @@
 ## Modules
 import wx
 import os
+import sys
+import subprocess
 import webbrowser
 import src.globals as g
 from docx import Document

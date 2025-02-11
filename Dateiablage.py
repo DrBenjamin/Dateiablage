@@ -2,7 +2,6 @@
 ## `Dateiablage.py`
 ## Modules
 import wx # wxPython / Phoenix
-import os
 import types
 import src.globals as g
 from src.methods import (

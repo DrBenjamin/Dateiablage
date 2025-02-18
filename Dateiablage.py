@@ -158,27 +158,29 @@ class MyFrame(wx.Frame):
         self.SetMenuBar(menu_bar)
 
         ## Creating a panel
-        panel = wx.Panel(self)
+        self.panel = wx.Panel(self)
+        self.panel.Bind(wx.EVT_PAINT, self.on_paint)
+        #panel.SetBackgroundColour(wx.Colour(191, 239, 255))  # Hell Baby Blue
 
         ## Creating a vertical box sizer
         vbox_learning = wx.BoxSizer(wx.VERTICAL)
         vbox_tasks = wx.BoxSizer(wx.VERTICAL)
 
         ## Creating the list controls
-        self.learning_ctrl = wx.ListCtrl(panel,
+        self.learning_ctrl = wx.ListCtrl(self.panel,
                                      style=wx.LC_REPORT
                                      |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID)
 
-        self.tasks_ctrl = wx.ListCtrl(panel,
+        self.tasks_ctrl = wx.ListCtrl(self.panel,
                                      style=wx.LC_LIST
                                      |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
                                      )
-        self.file_listbox = wx.ListBox(panel)
+        self.file_listbox = wx.ListBox(self.panel)
 
         ## Adding titles for the controls
-        learning_title = wx.StaticText(panel, label = "e-Learning", style=wx.ALIGN_LEFT)
-        task_title = wx.StaticText(panel, label = "Aufgaben", style=wx.ALIGN_RIGHT)
-        explorer_title = wx.StaticText(panel, label = "Dateien und Ordner", style=wx.ALIGN_LEFT)
+        learning_title = wx.StaticText(self.panel, label = "e-Learning", style=wx.ALIGN_LEFT)
+        task_title = wx.StaticText(self.panel, label = "Aufgaben", style=wx.ALIGN_RIGHT)
+        explorer_title = wx.StaticText(self.panel, label = "Dateien und Ordner", style=wx.ALIGN_LEFT)
 
         ## Setting font style
         learning_title.SetFont(wx.Font(wx.FontInfo(11).Bold()))
@@ -210,7 +212,7 @@ class MyFrame(wx.Frame):
         vbox.Add(self.file_listbox, 1, wx.ALL | wx.EXPAND, 5)
 
         ## Setting the sizer for the frame and fit the panel
-        panel.SetSizer(vbox)
+        self.panel.SetSizer(vbox)
 
         ## Binding of `Datei` methods to menu items
         # Binding the Import CSV menu item to the `on_import_csv`` method
@@ -264,6 +266,15 @@ class MyFrame(wx.Frame):
         self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_selected)
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
+
+    def on_paint(self, event):
+        dc = wx.PaintDC(self.panel)
+        bitmap = wx.Bitmap(r"C:\Users\190600032024\OneDrive - CGM\Dokumente\Dateiablage\_internal\images\Hintergrund.png")
+        panel_size = self.panel.GetSize()
+        image = bitmap.ConvertToImage()
+        image = image.Scale(panel_size.width, panel_size.height, wx.IMAGE_QUALITY_HIGH)
+        scaled_bitmap = wx.Bitmap(image)
+        dc.DrawBitmap(scaled_bitmap, 0, 0, True)
 
 ## Creating the wx App
 class MyApp(wx.App):

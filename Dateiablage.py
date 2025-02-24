@@ -188,8 +188,8 @@ class MyFrame(wx.Frame):
 
         ## Creating a panel
         self.panel = wx.Panel(self)
-        #self.panel.Bind(wx.EVT_PAINT, self.on_paint)
-        self.panel.SetBackgroundColour(wx.Colour(224, 242, 255))
+        self.panel.Bind(wx.EVT_PAINT, self.on_paint)
+        #self.panel.SetBackgroundColour(wx.Colour(224, 242, 255))
 
         ## Creating a vertical box sizer
         vbox_learning = wx.BoxSizer(wx.VERTICAL)
@@ -311,7 +311,7 @@ class MyFrame(wx.Frame):
     # Method to handle the paint event
     def on_paint(self, event):
         dc = wx.PaintDC(self.panel)
-        bitmap = wx.Bitmap(r"./_internal/images/logo.png")
+        bitmap = wx.Bitmap(r"./_internal/images/Hintergrund.png")
         panel_size = self.panel.GetSize()
         image = bitmap.ConvertToImage()
         image = image.Scale(panel_size.width, panel_size.height, wx.IMAGE_QUALITY_HIGH)

@@ -37,10 +37,14 @@ system.
 
 ### Windows
 
-To remove virtual drives manually, run the following command:
+To remove virtual drives manually, run the `subst` command:
 
 ```bash
-subst /d <drive letter>
+# Adding folger example 
+subst D: "C:\Users\dateiablage\Documents\GitHub\Dateiablage"
+
+# Removing drive letter D:
+subst /d D:
 ```
 
 ### MacOS

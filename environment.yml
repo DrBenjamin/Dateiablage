@@ -1,0 +1,7 @@
+name: dateiablage
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+    - wxPython
+    - -r requirements.txt

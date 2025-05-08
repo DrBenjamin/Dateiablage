@@ -1,0 +1,8 @@
+pyinstaller
+pandas
+xlsxwriter
+openpyxl
+xlrd
+python-docx
+bs4
+jinja2

@@ -32,7 +32,7 @@ python -m PyInstaller Dateiablage.spec
 
 ## OS specific notes
 
-All executables are built with PyInstaller and sneed to be build on the target 
+All executables are built with PyInstaller and need to be build on the target
 system.
 
 ### Windows
@@ -49,9 +49,9 @@ subst /d D:
 
 ### MacOS
 
-To run the executable, you need to allow it after the first start in the Privacy 
+To run the executable, you need to allow it after the first start in the Privacy
 settings.
 
 ### Linux
 
-Add the icon manaually to the executable.
+Add the icon manually to the executable.

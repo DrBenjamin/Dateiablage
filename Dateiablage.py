@@ -190,7 +190,6 @@ class MyFrame(wx.Frame):
 
         ## Creating a panel
         self.panel = wx.Panel(self)
-        self.panel.Bind(wx.EVT_PAINT, self.on_paint)
 
         ## Creating a vertical box sizer
         vbox_learning = wx.BoxSizer(wx.VERTICAL)
@@ -308,25 +307,6 @@ class MyFrame(wx.Frame):
         self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_selected)
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
-        
-        ## In MyFrame.__init__ after creating self.panel
-        self.Bind(wx.EVT_SIZE, self.on_size)
-
-    # Method to handle the size event
-    def on_size(self, event):
-        # Refreshing the panel to trigger on_paint
-        self.panel.Refresh()
-        event.Skip()
-
-    # Method to handle the paint event
-    def on_paint(self, event):
-        dc = wx.PaintDC(self.panel)
-        bitmap = wx.Bitmap(r"./_internal/images/Hintergrund.png")
-        panel_size = self.panel.GetSize()
-        image = bitmap.ConvertToImage()
-        image = image.Scale(panel_size.width, panel_size.height, wx.IMAGE_QUALITY_HIGH)
-        scaled_bitmap = wx.Bitmap(image)
-        dc.DrawBitmap(scaled_bitmap, 0, 0, True)
 
 ## Creating the wx App
 class MyApp(wx.App):

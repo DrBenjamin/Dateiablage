@@ -13,6 +13,8 @@ from minio import Minio
 from minio.error import S3Error
 from io import BytesIO
 from urllib.parse import urlparse
+import logging
+import os
 
 # Method to establish MiniO session
 def connect_to_minio(endpoint_url, access_key, secret_key, secure):
@@ -62,6 +64,17 @@ def list_objects(minio_client, bucket_name):
             f"Fehler beim auflisten der MinIO-Dateien: {e}", "Fehler", wx.OK | wx.ICON_ERROR)
     return
 
+# Method to upload file
+def on_upload_file(self, event):
+    wildcard = "Alle Dateien (*.*)|*.*" 
+    dialog = wx.FileDialog(self, "Bitte wählen Sie eine Datei aus:",
+        wildcard=wildcard,
+        style=wx.FD_OPEN | wx.FD_MULTIPLE
+    )
+    if dialog.ShowModal() == wx.ID_OK:
+        g.file_list_import = dialog.GetPaths()
+    dialog.Destroy()
+
 # Method to upload files to MinIO bucket
 def upload_files(minio_client, bucket_name, files):
     bucket_name = bucket_name.lower().replace(' ', '-')
@@ -85,7 +98,7 @@ def refresh_learning_ctrl_with_minio(self):
             st.secrets["MinIO"]["endpoint"],
             st.secrets["MinIO"]["access_key"],
             st.secrets["MinIO"]["secret_key"],
-            st.secrets["MinIO"]["secure"] == "true"
+            st.secrets["MinIO"]["secure"].lower() == "true"
         )
         files = list_objects(minio_client, st.secrets["MinIO"]["bucket"])
         if files is None:
@@ -129,3 +142,57 @@ def on_elearning_item_activated(self, event):
     item_text = self.learning_ctrl.GetItemText(item_index, 0)
     display_tasks(self, g.df_tasks)
     g.ticket_chosen = True
+
+# Method to upload file(s) to MinIO via wx dialog
+def on_upload_file_to_minio(self, event):
+    """
+    Handling file selection and uploading to MinIO bucket.
+    """
+    wildcard = "Alle Dateien (*.*)|*.*"
+    dialog = wx.FileDialog(
+        self,
+        "Bitte wählen Sie eine oder mehrere Dateien zum Hochladen aus:",
+        wildcard=wildcard,
+        style=wx.FD_OPEN | wx.FD_MULTIPLE
+    )
+    if dialog.ShowModal() == wx.ID_OK:
+        file_paths = dialog.GetPaths()
+        try:
+            # Connecting to MinIO
+            minio_client = connect_to_minio(
+                st.secrets["MinIO"]["endpoint"],
+                st.secrets["MinIO"]["access_key"],
+                st.secrets["MinIO"]["secret_key"],
+                st.secrets["MinIO"]["secure"].lower() == "true"
+            )
+            bucket_name = st.secrets["MinIO"]["bucket"]
+
+            # Creating bucket if it does not exist
+            if not minio_client.bucket_exists(bucket_name):
+                minio_client.make_bucket(bucket_name)
+
+            # Uploading each file
+            for file_path in file_paths:
+                file_name = os.path.basename(file_path)
+                with open(file_path, "rb") as f:
+                    file_data = f.read()
+                    minio_client.put_object(
+                        bucket_name,
+                        file_name,
+                        BytesIO(file_data),
+                        len(file_data)
+                    )
+            wx.MessageBox(
+                f"{len(file_paths)} Datei(en) erfolgreich hochgeladen.",
+                "Upload abgeschlossen",
+                wx.OK | wx.ICON_INFORMATION
+            )
+            # Refreshing the learning control to show new files
+            self.refresh_learning_ctrl_with_minio()
+        except Exception as e:
+            wx.MessageBox(
+                f"Fehler beim Hochladen zu MinIO: {e}",
+                "Fehler",
+                wx.OK | wx.ICON_ERROR
+            )
+    dialog.Destroy()

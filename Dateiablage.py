@@ -26,7 +26,8 @@ from src.methods import (
 from src.learning import (
     on_elearning_item_selected,
     on_elearning_item_activated,
-    refresh_learning_ctrl_with_minio  # Adding import for refresh method
+    refresh_learning_ctrl_with_minio,
+    on_upload_file_to_minio  # Adding import for upload handler
 )
 from src.tasks import (
     on_import_tasks_from_csv,
@@ -120,6 +121,7 @@ class MyFrame(wx.Frame):
         self.on_elearning_item_selected = types.MethodType(on_elearning_item_selected, self)
         self.on_elearning_item_activated = types.MethodType(on_elearning_item_activated, self)
         self.refresh_learning_ctrl_with_minio = types.MethodType(refresh_learning_ctrl_with_minio, self)
+        self.on_upload_file_to_minio = types.MethodType(on_upload_file_to_minio, self)  # Binding upload method
 
         # Methods from `tasks.py`
         self.on_import_tasks_from_csv = types.MethodType(on_import_tasks_from_csv, self)
@@ -147,7 +149,7 @@ class MyFrame(wx.Frame):
 
         ## Creating the `Datei` menu
         file_menu = wx.Menu()
-        import_definition = file_menu.Append(wx.ID_ANY, "&Wähle e-Learning Definition")
+        upload_file_minio = file_menu.Append(wx.ID_ANY, "Datei hochladen")
         import_tasks = file_menu.Append(wx.ID_ANY, "&Wähle organisatorische Aufgaben")
         browse_item = file_menu.Append(wx.ID_ANY, "&Wähle Quellverzeichnis")
         file_menu.AppendSeparator()
@@ -283,6 +285,8 @@ class MyFrame(wx.Frame):
         ## Binding of `Datei` methods to menu items
         # Binding the Import tasks menu item to the `on_import_task` method
         self.Bind(wx.EVT_MENU, self.on_import_tasks_from_csv, import_tasks)
+        # Binding the MinIO upload menu item to the upload handler
+        self.Bind(wx.EVT_MENU, self.on_upload_file_to_minio, upload_file_minio)
         # Binding the Browse menu item to the `on_browse_source` method
         self.Bind(wx.EVT_MENU, self.on_browse_source, browse_item)
         # Binding the Exit menu item to the on_exit method

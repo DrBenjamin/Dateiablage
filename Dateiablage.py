@@ -5,6 +5,12 @@
 ## Modules
 import wx # wxPython / Phoenix
 import types
+try:
+    import wx.html2
+    HAS_WEBVIEW = True
+except (ImportError, AttributeError):
+    HAS_WEBVIEW = False
+
 import src.globals as g
 from src.methods import (
     on_right_click,
@@ -197,17 +203,35 @@ class MyFrame(wx.Frame):
 
         ## Creating the list controls
         self.learning_ctrl = wx.ListCtrl(
-                                            self.panel,
-                                            style=wx.LC_REPORT
-                                            |wx.BORDER_SUNKEN
-                                            |wx.LIST_ALIGN_SNAP_TO_GRID
-                                        )
+            self.panel,
+            style=wx.LC_REPORT
+            | wx.BORDER_SUNKEN
+            | wx.LIST_ALIGN_SNAP_TO_GRID
+        )
 
-        self.tasks_ctrl = wx.ListCtrl(
-                                        self.panel,
-                                        style=wx.LC_LIST
-                                        |wx.BORDER_SUNKEN|wx.LIST_ALIGN_SNAP_TO_GRID
-                                     )
+        # Creating the tasks_ctrl depending on WebView availability
+        if HAS_WEBVIEW:
+            # Creating wx.html2.WebView for supported platforms
+            self.tasks_ctrl = wx.html2.WebView.New(self.panel)
+            self.tasks_ctrl.LoadURL("http://212.227.102.172:8502/?embed=true")
+
+            # Adding event handler to scroll to bottom after page load
+            self.tasks_ctrl.Bind(
+                wx.html2.EVT_WEBVIEW_LOADED,
+                self.on_tasks_webview_loaded
+            )
+        else:
+            # Creating a wx.ListCtrl if WebView is not available
+            self.tasks_ctrl = wx.ListCtrl(
+                self.panel,
+                style=wx.LC_REPORT
+                | wx.BORDER_SUNKEN
+                | wx.LIST_ALIGN_SNAP_TO_GRID
+            )
+            # Adding a column and a message for unsupported platform
+            self.tasks_ctrl.InsertColumn(0, "Hinweis")
+            self.tasks_ctrl.InsertItem(0, "WebView nicht verfügbar. Aufgabenanzeige deaktiviert.")
+
         self.file_listbox = wx.ListBox(self.panel)
 
         ## Adding titles for the controls
@@ -307,6 +331,19 @@ class MyFrame(wx.Frame):
         self.file_listbox.Bind(wx.EVT_LISTBOX, self.on_file_selected)
         # Binding the list control to the on_file_activated method
         self.file_listbox.Bind(wx.EVT_LISTBOX_DCLICK, self.on_file_activated)
+
+    # Adding the on_tasks_webview_loaded method as a class method
+    def on_tasks_webview_loaded(self, event):
+        """
+        Scrolling the WebView to the bottom after content is loaded.
+        """
+        js_scroll_bottom = """
+            window.scrollTo(0, document.body.scrollHeight);
+            if (document.scrollingElement) {
+                document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
+            }
+        """
+        self.tasks_ctrl.RunScript(js_scroll_bottom)
 
 ## Creating the wx App
 class MyApp(wx.App):

@@ -6,3 +6,5 @@ xlrd
 python-docx
 bs4
 jinja2
+minio
+streamlit

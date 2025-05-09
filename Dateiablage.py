@@ -24,9 +24,9 @@ from src.methods import (
     on_check_completeness
 )
 from src.learning import (
-    on_import_csv,
     on_elearning_item_selected,
-    on_elearning_item_activated
+    on_elearning_item_activated,
+    refresh_learning_ctrl_with_minio  # Adding import for refresh method
 )
 from src.tasks import (
     on_import_tasks_from_csv,
@@ -117,9 +117,9 @@ class MyFrame(wx.Frame):
         self.on_exit = types.MethodType(on_exit, self)
 
         # Methods from `learning.py`
-        self.on_import_csv = types.MethodType(on_import_csv, self)
         self.on_elearning_item_selected = types.MethodType(on_elearning_item_selected, self)
         self.on_elearning_item_activated = types.MethodType(on_elearning_item_activated, self)
+        self.refresh_learning_ctrl_with_minio = types.MethodType(refresh_learning_ctrl_with_minio, self)
 
         # Methods from `tasks.py`
         self.on_import_tasks_from_csv = types.MethodType(on_import_tasks_from_csv, self)
@@ -277,9 +277,10 @@ class MyFrame(wx.Frame):
         ## Setting the sizer for the frame and fit the panel
         self.panel.SetSizer(vbox)
 
+        # Refreshing and displaying the learning_ctrl list at startup
+        self.refresh_learning_ctrl_with_minio()
+
         ## Binding of `Datei` methods to menu items
-        # Binding the Import CSV menu item to the `on_import_csv`` method
-        self.Bind(wx.EVT_MENU, self.on_import_csv, import_definition)
         # Binding the Import tasks menu item to the `on_import_task` method
         self.Bind(wx.EVT_MENU, self.on_import_tasks_from_csv, import_tasks)
         # Binding the Browse menu item to the `on_browse_source` method
